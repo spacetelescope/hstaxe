@@ -1,0 +1,12 @@
+grism,s,a,"",,,"Name of grism image"
+config,s,a,"",,,"Configuration filename for instrument"
+mfwhm,r,a,,,,"Extraction width multiplicative factor"
+back,b,h,no,,,"Generate a BAF instead of an OAF file?"
+orient,b,h,yes,,,"Use tilted extraction?"
+slitless_geom,b,h,yes,,,"Use geometry optimized for slitless data?"
+exclude,b,h,no,,,"Remove faint objects from the results?"
+lambda_mark,r,h,800.0,,,"Wavelength  to apply MMAG_EXTRACT and MMAG_MARK?"
+dmag,r,h,,,,"Dmag adjustement for MMAG_EXTRACT and MMAG_MARK?"
+out_af,s,h,"",,,"Output APER filename (non-default)"
+in_gol,s,h,"",,,"Input catalog name (non-default)"
+mode,s,h,"al",,,

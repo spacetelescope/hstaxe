@@ -1,0 +1,9 @@
+inlist,s,a,"",,,"List with input images"
+configs,s,a,"",,,"Configuration filenames for CCD's"
+backgr,b,h,yes,,,"Subtract background image?"
+backims,s,h,"",,,"Background image(s)"
+backped,s,h,"",,,"Background podest mage"
+mfwhm,r,h,2.0,,,"Multiplicative factor for mask image"
+norm,b,h,yes,,,"Normalize image by exposure time?"
+gaincorr,b,h,no,,,"Apply gain correction?"
+mode,s,h,"al",,,

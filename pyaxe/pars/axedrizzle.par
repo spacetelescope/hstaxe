@@ -1,0 +1,32 @@
+inlist,s,a,"",,,"Name of image list"
+configs,s,a,"",,,"Configuration filenames for the CCD's"
+infwhm,r,a,,,,"Multiplicative factor in DPP's"
+outfwhm,r,a,,,,"List of multiplicative factors for drizzled data"
+back,b,h,no,,,"Drizzling a background image?"
+driz_separate,b,h,no,,,"Drizzling to separate image and CCR reject?"
+clean,b,h,yes,,,"Remove temporary files?
+
+MEDIAN IMAGE parameters:"
+combine_type,s,h,median,"median|sum|minmed|minimum",,"Type of combine operation?"
+combine_maskpt,r,h,0.7,,,"Percentage of weight image below which is is flagged as bad?"
+combine_nsigmas,s,h,"4.0 3.0",,,"Significance for accepting minimum instead of median (for minmed)?"
+combine_nlow,i,h,0,,,"Number of low pixels to reject?"
+combine_nhigh,i,h,0,,,"Number of high pixels to reject?"
+combine_lthresh,r,h,INDEF,,,"Lower threshold for clipping input pixel values?"
+combine_hthresh,r,h,INDEF,,,"Upper threshold for clipping input pixel values?"
+combine_grow,r,h,1.0,,,"Radius (pixels) for neighbor rejection?
+
+BLOT BACK parameters:"
+blot_interp,s,h,poly5,"nearest|linear|poly3|poly5|sinc",,"Interpolant (nearest,linear,poly3,poly5,sinc)?"
+blot_sinscl,r,h,1.0,,,"Scale for sinc interpolation kernel?
+
+REMOVE COSMIC RAYS parameters:"
+driz_cr_snr,s,h,"5.0 4.0",,,"Driz_cr.SNR parameter?"
+driz_cr_grow,r,h,1,,,"Driz_cr_grow parameter""
+driz_cr_scale,s,h,"1.2 0.7",,,"Driz_cr.scale parameter
+
+SPECTRAL EXTRACTION parameters:"
+makespc,b,h,yes,,,"Making the final SPC and STP?"
+adj_sens,b,h,no,,,"Using size-adjusted sensitivity curve?"
+opt_extr,b,h,no,,,"Using optimal extraction?"
+mode,s,h,"al",,,
