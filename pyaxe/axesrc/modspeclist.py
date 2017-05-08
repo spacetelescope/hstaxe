@@ -6,7 +6,7 @@ import sys
 import math
 from astropy.io import fits
 from stwcs.wcsutil import HSTWCS
-from axe import axe_asciidata
+from .. import axe_asciidata
 from ..axeerror import aXeSIMError
 
 

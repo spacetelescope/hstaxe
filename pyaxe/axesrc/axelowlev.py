@@ -4,8 +4,9 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import subprocess
 
-from .axeerror import aXeError
-from . import axeutils
+from ..config import __AXE_BINDIR as AXE_BINDIR
+from ..axeerror import aXeError
+from .. import axeutils
 
 # define the good return
 # value for the binaries
@@ -16,7 +17,6 @@ class TaskWrapper(object):
     """General class to execute C-tasks"""
     def __init__(self, taskname="", tshort=""):
         """
-
         Parameters
         ----------
         taskname: str
@@ -37,7 +37,7 @@ class TaskWrapper(object):
         self.stderr = axeutils.getOUTPUT(tshort+'.stderr')
 
         # put the command into the list
-        self.command_list.append(axeutils.getBINDIR(taskname))
+        self.command_list.append("/".join([AXE_BINDIR, taskname]))
 
     def _cleanup(self):
         """The method deletes the files created for stdout and stderr.

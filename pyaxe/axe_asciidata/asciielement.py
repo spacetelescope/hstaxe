@@ -1,20 +1,9 @@
-"""
-Table element classes for input
 
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-@since: 2005/09/13
-
-$LastChangedBy: mkuemmel $
-$LastChangedDate: 2008-07-03 10:27:47 +0200 (Thu, 03 Jul 2008) $
-$HeadURL: http://astropy.scipy.org/svn/astrolib/trunk/asciidata/Lib/asciielement.py $
-"""
-__version__ = "Version 1.0 $LastChangedRevision: 503 $"
-
-import string, sys, os, types
-from asciierror import *
+import string
+import sys
+import os
+import types
+from .asciierror import *
 
 class Element(object):
     """
@@ -46,7 +35,7 @@ class Element(object):
     def get_type(self):
         """
         Returns the element type.
-        
+
         @return: the element type
         @rtype: <types> name
         """
@@ -70,7 +59,7 @@ class Element(object):
             return types.FloatType
         # the default is string
         else:
-            return types.StringType        
+            return types.StringType
 
     def _isint(self, item):
         """
@@ -121,7 +110,7 @@ class ValElement(Element):
         if isinstance(item, type("a")):
             # if yes, initialize it in the super class
             super(ValElement, self).__init__(item)
-            
+
             # get the typed value
             self._tvalue = self._get_tvalue(item, self.get_type())
         else:
@@ -153,7 +142,7 @@ class ValElement(Element):
     def _get_tvalue(self, item, type):
         """
         Transforms and returns the typed value.
-        
+
         For a string element with a type different from
         string, the string is transformed into this type
         (e.g. "  1", int ----> 1).
@@ -161,7 +150,7 @@ class ValElement(Element):
         @param item: the element to transform
         @type item: string
         @param type: the type to transform into
-        @type type: <types> name        
+        @type type: <types> name
 
         @return: the typed element value
         @rtype: string/integer/float
@@ -191,7 +180,7 @@ class ForElement(ValElement):
 
         # check whether it is a string
         if isinstance(item, type("a")):
-            
+
             # get the format
             self._fvalue = self._get_fvalue(self.get_type())
         else:
@@ -214,9 +203,9 @@ class ForElement(ValElement):
         The proper format for the element is derived from
         it string representation. This string representation
         originates directly from the input data.
-        
+
         @param type: the type to transform into
-        @type type: <types> name        
+        @type type: <types> name
 
         @return: the format string
         @rtype: [string]
@@ -264,11 +253,11 @@ class ForElement(ValElement):
                 if string.find(svalue, '.') < 0:
                     # correct for missing dot
                     accuracy += 1
-                
+
                 # just for security:
                 if accuracy < 0:
                     accuracy = 0
-                    
+
                 # compute the total length
                 tlength = accuracy+6
 
@@ -282,7 +271,7 @@ class ForElement(ValElement):
                 # find the position of the '.' and the total length
                 dpos = string.find(svalue, '.')
                 tlength = len(svalue)
-                
+
                 # compute the accuracy, to say the number
                 # of digits after '.'
                 accuracy = tlength-dpos-1
@@ -294,7 +283,7 @@ class ForElement(ValElement):
                 # return the format
                 return ['% '+str(tlength)+'.'+str(accuracy)+'f', \
                         '%'+str(tlength+1)+'s']
-                       
+
         else:
             # default format for strings
             flength = str(len(self._item))
@@ -303,9 +292,9 @@ class ForElement(ValElement):
     def _get_fdefaults(self, type):
         """
         Determines and returns the default format
-        
+
         @param type: the type to find the format for
-        @type type: <types> name        
+        @type type: <types> name
 
         @return: the list of format strings
         @rtype: [string]
@@ -352,7 +341,7 @@ class TypeTransformator(object):
         The method analyzes whether a new type can be
         transformed into the original type. An integer
         is returned which gives the result.
-        
+
         @param orig_type: the element to be analyzed
         @type orig_type: <types>-name
         @param new_type: the element to be analyzed
@@ -378,7 +367,7 @@ class TypeTransformator(object):
 
         # check whether the original type is integer
         elif orig_type == types.IntType:
-            # NOTHING can be transformed to an integer 
+            # NOTHING can be transformed to an integer
             istransf = 0
 
         else:
@@ -393,7 +382,7 @@ class TypeTransformator(object):
         Only a limited number of types are admited. The method
         checks whether a certain type is valid or not.
         An exception is thrown for invalid types.
-        
+
         @param in_type: the element to be checked
         @type in_type: <types>-name
         """
@@ -423,7 +412,7 @@ class TypeTransformator(object):
                 rvalue = str(tvalue)
             except:
                 raise TypeTransError('Element: "' + str(tvalue) + '" can not be transformed to ' + str(types.StringType) + '!')
-            
+
         # check if higher type is float
         elif self.higher_type == types.FloatType:
             # transform to float
@@ -445,4 +434,3 @@ class TypeTransformator(object):
             raise ColTypeError('Column type: "'+str(in_type)+'" is not a valid column type!')
 
         return rvalue
-

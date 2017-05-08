@@ -4,10 +4,10 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import numpy as np
 from astropy.io import fits
-from . import axeutils
+from .. import axeutils
 from . import configfile
 from ..axeerror import aXeError
-from axe import axe_asciidata
+from .. import axe_asciidata
 
 
 class MEFExtractor(object):

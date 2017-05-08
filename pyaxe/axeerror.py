@@ -1,8 +1,6 @@
 from __future__ import (absolute_import, unicode_literals, division,
                         print_function)
 
-import Exception
-
 
 class aXeError(Exception):
     """Error class for aXe
@@ -11,13 +9,14 @@ class aXeError(Exception):
     All errors specific to 'axe' are thrown using this class to be able
     to distinguish them from different errors.
     """
-    def __init__(self, message):
+    def __init__(self, message, *args, **kwargs):
         """
-        Initializer for the class
-
-        @param message: message associated to the exception
-        @type message: string
+        Parameters
+        ----------
+        message: str
+            message associated to the exception
         """
+        super(aXeError, self).__init__(self, message, *args, **kwargs)
         self.message = message
 
     def __str__(self):

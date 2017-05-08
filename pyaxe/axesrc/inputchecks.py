@@ -4,7 +4,7 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import math
 from astropy.io import fits
-from . import axeutils
+from .. import axeutils
 from . import configfile
 from . import axeiol
 from ..axeerror import aXeError, aXeSIMError
@@ -16,7 +16,7 @@ class InputChecker(object):
         # store the parameters
         self.taskname = taskname
 
-        # check whether an IIL exists
+        # check whether an input image list exists
         if inlist is not None:
             # make sure the Input Image List does exist
             if not os.path.isfile(inlist):

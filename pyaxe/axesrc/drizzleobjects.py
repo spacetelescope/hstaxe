@@ -5,11 +5,12 @@ import re
 import math
 import numpy
 import shutil
-from . import axeutils
-from . import dither
+from .. import axeutils
+from drizzlepac import astrodrizzle
 from ..axeerror import aXeError
 from . import configfile
-from axe import axe_asciidata
+from .. import axe_asciidata
+from astropy.io import fits
 
 
 class DrizzleParams(dict):
@@ -188,7 +189,7 @@ class DrizzleObjectList(object):
         if not os.path.isdir(drztmp_dir):
             # complain and out if not
             err_msg = ("The specified path: {0:s} doens't exist or isn't a "
-                       "directory!".format(drizzle_dir))
+                       "directory!".format(drztmp_dir))
             raise aXeError(err_msg)
 
         # list all content in the tmp-directory
@@ -407,7 +408,7 @@ class DrizzleObjectList(object):
             drizzleObject.drizzle()
 
             # combine the layers to a MEF file
-            mef_name = drizzleObject.make_mef()
+            drizzleObject.make_mef()
 
 
 class DrizzleObject(object):
@@ -668,8 +669,6 @@ class DrizzleObject(object):
 
         # compute some statistics
         img_ave = fits_data.mean()
-        img_std = fits_data.std()
-        img_npix = fits_data.shape[0] * fits_data.shape[0]
 
         # close the image
         fits_img.close()
@@ -994,7 +993,7 @@ class DrizzleObject(object):
             npix, ngood_new = one_contrib.get_wht_info()
 
             # check whether there exists statistics
-            if (ngood_old and npixis and ngood_new):
+            if (ngood_old and npix and ngood_new):
                 # compute the number of rejected pixels
                 nreject = ngood_old - ngood_new
 
@@ -1093,7 +1092,7 @@ class DrizzleObject(object):
         sys.stdout.flush()
 
         # create a drizzle object
-        drizzleObject = dither.Drizzle()
+        drizzleObject = astrodrizzle.adrizzle.drizzle()
 
         # go over all contributing objects
         for one_contrib in self.contrib_list:
@@ -1199,9 +1198,9 @@ class DrizzleObjectContrib(object):
     """Class for a contributing image to a drizzle object"""
     def __init__(self, file_root, objID, opt_extr, back, drztmp_dir):
         # get and save the root name
-        self.rootname   = self._get_rootname(file_root)
-        self.objID      = objID
-        self.opt_extr   = opt_extr
+        self.rootname = self._get_rootname(file_root)
+        self.objID = objID
+        self.opt_extr = opt_extr
         self.drztmp_dir = drztmp_dir
 
         # determine the names of all possible input
@@ -1245,34 +1244,74 @@ class DrizzleObjectContrib(object):
         ext_names = {}
 
         if back:
-            # fill the dictionary will all possible input files for the aXedrizzle process
-            ext_names['FLT'] = os.path.join(drztmp_dir, '{0:s}_flt_{1:s}.BCK.fits'.format(file_root, objID))
-            ext_names['ERR'] = os.path.join(drztmp_dir, '{0:s}_err_{1:s}.BCK.fits'.format(file_root, objID))
-            ext_names['CON'] = os.path.join(drztmp_dir, '{0:s}_con_{1:s}.BCK.fits'.format(file_root, objID))
-            ext_names['WHT'] = os.path.join(drztmp_dir, '{0:s}_wht_{1:s}.BCK.fits'.format(file_root, objID))
-            ext_names['MOD'] = os.path.join(drztmp_dir, '{0:s}_mod_{1:s}.BCK.fits'.format(file_root, objID))
-            ext_names['VAR'] = os.path.join(drztmp_dir, '{0:s}_var_{1:s}.BCK.fits'.format(file_root, objID))
+            # fill the dictionary will all possible input files for the
+            # aXedrizzle process
+            ext_names['FLT'] = os.path.join(drztmp_dir,
+                                            '{0:s}_flt_{1:s}.BCK.fits'
+                                            .format(file_root, objID))
+            ext_names['ERR'] = os.path.join(drztmp_dir,
+                                            '{0:s}_err_{1:s}.BCK.fits'
+                                            .format(file_root, objID))
+            ext_names['CON'] = os.path.join(drztmp_dir,
+                                            '{0:s}_con_{1:s}.BCK.fits'
+                                            .format(file_root, objID))
+            ext_names['WHT'] = os.path.join(drztmp_dir,
+                                            '{0:s}_wht_{1:s}.BCK.fits'
+                                            .format(file_root, objID))
+            ext_names['MOD'] = os.path.join(drztmp_dir,
+                                            '{0:s}_mod_{1:s}.BCK.fits'
+                                            .format(file_root, objID))
+            ext_names['VAR'] = os.path.join(drztmp_dir,
+                                            '{0:s}_var_{1:s}.BCK.fits'
+                                            .format(file_root, objID))
 
             # name of the drizzle coefficients file
-            ext_names['CFF'] = os.path.join(drztmp_dir, '{0:s}_flt_{1:s}.coeffs'.format(file_root, objID))
+            ext_names['CFF'] = os.path.join(drztmp_dir,
+                                            '{0:s}_flt_{1:s}.coeffs'
+                                            .format(file_root, objID))
 
         else:
-            # fill the dictionary will all possible input files for the aXedrizzle process
-            ext_names['FLT'] = os.path.join(drztmp_dir, '{0:s}_flt_{1:s}.fits'.format(file_root, objID))
-            ext_names['ERR'] = os.path.join(drztmp_dir, '{0:s}_err_{1:s}.fits'.format(file_root, objID))
-            ext_names['CON'] = os.path.join(drztmp_dir, '{0:s}_con_{1:s}.fits'.format(file_root, objID))
-            ext_names['WHT'] = os.path.join(drztmp_dir, '{0:s}_wht_{1:s}.fits'.format(file_root, objID))
-            ext_names['MOD'] = os.path.join(drztmp_dir, '{0:s}_mod_{1:s}.fits'.format(file_root, objID))
-            ext_names['VAR'] = os.path.join(drztmp_dir, '{0:s}_var_{1:s}.fits'.format(file_root, objID))
-            ext_names['BLT'] = os.path.join(drztmp_dir, '{0:s}_blt_{1:s}.fits'.format(file_root, objID))
-            ext_names['DER'] = os.path.join(drztmp_dir, '{0:s}_der_{1:s}.fits'.format(file_root, objID))
-            ext_names['CRR'] = os.path.join(drztmp_dir, '{0:s}_crr_{1:s}.fits'.format(file_root, objID))
+            # fill the dictionary will all possible input files
+            # for the aXedrizzle process
+            ext_names['FLT'] = os.path.join(drztmp_dir,
+                                            '{0:s}_flt_{1:s}.fits'
+                                            .format(file_root, objID))
+            ext_names['ERR'] = os.path.join(drztmp_dir,
+                                            '{0:s}_err_{1:s}.fits'
+                                            .format(file_root, objID))
+            ext_names['CON'] = os.path.join(drztmp_dir,
+                                            '{0:s}_con_{1:s}.fits'
+                                            .format(file_root, objID))
+            ext_names['WHT'] = os.path.join(drztmp_dir,
+                                            '{0:s}_wht_{1:s}.fits'
+                                            .format(file_root, objID))
+            ext_names['MOD'] = os.path.join(drztmp_dir,
+                                            '{0:s}_mod_{1:s}.fits'
+                                            .format(file_root, objID))
+            ext_names['VAR'] = os.path.join(drztmp_dir,
+                                            '{0:s}_var_{1:s}.fits'
+                                            .format(file_root, objID))
+            ext_names['BLT'] = os.path.join(drztmp_dir,
+                                            '{0:s}_blt_{1:s}.fits'
+                                            .format(file_root, objID))
+            ext_names['DER'] = os.path.join(drztmp_dir,
+                                            '{0:s}_der_{1:s}.fits'
+                                            .format(file_root, objID))
+            ext_names['CRR'] = os.path.join(drztmp_dir,
+                                            '{0:s}_crr_{1:s}.fits'
+                                            .format(file_root, objID))
 
-            ext_names['SING_SCI'] = os.path.join(drztmp_dir, '{0:s}_single_sci_{1:s}.fits'.format(file_root, objID))
-            ext_names['SING_WHT'] = os.path.join(drztmp_dir, '{0:s}_single_wht_{1:s}.fits'.format(file_root, objID))
+            ext_names['SING_SCI'] = os.path.join(drztmp_dir,
+                                                 '{0:s}_single_sci_{1:s}.fits'
+                                                 .format(file_root, objID))
+            ext_names['SING_WHT'] = os.path.join(drztmp_dir,
+                                                 '{0:s}_single_wht_{1:s}.fits'
+                                                 .format(file_root, objID))
 
             # name of the drizzle coefficients file
-            ext_names['CFF'] = os.path.join(drztmp_dir, '{0:s}_flt_{0:s}.coeffs'.format(file_root, objID))
+            ext_names['CFF'] = os.path.join(drztmp_dir,
+                                            '{0:s}_flt_{0:s}.coeffs'
+                                            .format(file_root, objID))
 
         # return the dictionary
         return ext_names
@@ -1281,7 +1320,7 @@ class DrizzleObjectContrib(object):
         """Set the exposure time from the object contributor"""
         # create a dictionary
         # for self-information
-        self.info ={}
+        self.info = {}
 
         # the list of mandatory keywords to be extracted
         man_kwords = ['EXPTIME', 'LENGTH', 'OWIDTH', 'DRZWIDTH',
@@ -1291,7 +1330,7 @@ class DrizzleObjectContrib(object):
         opt_kwords = ['SLITWIDT', 'SKY_CPS']
 
         # open the object image and go to the header
-        fits_img  = fits.open(self.ext_names['FLT'], mode='readonly')
+        fits_img = fits.open(self.ext_names['FLT'], mode='readonly')
         fits_head = fits_img[0].header
 
         # go over all mandatory keywords
@@ -1315,7 +1354,6 @@ class DrizzleObjectContrib(object):
                 # store a default
                 self.info[a_kword] = None
 
-
         # close the image
         fits_img.close()
 
@@ -1332,7 +1370,7 @@ class DrizzleObjectContrib(object):
         flt_file.close()
 
         # in the FLT image, replace -infinity with 0.0
-        flt_file = fits.open(self.ext_names['FLT'],'update')
+        flt_file = fits.open(self.ext_names['FLT'], 'update')
         flt_file[0].data[flt_file[0].data < -900000.0] = 0.0
         flt_file.close()
 
@@ -1345,7 +1383,7 @@ class DrizzleObjectContrib(object):
         """
 
         # list of keys to check
-        checklist = ['FLT','ERR','CON']
+        checklist = ['FLT', 'ERR', 'CON']
 
         # get the name of the dpp file
         dpp_file = axeutils.getOUTPUT(self.file_root+'.DPP.fits')
@@ -1363,9 +1401,9 @@ class DrizzleObjectContrib(object):
         # differentiate between normal
         # and optimal extraction
         if self.opt_extr:
-            checklist = ['FLT','ERR','CON', 'MOD', 'VAR']
+            checklist = ['FLT', 'ERR', 'CON', 'MOD', 'VAR']
         else:
-            checklist = ['FLT','ERR','CON']
+            checklist = ['FLT', 'ERR', 'CON']
 
         # go over all keys
         for one_check in checklist:
@@ -1396,10 +1434,10 @@ class DrizzleObjectContrib(object):
     def check_files(self):
         """Check for all files"""
         # list of keys to check all the time
-        checklist = ['FLT','ERR','CON']
+        checklist = ['FLT', 'ERR', 'CON']
 
         # keys to check in optimal extraction
-        optlist   = ['MOD', 'VAR']
+        optlist = ['MOD', 'VAR']
 
         # go over all keys
         for one_check in checklist:
@@ -1420,11 +1458,10 @@ class DrizzleObjectContrib(object):
                                .format(self.ext_names[one_check]))
                     raise aXeError(err_msg)
 
-
         # transfer the exposure time from the
         # DPP to the contributors
         # no longer necessary!!
-        #self._transfer_exptime()
+        # self._transfer_exptime()
 
     def isempty(self):
         """Checks whether the files contain meaningful data"""
@@ -1438,11 +1475,11 @@ class DrizzleObjectContrib(object):
         data_ext = image[0].data
 
         # check whether average is ZERO or -1.0E+06 and std is ZERO
-        if ((data_ext.shape == (10,10)) and (data_ext.std() == 0.0)):
+        if ((data_ext.shape == (10, 10)) and (data_ext.std() == 0.0)):
             if ((data_ext.mean() == 0.0) or (data_ext.mean() == -1.0E+06)):
                 # set to empty
                 isempty = 1
-        if data_ext.shape[1]< 2:
+        if data_ext.shape[1] < 2:
             isempty = 1
             print("empty")
 
@@ -1523,6 +1560,7 @@ class DrizzleObjectContrib(object):
         # return values
         return npix, nwht
 
+
 class DrizzleCoefficients(object):
     """Class for a contributing image to a drizzle object"""
     def __init__(self, image):
@@ -1574,7 +1612,7 @@ class DrizzleCoefficients(object):
     def _get_order(self, coeff_list):
         """Determine the order of the polynomial"""
         # dictionary with the fixed names for the orders
-        fixed_orders = {1:'constant', 2:'linear',3:'quadratic', 4:'cubic'}
+        fixed_orders = {1: 'constant', 2: 'linear', 3: 'quadratic', 4: 'cubic'}
 
         # try to determine the order
         order = (-1.0 + math.sqrt(1.0 + 8.0*len(coeff_list))) / 2.0
@@ -1587,9 +1625,9 @@ class DrizzleCoefficients(object):
             raise aXeError(err_msg)
 
         # check whether the order is 'known'
-        if not order in fixed_orders:
+        if order not in fixed_orders:
             err_msg = ("The oder of the coefficients in image: {0:s} is {1:d}"
-                        "and not allowed!".format(self.image, order))
+                       "and not allowed!".format(self.image, order))
             raise aXeError(err_msg)
 
         # return the order

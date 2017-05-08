@@ -1,22 +1,8 @@
-"""
-Various header classes to be part of the asciidata class
-
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-@since: 2005/09/13
-
-$LastChangedBy: mkuemmel $
-$LastChangedDate: 2008-07-03 10:27:47 +0200 (Thu, 03 Jul 2008) $
-$HeadURL: http://astropy.scipy.org/svn/astrolib/trunk/asciidata/Lib/asciiheader.py $
-"""
-__version__ = "Version 1.1 $LastChangedRevision: 503 $"
 
 import string
 import re
 
-from asciiutils  import *
+from .asciiutils  import *
 
 class Header(object):
     """

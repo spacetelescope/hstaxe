@@ -6,7 +6,7 @@ from astropy.io import fits
 import stsci.imagestats as imagestats
 from . import axelowlev
 from . import configfile
-from . import axeutils
+from .. import axeutils
 from ..axeerror import aXeError
 from . import axetasks
 

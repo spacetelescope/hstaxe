@@ -3,7 +3,7 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 from astropy.io import fits
 
-from . import axeutils
+from .. import axeutils
 from . import axeinputs
 from . import configfile
 from . import axelowlev

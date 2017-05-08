@@ -1,21 +1,9 @@
-"""
-Unittest classes for the asciidata module
-
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-@since: 2005/09/13
-
-$LastChangedBy: jhaase $
-$LastChangedDate: 2007-07-11 08:45:32Z $
-$HeadURL: http://astropy.scipy.org/svn/astrolib/trunk/asciidata/Lib/asciidata_SExtest.py $
-"""
-__version__ = "Version 1.1 $LastChangedRevision: 234 $"
 
 import unittest
-import asciidata, asciifunction
-import os, string
+from . import asciidata
+from . import asciifunction
+import os
+import string
 
 
 class Test_SExtractCat(unittest.TestCase):
@@ -76,7 +64,7 @@ class Test_SExtractCat(unittest.TestCase):
         self.assertEqual(self.tdata.ncols, 19)
         self.assertEqual(self.tdata.nrows, 10)
 
-    
+
     def testSExColumns(self):
         """
         Basic tests on the SExtractor table
@@ -185,7 +173,7 @@ class Test_SExtractCatII(unittest.TestCase):
         self.assertEqual(self.tdata.ncols, 19)
         self.assertEqual(self.tdata.nrows, 10)
 
-    
+
     def testSExColumns(self):
         """
         Basic tests on the SExtractor table
@@ -294,7 +282,7 @@ class Test_SExtractCatIII(unittest.TestCase):
         self.assertEqual(self.tdata.ncols, 19)
         self.assertEqual(self.tdata.nrows, 10)
 
-    
+
     def testSExColumns(self):
         """
         Basic tests on the SExtractor table
@@ -446,7 +434,7 @@ class Test_SExtractCatIV(unittest.TestCase):
         Test the change to plain format
         """
         self.tdata.toplain()
-        
+
         # check the number of columns and rows
         self.assertEqual(self.tdata.ncols, 35)
         self.assertEqual(self.tdata.nrows, 7)
@@ -459,7 +447,7 @@ class Test_SExtractCatIV(unittest.TestCase):
 
         # find a comment in this string
         commpos = bstring.find('#')
-        
+
         # there should be none, since
         # a header comment did not exist
         # and the column info is not printed
@@ -468,7 +456,7 @@ class Test_SExtractCatIV(unittest.TestCase):
     def testwriteto(self):
         """
         Test the writeto method
-        
+
         This module tests the writeto method with all
         it's different options.
         """
@@ -480,34 +468,34 @@ class Test_SExtractCatIV(unittest.TestCase):
         #----------------------
         # Part I
         #
-        
+
        # write the object to the tmp-file,
         # using the default settings
         self.tdata.writeto(temp_file.name)
 
         # create an object from the tmp-file
         adata = asciifunction.open(temp_file.name)
-        
+
         # check for the expanded column name
         # in the re-loaded object
         cindex = adata.find('VIGNET3')
         self.assertEqual(cindex, 8)
 
-        # check for the comment 
+        # check for the comment
         # in the re-loaded object
         self.assertEqual(adata.header[1],  " Believe it or not, a comment!!\n")
 
         #----------------------
         # Part II
         #
-        
+
         # write the object to the tmp-file,
         # using non-default
         self.tdata.writeto(temp_file.name, colInfo=0)
 
         # create an object from the tmp-file
         adata = asciifunction.open(temp_file.name)
-        
+
         # check for the expanded column name
         # in the re-loaded object
         cindex = adata.find('VIGNET3')
@@ -529,7 +517,7 @@ class Test_SExtractCatIV(unittest.TestCase):
 
         # create an object from the tmp-file
         adata = asciifunction.open(temp_file.name)
-        
+
         # check for the expanded column name
         # in the re-loaded object
         cindex = adata.find('VIGNET3')
@@ -540,7 +528,7 @@ class Test_SExtractCatIV(unittest.TestCase):
         # the header has length=0
         # since it did not survive
         self.assertEqual(len(adata.header), 0)
-      
+
 class Test_SExtractCatV(unittest.TestCase):
     """
     A test class for SExtractor catalogue format
@@ -622,19 +610,19 @@ M5    12.3    1.64    1.24    1.80    1.67    3170    -2.73
         #
         cindex = self.tdata.find('Teff')
         self.assertEqual(cindex, 6)
-         
+
         cindex = self.tdata.find('B-V')
         self.assertEqual(cindex, 2)
 
         cindex = self.tdata.find('R+I')
         self.assertEqual(cindex, 5)
-        
+
         cindex = self.tdata.find('1.05*bla')
         self.assertEqual(cindex, 7)
-              
+
         cindex = self.tdata.find('U/B')
         self.assertEqual(cindex, 3)
-        
+
 if __name__ == '__main__':
 
     suite = unittest.makeSuite(Test_SExtractCat)

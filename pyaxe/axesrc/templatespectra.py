@@ -3,11 +3,10 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 from astropy.io import fits
 
-from axe import axe_asciidata
-
 from . import interpolator
 from . import modspeclist
 
+from .. import axe_asciidata
 from ..axeerror import aXeSIMError
 from ..axeutils import getIMAGE, getSIMDATA, getOUTSIM
 

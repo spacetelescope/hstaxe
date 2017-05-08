@@ -8,6 +8,7 @@ from astropy.io import fits
 from .axeerror import aXeSIMError
 from . import axeutils
 from . import axetasks
+from ..config import *
 
 
 class DispImator(object):

@@ -3,7 +3,6 @@ from __future__ import (absolute_import, unicode_literals, division,
 
 from . import iolmaking
 from . import fcubeobjs
-from . import axeutils
 from . import axeinputs
 from . import axepreptor
 from . import inputchecks
@@ -15,14 +14,15 @@ from . import mefobjects
 from . import mdrzobjects
 from . import pysex2gol
 
+from .. import axeutils
 
 def iolprep(drizzle_image='',
             input_cat='',
-            dim_info='0,0,0,0'):
+            dimension_in='0,0,0,0'):
     """Function for the aXe task IOLPREP"""
     iol_maker = iolmaking.IOL_Maker(drizzle_image,
                                     input_cat,
-                                    dim_info)
+                                    dimension_in)
     iol_maker.run()
 
 

@@ -1,24 +1,11 @@
-"""
-All functions for the ascidata module  
 
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-@since: 2005/09/13
+from .asciidata import *
 
-$LastChangedBy: jhaase $ 
-$LastChangedDate: 2007-07-11 08:45:32Z $
-$HeadURL: http://astropy.scipy.org/svn/astrolib/trunk/asciidata/Lib/asciifunction.py $
-"""
-__version__ = "Version 1.1 $LastChangedRevision: 234 $"
-
-from asciidata import *
 
 def open(filename, null=None, delimiter=None, comment_char=None):
     """
     Constructor for the AsciiData class
-    
+
     @param filename: the filename to create the AsciiData from
     @type filename: string
     @param null: string to be interpretet as NULL
@@ -38,7 +25,7 @@ def open(filename, null=None, delimiter=None, comment_char=None):
 def create(ncols, nrows, null=None, delimiter=None):
     """
     Constructor for the empty AsciiData class
-    
+
     @param ncols: number of columns to be created
     @type ncols: integer
     @param nrows: number of columns to be created
@@ -58,7 +45,7 @@ def create(ncols, nrows, null=None, delimiter=None):
 def createSEx(ncols, nrows, null=None, delimiter=None):
     """
     Constructor for the empty class in the SExtractor catalogue style
-    
+
     @param ncols: number of columns to be created
     @type ncols: integer
     @param nrows: number of columns to be created

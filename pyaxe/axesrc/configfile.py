@@ -3,8 +3,8 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import math
 
-from . import axeutils
-from .axeerror import aXeError
+from .. import axeutils
+from ..axeerror import aXeError
 
 
 class ConfigList(object):

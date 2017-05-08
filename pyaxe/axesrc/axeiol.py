@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, unicode_literals, division,
                         print_function)
-from axe import axe_asciidata
-from .axeerror import aXeError
+from .. import axe_asciidata
+from ..axeerror import aXeError
 
 class InputObjectList(axe_asciidata.AsciiData):
     """Subclass of the AsciiData class for aXe"""

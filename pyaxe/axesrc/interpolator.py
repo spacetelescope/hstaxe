@@ -4,8 +4,8 @@ from __future__ import (absolute_import, unicode_literals, division,
 import copy
 import math
 from astropy.io import fits
-from axe import axe_asciidata
-from .axeerror import aXeSIMError
+from .. import axe_asciidata
+from ..axeerror import aXeError
 
 
 class Interpolator(object):

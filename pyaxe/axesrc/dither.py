@@ -3,6 +3,19 @@ from __future__ import (absolute_import, unicode_literals, division,
 
 from ..axeerror import aXeError
 import pydrizzle
+import os
+from astropy.io import fits as pyfits
+
+# Import numpy functionality
+import numpy as np
+
+# Import general tools
+from stsci.imagestats import ImageStats
+from stsci.image.numcombine import numCombine
+
+import multidrizzle
+from multidrizzle.minmed import minmed
+import multidrizzle.quickDeriv
 
 
 class Drizzle(object):
@@ -22,49 +35,52 @@ class Drizzle(object):
 
         # Check for file names that are too long for the drizzle task
         if len(data) > 80:
-           err_msg = 'File name "%s" is too long (>80 chars) for drizzle task' % data
-           raise aXeError(err_msg)
+            err_msg = ("File name '{0:s}' is too long (>80 chars)"
+                       "for drizzle task".format(data))
+            raise aXeError(err_msg)
         if len(outdata) > 80:
-           err_msg = 'File name "%s" is too long (>80 chars) for drizzle task' % outdata
-           raise aXeError(err_msg)
+            err_msg = ("File name '{0:s}' is too long (>80 chars) "
+                       "for drizzle task".format(outdata))
+            raise aXeError(err_msg)
 
-        ret = iraf.drizzle(data=data, outdata=outdata, outweig=outweig,
-                     in_mask=in_mask, wt_scl=wt_scl, coeffs=coeffs,
-                     outnx=img_nx, outny=img_ny,
-                     in_un=drizzle_params['IN_UN'], out_un=drizzle_params['OUT_UN'],
-                     pixfrac=drizzle_params['PFRAC'],scale=drizzle_params['PSCALE'],
-                     kernel=drizzle_params['KERNEL'], Stdout=1)
+        ret = pydrizzle.drizzle(data=data, outdata=outdata, outweig=outweig,
+                                in_mask=in_mask, wt_scl=wt_scl, coeffs=coeffs,
+                                outnx=img_nx, outny=img_ny,
+                                in_un=drizzle_params['IN_UN'],
+                                out_un=drizzle_params['OUT_UN'],
+                                pixfrac=drizzle_params['PFRAC'],
+                                scale=drizzle_params['PSCALE'],
+                                kernel=drizzle_params['KERNEL'], Stdout=1)
 
         for i in range(len(ret)):
             print(ret[i])
 
+
 class MedianCombine(object):
-    """
-    Class to median-combine individual drizzles
-    """
-    def __init__(self, contributors, drizzle_params, mult_drizzle_par, ext_names):
-        """
-        Initialize the class
-        """
+    """Class to median-combine individual drizzles"""
+    def __init__(self, contributors,
+                 drizzle_params, mult_drizzle_par,
+                 ext_names):
+        """Initialize the class"""
 
         # store the parameters
-        self.combine_maskpt  = mult_drizzle_par['combine_maskpt']
-        self.combine_type    = mult_drizzle_par['combine_type']
+        self.combine_maskpt = mult_drizzle_par['combine_maskpt']
+        self.combine_type = mult_drizzle_par['combine_type']
         self.combine_nsigma1 = mult_drizzle_par['combine_nsigma1']
         self.combine_nsigma2 = mult_drizzle_par['combine_nsigma2']
-        self.combine_nlow    = mult_drizzle_par['combine_nlow']
-        self.combine_nhigh   = mult_drizzle_par['combine_nhigh']
+        self.combine_nlow = mult_drizzle_par['combine_nlow']
+        self.combine_nhigh = mult_drizzle_par['combine_nhigh']
         self.combine_lthresh = mult_drizzle_par['combine_lthresh']
         self.combine_hthresh = mult_drizzle_par['combine_hthresh']
-        self.combine_grow    = mult_drizzle_par['combine_grow']
+        self.combine_grow = mult_drizzle_par['combine_grow']
 
         self.ext_names = ext_names
 
-       # store the name of the median image
+        # store the name of the median image
         self.median_image = ext_names['MED']
 
         # store the readout noise
-        self.rdnoise      = drizzle_params['RDNOISE']
+        self.rdnoise = drizzle_params['RDNOISE']
 
         self.input_data = self._get_inputs(contributors)
 
@@ -81,7 +97,7 @@ class MedianCombine(object):
         exp_vals = []
         rdn_vals = []
         sky_vals = []
-        exp_tot  = 0.0
+        exp_tot = 0.0
         for one_contrib in contributors:
 
             # put the image names to the list
@@ -94,7 +110,8 @@ class MedianCombine(object):
             if 'SKY_CPS' in one_contrib.info:
                 sky_vals.append(one_contrib.info['SKY_CPS'])
             else:
-                err_msg = 'Sky value missing for image: %s!' % input_data['sci_imgs']
+                err_msg = ("Sky value missing for image: {0:s}!"
+                           .format(input_data['sci_imgs']))
                 raise aXeError(err_msg)
 
             # compose the total exposure time
@@ -108,9 +125,7 @@ class MedianCombine(object):
         input_data['exp_vals'] = exp_vals
         input_data['rdn_vals'] = rdn_vals
         input_data['sky_vals'] = sky_vals
-
-
-        input_data['exp_tot']  = exp_tot
+        input_data['exp_tot'] = exp_tot
 
         # return the dictionary
         return input_data
@@ -123,62 +138,53 @@ class MedianCombine(object):
         pydrizzle version or done after this version. Necessary
         adjustments to the slitless data were applied.
         """
-        import os
-        import os.path
-        from astropy.io import fits as pyfits
-
-        # Import numpy functionality
-        import numpy as np
-
-        # Import general tools
-        from stsci.imagestats import ImageStats
-        from stsci.image import numcombine
-        from stsci.image.numcombine import numCombine
-
-        import multidrizzle
-        import multidrizzle.minmed
-        from multidrizzle.minmed import minmed
-
         sci_data = []
 
         for one_image in self.input_data['sci_imgs']:
-            if os.access(one_image,os.F_OK):
+            if os.access(one_image, os.F_OK):
                 in_fits = pyfits.open(one_image, 'readonly')
                 sci_data.append(in_fits[0].data)
                 in_fits.close()
 
         wht_data = []
-        for one_image in  self.input_data['wht_imgs']:
-            if os.access(one_image,os.F_OK):
+        for one_image in self.input_data['wht_imgs']:
+            if os.access(one_image, os.F_OK):
                 in_fits = pyfits.open(one_image, 'readonly')
                 wht_data.append(in_fits[0].data)
                 in_fits.close()
             else:
-                print(one_image,"not found/created by multidrizzle...skipping it.")
+                print("{0:s} not found/created by multidrizzle"
+                      "...skipping it.".format(one_image))
 
         if len(sci_data) != len(wht_data):
-            print("The number of single_sci images created by multidrizzle does not match the number of single_wht files created!")
+            print("The number of single_sci images created by "
+                  "multidrizzle does not match the number of single_wht"
+                  " files created!")
             raise aXeError("Multidrizzle error")
 
         weight_mask_list = []
 
-        #added the except so that if the image area contains only zeros then the zero value is returned which is better for later processing
-        #we dont understand why the original lower=1e-8 value was supplied unless it was for the case of spectral in the normal field of view
-        #see #1110
+        # added the except so that if the image area contains only
+        # zeros then the zero value is returned which is better for later
+        # processing
+        # we dont understand why the original lower=1e-8 value was
+        # supplied unless it was for the case of spectral in the normal
+        # field of view see #1110
         for wht_arr in wht_data:
             try:
                 tmp_mean_value = self.combine_maskpt * ImageStats(wht_arr,lower=1e-8,lsig=None,usig=None,fields="mean",nclip=0).mean
-            except (ValueError,AttributeError):
+            except (ValueError, AttributeError):
                 tmp_mean_value = 0.
-                print("tmp_mean_value set to 0 because no good pixels found; %s"%(self.ext_names["MEF"]))
+                print("tmp_mean_value set to 0 because no good "
+                      "pixels found; {0:s}".format(self.ext_names["MEF"]))
             except:
                 tmp_mean_value = 0.
-                print("tmp_mean_value set to 0; possible uncaught exception in dither.py; %s"%(self.ext_names["MEF"]))
+                print("tmp_mean_value set to 0; possible uncaught "
+                      "exception in dither.py; {0:s}"
+                      .format(self.ext_names["MEF"]))
 
-
-            weight_mask = np.zeros(wht_arr.shape,dtype=np.uint8)
+            weight_mask = np.zeros(wht_arr.shape, dtype=np.uint8)
             np.putmask(weight_mask, np.less(wht_arr, tmp_mean_value), 1)
-
 
             weight_mask_list.append(weight_mask)
 
@@ -191,16 +197,16 @@ class MedianCombine(object):
             # Create the combined array object using the minmed algorithm
             result = minmed(sci_data,  # list of input data to be combined.
                             wht_data,# list of input data weight images to be combined.
-                            self.input_data['rdn_vals'],           # list of readnoise values to use for the input images.
-                            self.input_data['exp_vals'],           # list of exposure times to use for the input images.
-                            self.input_data['sky_vals'],           # list of image background values to use for the input images
-                            weightMaskList = weight_mask_list,     # list of imput data weight masks to use for pixel rejection.
-                            combine_grow = self.combine_grow,           # Radius (pixels) for neighbor rejection
-                            combine_nsigma1 = self.combine_nsigma1,     # Significance for accepting minimum instead of median
-                            combine_nsigma2 = self.combine_nsigma2      # Significance for accepting minimum instead of median
+                            self.input_data['rdn_vals'],  # list of readnoise values to use for the input images.
+                            self.input_data['exp_vals'],  # list of exposure times to use for the input images.
+                            self.input_data['sky_vals'],  # list of image background values to use for the input images
+                            weightMaskList = weight_mask_list,  # list of imput data weight masks to use for pixel rejection.
+                            combine_grow = self.combine_grow,  # Radius (pixels) for neighbor rejection
+                            combine_nsigma1 = self.combine_nsigma1,  # Significance for accepting minimum instead of median
+                            combine_nsigma2 = self.combine_nsigma2  # Significance for accepting minimum instead of median
                             )
         else:
-            #print 'going to other', combine_type
+            # print 'going to other', combine_type
             # Create the combined array object using the numcombine task
             result = numCombine(sci_data,
                                 numarrayMaskList=weight_mask_list,
@@ -211,10 +217,11 @@ class MedianCombine(object):
                                 lower=self.combine_lthresh
                                 )
 
-        #print result.combArrObj
+        # print result.combArrObj
         hdu = pyfits.PrimaryHDU(result.combArrObj)
         hdulist = pyfits.HDUList([hdu])
-        hdulist[0].header['EXPTIME'] = ( self.input_data['exp_tot'], 'total exposure time')
+        hdulist[0].header['EXPTIME'] = (self.input_data['exp_tot'],
+                                        'total exposure time')
         hdulist.writeto(self.median_image)
 
         # delete the various arrays
@@ -244,17 +251,18 @@ class Blot(object):
         Currently only the iraf version of blot is invoked.
         """
         pydrizzle.blot(data=in_data,
-                  outdata=out_data,
-                  scale=drizzle_params['PSCALE'],
-                  coeffs=coeffs,
-                  outnx=out_nx,
-                  outny=out_ny,
-                  interpol=mult_drizzle_par['blot_interp'],
-                  sinscl=mult_drizzle_par['blot_sinscl'],
-                  in_un=drizzle_params['IN_UN'],
-                  out_un=drizzle_params['OUT_UN'],
-                  expkey='exptime',
-                  expout='input')
+                       outdata=out_data,
+                       scale=drizzle_params['PSCALE'],
+                       coeffs=coeffs,
+                       outnx=out_nx,
+                       outny=out_ny,
+                       interpol=mult_drizzle_par['blot_interp'],
+                       sinscl=mult_drizzle_par['blot_sinscl'],
+                       in_un=drizzle_params['IN_UN'],
+                       out_un=drizzle_params['OUT_UN'],
+                       expkey='exptime',
+                       expout='input')
+
 
 class Deriv(object):
     """
@@ -266,61 +274,69 @@ class Deriv(object):
         """
         pass
 
-    def _absoluteSubtract(self, array,tmpArray,outArray):
+    def _absoluteSubtract(self, array, tmpArray, outArray):
         """
         Subtract the absolute value of two images
         """
         import numpy
-        #subtract shifted image from imput image
+        # subtract shifted image from imput image
         tmpArray = array - tmpArray
-        #take the absolute value of tmpArray
+        # take the absolute value of tmpArray
         tmpArray = numpy.fabs(tmpArray)
-        #save maximum value of outArray or tmpArray and save in outArray
-        outArray = numpy.maximum(tmpArray,outArray)
-        #zero out tmpArray before reuse
+        # save maximum value of outArray or tmpArray and save in outArray
+        outArray = numpy.maximum(tmpArray, outArray)
+        # zero out tmpArray before reuse
         tmpArray = tmpArray * 0.
 
-        return (tmpArray,outArray)
+        return (tmpArray, outArray)
 
-    def _qderiv(self, array): # TAKE THE ABSOLUTE DERIVATIVE OF A NUMARRY OBJECT
+    def _qderiv(self, array):
         """
         Take the absolute derivate of an image in memory
         """
         import numpy
 
-        #Create 2 empty arrays in memory of the same dimensions as 'array'
+        # Create 2 empty arrays in memory of the same dimensions as 'array'
         tmpArray = numpy.zeros(array.shape, dtype=numpy.float64)
         outArray = numpy.zeros(array.shape, dtype=numpy.float64)
 
         # Get the length of an array side
-        (naxis1,naxis2) = array.shape
+        (naxis1, naxis2) = array.shape
 
-        #Main derivate loop:
-        #Shift images +/- 1 in Y.
-        for y in range(-1,2,2):
+        # Main derivate loop:
+        # Shift images +/- 1 in Y.
+        for y in range(-1, 2, 2):
             if y == -1:
-                #shift input image 1 pixel right
-                tmpArray[0:(naxis1-1),1:(naxis2-1)] = array[0:(naxis1-1),0:(naxis2-2)]
+                # shift input image 1 pixel right
+                tmpArray[0:(naxis1-1), 1:(naxis2-1)] = array[0:(naxis1-1),
+                                                             0:(naxis2-2)]
 
             else:
-                #shift input image 1 pixel left
-                tmpArray[0:(naxis1-1),0:(naxis2-2)] = array[0:(naxis1-1),1:(naxis2-1)]
+                # shift input image 1 pixel left
+                tmpArray[0:(naxis1-1), 0:(naxis2-2)] = array[0:(naxis1-1),
+                                                             1:(naxis2-1)]
 
             # subtract the arrays
-            (tmpArray,outArray) = self._absoluteSubtract(array,tmpArray,outArray)
+            (tmpArray, outArray) = self._absoluteSubtract(array,
+                                                          tmpArray,
+                                                          outArray)
 
-        #Shift images +/- 1 in X.
-        for x in range(-1,2,2):
+        # Shift images +/- 1 in X.
+        for x in range(-1, 2, 2):
             if x == -1:
-                #shift input image 1 pixel right
-                tmpArray[1:(naxis1-1),0:(naxis2-1)] = array[0:(naxis1-2),0:(naxis2-1)]
+                # shift input image 1 pixel right
+                tmpArray[1:(naxis1-1), 0:(naxis2-1)] = array[0:(naxis1-2),
+                                                             0:(naxis2-1)]
 
             else:
-                #shift input image 1 pixel left
-                tmpArray[0:(naxis1-2),0:(naxis2-1)] = array[1:(naxis1-1),0:(naxis2-1)]
+                # shift input image 1 pixel left
+                tmpArray[0:(naxis1-2), 0:(naxis2-1)] = array[1:(naxis1-1),
+                                                             0:(naxis2-1)]
 
             # subtract the arrays
-            (tmpArray,outArray) = self._absoluteSubtract(array,tmpArray,outArray)
+            (tmpArray, outArray) = self._absoluteSubtract(array,
+                                                          tmpArray,
+                                                          outArray)
 
         # delete the tmp-array
         del tmpArray
@@ -329,19 +345,9 @@ class Deriv(object):
         return outArray.astype(numpy.float32)
 
     def run(self, in_name, out_name):
-        """
-        Code stolen from Multidrizzle.deriv()
-        """
-        import os
-        import os.path
-
-        from astropy.io import fits as pyfits
-
-        import multidrizzle
-        import multidrizzle.quickDeriv
-
+        """Code stolen from Multidrizzle.deriv()"""
         # store the names
-        self.in_name  = in_name
+        self.in_name = in_name
         self.out_name = out_name
 
         # make sure the input image exists
@@ -357,15 +363,15 @@ class Deriv(object):
 
         print("Running quickDeriv on ", self.in_name)
         # OPEN THE INPUT IMAGE IN READ ONLY MODE
-        img = pyfits.open(self.in_name,mode='readonly', memmap=0)
+        img = pyfits.open(self.in_name, mode='readonly', memmap=0)
 
         # calling qderiv with the assumption that the
         # input file is a simple FITS file.
         absderiv = multidrizzle.quickDeriv.qderiv(img["PRIMARY"].data)
-        #absderiv = self._qderiv(img["PRIMARY"].data)
+        # absderiv = self._qderiv(img["PRIMARY"].data)
 
         # WRITE THE OUTPUT IMAGE TO A FITS FILE
-        outfile = pyfits.open(self.out_name,'append')
+        outfile = pyfits.open(self.out_name, 'append')
         outhdu = pyfits.PrimaryHDU(data=absderiv)
         outfile.append(outhdu)
 
@@ -375,22 +381,24 @@ class Deriv(object):
         del outfile
         del img
 
+
 class CRIdent(object):
     def __init__(self, drizzle_params, mult_drizzle_par):
         """
         Initializes the class
         """
-        self.driz_cr_scale   = (float(mult_drizzle_par['driz_cr_scale'].split()[0]), float(mult_drizzle_par['driz_cr_scale'].split()[1]))
-        self.driz_cr_snr     = (float(mult_drizzle_par['driz_cr_snr'].split()[0]),   float(mult_drizzle_par['driz_cr_snr'].split()[1]))
-        self.driz_cr_grow    = int(mult_drizzle_par['driz_cr_grow'])
+        self.driz_cr_scale = (float(mult_drizzle_par['driz_cr_scale'].split()[0]),
+                              float(mult_drizzle_par['driz_cr_scale'].split()[1]))
+        self.driz_cr_snr = (float(mult_drizzle_par['driz_cr_snr'].split()[0]),
+                            float(mult_drizzle_par['driz_cr_snr'].split()[1]))
+        self.driz_cr_grow = int(mult_drizzle_par['driz_cr_grow'])
         self.driz_cr_ctegrow = 0
 
         # store the readout noise
-        self.rdnoise      = drizzle_params['RDNOISE']
+        self.rdnoise = drizzle_params['RDNOISE']
 
     def _identify_crr(self, in_img, blot_img, blotder_img, exptime, sky_val):
-        """
-        Identify CRR's and other deviant pixels
+        """Identify CRR's and other deviant pixels
 
         The code was taken from muldidrizzle.DrizCR. Small adjustments and
         re-factoring was done.
@@ -399,13 +407,15 @@ class CRIdent(object):
         import stsci.convolve as convolve
 
         # create an empty file
-        __crMask = numpy.zeros(in_img.shape,dtype=numpy.uint8)
+        __crMask = numpy.zeros(in_img.shape, dtype=numpy.uint8)
 
         # Part 1 of computation:
         # flag the central pixels
         # Create a temp array mask
         __t1 = numpy.absolute(in_img - blot_img)
-        __ta = numpy.sqrt(numpy.absolute(blot_img * exptime + sky_val * exptime) + self.rdnoise*self.rdnoise)
+        __ta = numpy.sqrt(numpy.absolute(blot_img * exptime
+                                         + sky_val * exptime) +
+                          self.rdnoise*self.rdnoise)
         __t2 = self.driz_cr_scale[0] * blotder_img + self.driz_cr_snr[0] * __ta / exptime
         __tmp1 = numpy.logical_not(numpy.greater(__t1, __t2))
 
@@ -415,11 +425,16 @@ class CRIdent(object):
         del __t2
 
         # Create a convolution kernel that is 3 x 3 of 1's
-        __kernel = numpy.ones((3,3),dtype=numpy.uint8)
+        __kernel = numpy.ones((3, 3), dtype=numpy.uint8)
         # Create an output tmp file the same size as the input temp mask array
-        __tmp2 = numpy.zeros(__tmp1.shape,dtype=numpy.int16)
+        __tmp2 = numpy.zeros(__tmp1.shape, dtype=numpy.int16)
         # Convolve the mask with the kernel
-        convolve.convolve2d(__tmp1,__kernel,output=__tmp2,fft=0,mode='nearest',cval=0)
+        convolve.convolve2d(__tmp1,
+                            __kernel,
+                            output=__tmp2,
+                            fft=0,
+                            mode='nearest',
+                            cval=0)
         del __kernel
         del __tmp1
 
@@ -427,7 +442,9 @@ class CRIdent(object):
         # flag the neighboring pixels
         # Create the CR Mask
         __xt1 = numpy.absolute(in_img - blot_img)
-        __xta = numpy.sqrt(numpy.absolute(blot_img * exptime + sky_val * exptime) + self.rdnoise*self.rdnoise)
+        __xta = numpy.sqrt(numpy.absolute(blot_img * exptime +
+                                          sky_val * exptime) +
+                           self.rdnoise*self.rdnoise)
         __xt2 = self.driz_cr_scale[1] * blotder_img + self.driz_cr_snr[1] * __xta / exptime
 
         # It is necessary to use a bitwise 'and' to create the mask with numarray objects.
@@ -438,36 +455,46 @@ class CRIdent(object):
         del __xt2
         del __tmp2
 
-        # Part 3 of computation - flag additional cte 'radial' and 'tail' pixels surrounding CR pixels as CRs
-        # In both the 'radial' and 'length' kernels below, 0->good and 1->bad, so that upon
-        # convolving the kernels with __crMask, the convolution output will have low->bad and high->good
-        # from which 2 new arrays are created having 0->bad and 1->good. These 2 new arrays are then 'anded'
+        # Part 3 of computation - flag additional cte 'radial'
+        # and 'tail' pixels surrounding CR pixels as CRs
+        # In both the 'radial' and 'length' kernels below, 0->good and
+        # 1->bad, so that upon
+        # convolving the kernels with __crMask, the convolution
+        # output will have low->bad and high->good
+        # from which 2 new arrays are created having 0->bad and 1->good.
+        # These 2 new arrays are then 'anded'
         # to create a new __crMask.
 
-        # recast __crMask to int for manipulations below; will recast to Bool at end
-        __crMask_orig_bool= __crMask.copy()
-        __crMask= __crMask_orig_bool.astype( numpy.int8 )
+        # recast __crMask to int for manipulations below;
+        # will recast to Bool at end
+        __crMask_orig_bool = __crMask.copy()
+        __crMask = __crMask_orig_bool.astype(numpy.int8)
 
         # make radial convolution kernel and convolve it with original __crMask
-        cr_grow_kernel = numpy.ones((self.driz_cr_grow, self.driz_cr_grow))     # kernel for radial masking of CR pixel
+        # kernel for radial masking of CR pixel
+        cr_grow_kernel = numpy.ones((self.driz_cr_grow, self.driz_cr_grow))
         cr_grow_kernel_conv = __crMask.copy()   # for output of convolution
-        convolve.convolve2d( __crMask, cr_grow_kernel, output = cr_grow_kernel_conv)
+        convolve.convolve2d(__crMask,
+                            cr_grow_kernel,
+                            output=cr_grow_kernel_conv)
 
         # make tail convolution kernel and convolve it with original __crMask
-        cr_ctegrow_kernel = numpy.zeros((2*self.driz_cr_ctegrow+1,2*self.driz_cr_ctegrow+1))  # kernel for tail masking of CR pixel
+        cr_ctegrow_kernel = numpy.zeros((2*self.driz_cr_ctegrow+1,
+                                         2*self.driz_cr_ctegrow+1)) #  kernel for tail masking of CR pixel
         cr_ctegrow_kernel_conv = __crMask.copy()  # for output convolution
 
-        # which pixels are masked by tail kernel depends on sign of ctedir (i.e.,readout direction):
-        ctedir=0
-        if ( ctedir == 1 ):  # HRC: amp C or D ; WFC: chip = sci,1 ; WFPC2
-            cr_ctegrow_kernel[ 0:ctegrow, ctegrow ]=1    #  'positive' direction
-        if ( ctedir == -1 ): # HRC: amp A or B ; WFC: chip = sci,2
-            cr_ctegrow_kernel[ ctegrow+1:2*ctegrow+1, ctegrow ]=1    #'negative' direction
-        if ( ctedir == 0 ):  # NICMOS: no cte tail correction
+        # which pixels are masked by tail kernel depends on sign of
+        # ctedir (i.e., readout direction):
+        ctedir = 0
+        if (ctedir == 1):  # HRC: amp C or D ; WFC: chip = sci,1 ; WFPC2
+            cr_ctegrow_kernel[0:ctegrow, ctegrow] = 1  # 'positive' direction
+        if (ctedir == -1):  # HRC: amp A or B ; WFC: chip = sci,2
+            cr_ctegrow_kernel[ctegrow+1:2*ctegrow+1, ctegrow ] = 1    #'negative' direction
+        if (ctedir == 0):  # NICMOS: no cte tail correction
             pass
 
         # do the convolution
-        convolve.convolve2d( __crMask, cr_ctegrow_kernel, output = cr_ctegrow_kernel_conv)
+        convolve.convolve2d(__crMask, cr_ctegrow_kernel, output = cr_ctegrow_kernel_conv)
 
         # select high pixels from both convolution outputs; then 'and' them to create new __crMask
         where_cr_grow_kernel_conv    = numpy.where( cr_grow_kernel_conv < self.driz_cr_grow*self.driz_cr_grow,0,1 )        # radial
@@ -507,7 +534,7 @@ class CRIdent(object):
         # Create the output file
         fitsobj = pyfits.HDUList()
 
-        if (header != None):
+        if (header is not None):
             del(header['NAXIS1'])
             del(header['NAXIS2'])
             if 'XTENSION' in header:
@@ -519,7 +546,7 @@ class CRIdent(object):
             if 'NEXTEND' in header:
                 header['NEXTEND'] = 0
 
-            hdu = pyfits.PrimaryHDU(data=_cr_file,header=header)
+            hdu = pyfits.PrimaryHDU(data=_cr_file, header=header)
             del hdu.header['PCOUNT']
             del hdu.header['GCOUNT']
 
@@ -552,10 +579,16 @@ class CRIdent(object):
         blotDerImage = pyfits.open(blotder_image, 'readonly')
 
         # identify the CR's
-        crr_data = self._identify_crr(inImage[0].data, blotImage[0].data, blotDerImage[0].data, exptime, sky_val)
+        crr_data = self._identify_crr(inImage[0].data,
+                                      blotImage[0].data,
+                                      blotDerImage[0].data,
+                                      exptime, sky_val)
 
         # save the image
-        self._createcrmaskfile(crr_image, crr_data, inImage[0].header, inImage[0].data)
+        self._createcrmaskfile(crr_image,
+                               crr_data,
+                               inImage[0].header,
+                               inImage[0].data)
 
         # delete the array
         del crr_data

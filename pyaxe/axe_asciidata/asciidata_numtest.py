@@ -1,21 +1,9 @@
-"""
-Unittest classes for the asciidata module
-
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-@since: 2005/09/13
-
-$LastChangedBy: $
-$LastChangedDate: $
-$HeadURL: $
-"""
-__version__ = "Version 1.0 $LastChangedRevision: 113 $"
 
 import unittest
-import asciidata, asciifunction
-import os, string
+from . import asciidata
+from . import asciifunction
+import os
+import string
 
 class Test_AsciiNumpy(unittest.TestCase):
     """
@@ -248,4 +236,3 @@ if __name__ == '__main__':
 
     suite = unittest.makeSuite(Test_AsciiNumarray)
     unittest.TextTestRunner(verbosity=2).run(suite)
-

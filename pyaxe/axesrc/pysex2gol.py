@@ -4,9 +4,9 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 from stsci.tools import wcsutil
 
-from axe import axe_asciidata
+from .. import axe_asciidata
 from ..axeerror import aXeError
-from . import axeutils
+from .. import axeutils
 from . import configfile
 from . import axeiol
 

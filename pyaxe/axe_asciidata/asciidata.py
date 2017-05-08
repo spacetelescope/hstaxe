@@ -1,25 +1,14 @@
-"""
-Main class of the asciidata module
 
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-@since: 2005/09/13
-
-$LastChangedBy: mkuemmel $
-$LastChangedDate: 2008-01-08 18:17:08 +0100 (Tue, 08 Jan 2008) $
-$LastChangedRevision:  $
-$HeadURL: $
-"""
-__version__ = "Version 1.1 $LastChangedRevision: 330 $"
-
-import string, sys, os, types,copy
-from asciiheader import *
-from asciicolumn import *
-from asciisorter import *
-from asciierror  import *
-from asciiutils  import *
+import string
+import sys
+import os
+import types
+import copy
+from .asciiheader import *
+from .asciicolumn import *
+from .asciisorter import *
+from .asciierror  import *
+from .asciiutils  import *
 
 class NullData(object):
     """

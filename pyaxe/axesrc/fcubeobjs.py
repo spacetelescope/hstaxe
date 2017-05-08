@@ -8,7 +8,7 @@ from astropy.io import fits
 from stwcs.wcsutil import HSTWCS
 from drizzlepac import astrodrizzle
 from stsci.tools import fileutil
-from axe import axe_asciidata
+from .. import axe_asciidata
 from ..axeerror import aXeError
 from .. import axeutils
 

@@ -1,16 +1,3 @@
-"""
-
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-@since: 2005/09/13
-
-$LastChangedBy: jhaase $
-$LastChangedDate: 2006-10-13 18:38:13Z $
-$HeadURL: http://astropy.scipy.org/svn/astrolib/trunk/asciidata/Lib/asciisorter.py $
-"""
-__version__ = "Version 1.0 $LastChangedRevision: 113 $"
 
 class ColumnIndex(object):
     """
@@ -25,13 +12,13 @@ class ColumnIndex(object):
     def __init__(self, nrows=None):
         """
         Initializes the class
- 
+
         @param nrows: the number of rows in the index
         @type nrows: int
         """
         # set the sort flagg
         self.sorted = 0
-        
+
         if nrows:
              # create the initial index
             self.index_col = range(nrows)
@@ -48,7 +35,7 @@ class ColumnIndex(object):
 
         @return: the string representation of te object
         @rtype: string
-        """      
+        """
         # intialize the string
         bigstring = ''
 
@@ -76,11 +63,11 @@ class ColumnIndex(object):
     def create_index(self, nrows):
         """
         Create the index
-        
+
         The method creates of redefines the index. The former
         is important if the class was not intialized with the
         number of columns.
-        
+
         @param nrows: the number of rows in the index
         @type nrows: int
         """
@@ -91,13 +78,13 @@ class ColumnIndex(object):
     def sort(self, sort_col=None, descending=0, ordered=1):
         """
         Implementation of a sort algorithm
-        
+
         The method is a frontend to a sorting algorithm.
         Under this method it is possible to implement
         various sorting algortihms, which are called
         according the specifications of according
         to the user request.
- 
+
         @param sort_col: the first column to sort for
         @type sort_col: []
         @param descending: boolean to fix ascending (=0) or descending (1) sort order
@@ -121,18 +108,18 @@ class ColumnIndex(object):
             self._rand_quick_sort(self.index_col, sort_col, 0, len(sort_col)-1)
             if descending:
                 self.index_col.reverse()
-            
+
 
         # set the sort flagg
         self.sorted = 1
- 
+
 
     def _quick_sort(self, index_col, sort_col, first, last):
         """
         Implementation of the quick sort algorithm
-        
+
         An implementation of the classical quick sort algorithm.
-       
+
         @param index_col: the index column
         @type index_col: []
         @param sort_col: the sort column
@@ -151,14 +138,14 @@ class ColumnIndex(object):
             # sort from start to the pivot elemetn
             self._quick_sort(index_col, sort_col, first  , div_index-1)
 
-            # sort from the pivot to the end 
+            # sort from the pivot to the end
             self._quick_sort(index_col, sort_col, div_index+1, last  )
 
 
     def _partition(self, index_col, sort_col, first, last):
         """
         Rearrange the array using the last element as pivot
-        
+
         The method selects the last element from the sort column
         as pivot. Then it rearranges the sort column and the index
         column such that all indices higher than the pivot have
@@ -202,7 +189,7 @@ class ColumnIndex(object):
         # and index column
         self._exchange_elements(sort_col, last, i+1)
         self._exchange_elements(index_col, last, i+1)
-            
+
         # return the order index
         return i+1
 
@@ -222,16 +209,16 @@ class ColumnIndex(object):
         tmp = array[index1]
         array[index1] = array[index2]
         array[index2] = tmp
-       
+
 
     def _rand_quick_sort(self, index_col, sort_col, first, last):
         """
         Implementation of a randomized quick sort algorithm
-        
+
         An implementation of the classical quick sort algorithm,
         however using a random element and NOT the last element
         as a pivot.
-        
+
         @param index_col: the index column
         @type index_col: []
         @param sort_col: the sort column
@@ -250,8 +237,8 @@ class ColumnIndex(object):
             # sort from start to the pivot elemetn
             self._rand_quick_sort(index_col, sort_col, first  , div_index-1)
 
-            # sort from the pivot to the end 
-            self._rand_quick_sort(index_col, sort_col, div_index+1, last  )    
+            # sort from the pivot to the end
+            self._rand_quick_sort(index_col, sort_col, div_index+1, last  )
 
 
     def _rand_partition(self, index_col, sort_col, first, last):
@@ -277,7 +264,7 @@ class ColumnIndex(object):
         @rtype: int
         """
         import random
-        
+
         # get a random index
         rand_index = random.randint(first, last)
 
@@ -307,7 +294,7 @@ class ColumnIndex(object):
         """
         # go along the array
         for jj in range(1, len(index_col)):
-            
+
             # choose the current element
             sort_key  = sort_col[jj]
             index_key = index_col[jj]
@@ -321,7 +308,7 @@ class ColumnIndex(object):
                 # move the element to the left
                 sort_col[ii+1]  = sort_col[ii]
                 index_col[ii+1] = index_col[ii]
-                
+
                 # decrease the index
                 ii -= 1
 
@@ -333,7 +320,7 @@ class ColumnIndex(object):
     def _insertion_sort_desc(self, index_col, sort_col):
         """
         The descending insertion sort algorithm
-    
+
         An implementation of the insertion sort algortihm. This algorithm
         sort in DESCENDING order.
         It is suited for order sequences. The result of previous sortings
@@ -346,7 +333,7 @@ class ColumnIndex(object):
         """
         # go along the array
         for jj in range(1, len(index_col)):
-            
+
             # choose the current element
             sort_key  = sort_col[jj]
             index_key = index_col[jj]
@@ -360,7 +347,7 @@ class ColumnIndex(object):
                 # move the element to the left
                 sort_col[ii+1]  = sort_col[ii]
                 index_col[ii+1] = index_col[ii]
-                
+
                 # decrease the index
                 ii -= 1
 
@@ -372,7 +359,7 @@ class ColumnIndex(object):
     def deindex(self, array):
         """
         Reorders an array into the index order
-        
+
         The method creates and returns an array in the index
         order, such that:
         new_array[index_array[index]] = old_array[index]
@@ -387,10 +374,10 @@ class ColumnIndex(object):
         """
         # create a new array
         new_array = len(array) * [None]
-        
+
         # go over the array
         for index  in range(len(array)):
-            
+
             # put one element into the right place
             new_array[self.index_col[index]] = array[index]
 
@@ -401,7 +388,7 @@ class ColumnIndex(object):
     def enindex(self, array):
         """
         Reorders an indexed array into the normal order
- 
+
         The method creates and returns an array in the natural
         order, such that:
         new_array[index] = old_array[index_array[index]]
@@ -416,10 +403,10 @@ class ColumnIndex(object):
         """
         # create a new array
         new_array = len(array) * [None]
-        
+
         # go over the array
         for index  in range(len(array)):
-            
+
             # put one element into the right place
             new_array[index] = array[self.index_col[index]]
 

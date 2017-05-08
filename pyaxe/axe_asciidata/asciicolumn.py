@@ -1,20 +1,8 @@
-"""
-Various column classes
-
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-$LastChangedBy: mkuemmel $
-$LastChangedDate: 2008-07-03 10:27:47 +0200 (Thu, 03 Jul 2008) $
-$HeadURL: http://astropy.scipy.org/svn/astrolib/trunk/asciidata/Lib/asciicolumn.py $
-"""
-__version__ = "Version 1.0 $LastChangedRevision: 503 $"
 
 import string
-from asciielement import *
-from asciierror   import *
-from asciiutils   import *
+from .asciielement import *
+from .asciierror   import *
+from .asciiutils   import *
 
 class NullColumn(object):
     """

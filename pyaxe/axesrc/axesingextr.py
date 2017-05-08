@@ -1,6 +1,6 @@
 from __future__ import (absolute_import, unicode_literals, division,
                         print_function)
-from . import axeutils
+from .. import axeutils
 from . import axetasks
 from . import configfile
 from . import nlincoeffs

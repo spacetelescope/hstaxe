@@ -1,21 +1,7 @@
-"""
-Fits related classes
-
-@author: Martin Kuemmel, Jonas Haase
-@organization: Space Telescope - European Coordinating Facility (ST-ECF)
-@license: Gnu Public Licence
-@contact: mkuemmel@eso.org
-@since: 2005/09/13
-
-$LastChangedBy: mkuemmel $
-$LastChangedDate: 2008-01-08 18:13:38 +0100 (Tue, 08 Jan 2008) $
-$HeadURL: http://astropy.scipy.org/svn/astrolib/trunk/asciidata/Lib/asciifits.py $
-"""
-__version__ = "Version 1.0 $LastChangedRevision: 329 $"
 
 import string
 import os
-import pyfits
+from astropy.io import fits as pyfits
 
 class AsciiFits(object):
     """

@@ -4,8 +4,7 @@ from __future__ import (absolute_import, unicode_literals, division,
 
 import sys
 import math
-from . import dither
-from . import axeutils
+from .. import axeutils
 from . import drizzleobjects
 
 

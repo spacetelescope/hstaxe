@@ -1,11 +1,9 @@
 from __future__ import (absolute_import, unicode_literals, division,
                         print_function)
 from math import *
-from pyraf import iraf
-from iraf import stsdas, analysis, dither
 
 import sys
-import pydrizzle
+from drizzlepac import astrodrizzle
 from stsci.tools import fileutil
 """
 
@@ -171,7 +169,7 @@ class DrizGeoPars:
                   print('\n-Coeffs file not found.  Trying to reproduce them using PyDrizzle...')
                   # Try to generate the coeffs file automatically
                   indx = inimage.find('[')
-                  p = pydrizzle.PyDrizzle(inimage[:indx], bits_single=None, bits_final=None, updatewcs=FALSE)
+                  p = astrodrizzle.adrizzle.drizzle(inimage[:indx], bits_single=None, bits_final=None, updatewcs=FALSE)
                   del p
                except:
                   print("! Cannot access coefficients file. (",self.coeffs,")")

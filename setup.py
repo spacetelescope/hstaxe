@@ -162,7 +162,7 @@ setup(
         'Programming Language :: Python :: C',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=['numpy'],
+    install_requires=['numpy', 'astropy'],
     scripts=scripts,
     packages=find_packages(),
     tests_require=[

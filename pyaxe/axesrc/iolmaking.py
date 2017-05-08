@@ -8,7 +8,7 @@ from astropy.io import fits
 from stsci.tools import fileutil
 
 from ..axeerror import aXeError
-from axe import axe_asciidata
+from .. import axe_asciidata
 from .. import axeutils
 from . import axeiol
 

@@ -3,10 +3,10 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import os.path
 from astropy.io import fits
-from axe import axe_asciidata
+from .. import axe_asciidata
 
 from ..axeerror import aXeSIMError
-from ..axeutils import (getIMAGE, getOUTSIM, getSIMDATA)
+from ..config import getIMAGE, getOUTSIM, getSIMDATA
 
 
 class ArtImaList(object):
