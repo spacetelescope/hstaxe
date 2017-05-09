@@ -249,11 +249,11 @@ class Test_AsciiData(unittest.TestCase):
 
         # integer element into string column --> string element
         self.tdata[2][0] = 1
-        self.assertEqual(string.strip(self.tdata[2][0]), '1')
+        self.assertEqual(self.tdata[2][0].strip(), '1')
 
         # float element into string column --> string element
         self.tdata[2][1] = 1.0
-        self.assertEqual(string.strip(self.tdata[2][1]), '1.0')
+        self.assertEqual(self.tdata[2][1].strip(), '1.0')
 
 
     def testColumnCreation(self):
@@ -1672,7 +1672,7 @@ class Test_AsciiFits(unittest.TestCase):
         self.assertAlmostEqual(tdata.field(0)[0], 105.2, 4)
         self.assertAlmostEqual(tdata.field(0)[2], 834.1, 4)
         self.assertAlmostEqual(tdata.field(1)[1], 529.0, 4)
-        self.assertEqual(string.strip(tdata.field(2)[0]), 'star')
+        self.assertEqual(tdata.field(2)[0].strip(), 'star')
         self.assertEqual(tdata.field(2)[1], 'galaxy')
         self.assertEqual(tdata.field(3)[0], 20)
         self.assertEqual(tdata.field(3)[1], 21)
@@ -1988,7 +1988,7 @@ Null Null Null Null
        # and stripping them off
        self.tdata.rstrip()
        self.assertEqual(self.tdata.nrows,orig_nrows-1)
-       
+
     def testLstrip(self):
        orig_nrows = self.tdata.nrows
        # strip off the first row
@@ -1996,7 +1996,7 @@ Null Null Null Null
        self.assertEqual(self.tdata.nrows,orig_nrows-1)
        self.tdata.lstrip()
        self.assertEqual(self.tdata.nrows,orig_nrows-2)
-       
+
 if __name__ == '__main__':
     suite = unittest.makeSuite(Test_AsciiData)
     unittest.TextTestRunner(verbosity=2).run(suite)

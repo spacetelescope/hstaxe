@@ -117,7 +117,7 @@ class AsciiFits(object):
         for line in asciiHeader.hdata:
 
             # check whether there is indeed some content
-            if len(string.strip(line)) > 0:
+            if len(line.strip()) > 0:
 
                 # add the header in a history line
                 theader.add_history(line)
@@ -210,7 +210,7 @@ class AsciiFits(object):
 
             # check and perhaps replace tthe
             # maximum length
-            if len(string.strip(asciiColumn[ii])) > maxlen:
+            if len(asciiColumn[ii].strip()) > maxlen:
                 maxlen = len(string.strip(asciiColumn[ii]))
 
         # return the maximum lengt

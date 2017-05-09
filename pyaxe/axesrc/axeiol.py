@@ -3,6 +3,7 @@ from __future__ import (absolute_import, unicode_literals, division,
 from .. import axe_asciidata
 from ..axeerror import aXeError
 
+
 class InputObjectList(axe_asciidata.AsciiData):
     """Subclass of the AsciiData class for aXe"""
     def __init__(self, filename):
@@ -113,7 +114,6 @@ class InputObjectList(axe_asciidata.AsciiData):
 
         # return the index
         return min_ind
-
 
     def search_mcols(self):
         """

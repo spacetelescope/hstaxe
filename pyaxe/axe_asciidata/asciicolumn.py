@@ -59,13 +59,13 @@ class AsciiColumn(NullColumn):
         self.colcomment =''
         self._data    = []
         self._defined = 0
-        self._type    = types.StringType
+        self._type    = type('')
         self._format  = ['%10s','%10s']
         self._nrows   = 0
 
         # set the default null string
         if null:
-            self._null = [string.strip(null[0])]
+            self._null = [null[0].strip()]
         else:
             self._null  = ['*']
 
@@ -468,7 +468,7 @@ class AsciiColumn(NullColumn):
             raise Exception('There are "None" elements in the column. They can not be\ntransformed to numarrays!')
 
         # check for string column
-        if self._type == types.StringType:
+        if isinstance(self._type,str):
             # import CharArrays
             import numarray.strings
             # transform the array to CharArrays

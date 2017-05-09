@@ -20,8 +20,8 @@ class Element(object):
         @param item: the element to be analyzed
         @type item: string/integer/float
         """
-        self._item   = item
-        self._type   = self._find_type(item)
+        self._item = item
+        self._type = self._find_type(item)
 
     def get_value(self):
         """
@@ -52,14 +52,7 @@ class Element(object):
         @rtype: <types> name
         """
         # check for int
-        if self._isint(item):
-            return types.IntType
-        # check for float
-        elif self._isfloat(item):
-            return types.FloatType
-        # the default is string
-        else:
-            return types.StringType
+        return type(item)
 
     def _isint(self, item):
         """
@@ -71,11 +64,7 @@ class Element(object):
         @return: 1/0
         @rtype: integer
         """
-        try:
-            int(item)
-        except:
-            return 0
-        return 1
+        return isinstance(item, int)
 
     def _isfloat(self, item):
         """
@@ -87,11 +76,7 @@ class Element(object):
         @return: 1/0
         @rtype: float
         """
-        try:
-            float(item)
-        except:
-            return 0
-        return 1
+        return isinstance(item, float)
 
 class ValElement(Element):
     """
@@ -107,12 +92,12 @@ class ValElement(Element):
         @type item: string/integer/float
         """
         # check whether it is a string
-        if isinstance(item, type("a")):
+        if isinstance(item, str):
             # if yes, initialize it in the super class
             super(ValElement, self).__init__(item)
 
             # get the typed value
-            self._tvalue = self._get_tvalue(item, self.get_type())
+            self._tvalue = type(item)
         else:
             # if no string, determine the type.
             # store the typed value and the
@@ -214,7 +199,7 @@ class ForElement(ValElement):
         if type == types.IntType:
 
             # get the length of the stripped string version
-            svalue = string.strip(self._item)
+            svalue = self._item.strip()
             flength = len(svalue)
 
             # correct for a sign in the stripped string
@@ -231,7 +216,7 @@ class ForElement(ValElement):
 
         elif type == types.FloatType:
             # store the stripped string
-            svalue = string.strip(self._item)
+            svalue = self._item.strip()
 
             # check for an exponent
             epos = string.find(svalue, 'E')

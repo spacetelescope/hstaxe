@@ -94,7 +94,7 @@ class Header(object):
             raise Exception(err_msg)
 
         # split the string to lines
-        hitems = string.split(string.strip(hentry),'\n')
+        hitems = hentry.strip().split('\n')
 
         # check whether more than one line
         # wants to be added
@@ -186,7 +186,7 @@ class Header(object):
         @type hlist: string
         """
         # split the string to lines
-        hitems = string.split(hlist,'\n')
+        hitems = hlist.split('\n')
 
         # for each line
         for item in hitems:
@@ -206,60 +206,61 @@ class Header(object):
         @param comment_char: the comment_char string
         @type comment_char: string
         """
-
+        print("loading header from {0:s}".format(filename))
         # start the item list
         data = []
-        lastcoll,currcoll =0,0
-        lastname =''
+        lastcoll, currcoll = 0, 0
+        lastname = ''
         # Define patterns for some common header formats
         commentpattern = re.compile(comment_char)
         sextractor_header = re.compile('^#\s*(\d+)\s+([+*-/()\w]+)([^\[]*)(\[\w+\])?(.*)\n')
         # open the data file and go over its rows
-        for line in file(filename, 'r'):
-            if commentpattern.match(line):
-                #append everything after the comment_char separator to Fullhdata
-                line_with_comment_char_stripped_off = commentpattern.sub('',line,count=1)
-                self.Fullhdata.append(line_with_comment_char_stripped_off)
-                SEmatch = sextractor_header.match(line)
-                if SEmatch:  #sextractor_header.match(line):
-                    # seems we have a SExtractorheader
-                    if not self.SExtractorFlag:
-                        self.SExtractorFlag = True
-                    groups = SEmatch.groups()
-                    currcoll = int(groups[0])
-                    name = groups[1]
-                    if currcoll <= lastcoll:
-                        #ignore multiple and definitions out of order
-                        continue
-                    if currcoll >  (lastcoll +1):
-#                        print currcoll,lastcoll
-                        # we jumped some lines, pad CollInfo
-                        vcounter = 1
-                        while (lastcoll +1) < currcoll:
-                            if lastname in self.SexVectorColls:
-                                self.CollInfo.append({'NAME':lastname+str(vcounter)})
-                                vcounter +=1
-                            else:
-                                self.CollInfo.append(None)
-                            lastcoll +=1
-                    self.CollInfo.append({'NAME':name})
-                    lastcoll =  currcoll
-                    lastname = name
-                    if groups[3]:
-                        # a unit was extracted
-                        self.CollInfo[-1]['UNIT'] = str(groups[3].strip('[]'))
-                    if groups[2] or groups[4]:
-                            self.CollInfo[-1]['COMMENT'] =''
-                            self.CollInfo[-1]['COMMENT'] += groups[2].strip()
-                            if groups[2] and groups[4]:
-                                self.CollInfo[-1]['COMMENT'] += ' '
-                            self.CollInfo[-1]['COMMENT'] += groups[4].strip()
+        with open(filename, 'r') as infile:
+            for line in infile:
+                if commentpattern.match(line):
+                    # append everything after the comment_char separator to Fullhdata
+                    line_with_comment_char_stripped_off = commentpattern.sub('',line,count=1)
+                    self.Fullhdata.append(line_with_comment_char_stripped_off)
+                    SEmatch = sextractor_header.match(line)
+                    if SEmatch:  # sextractor_header.match(line):
+                        # seems we have a SExtractorheader
+                        if not self.SExtractorFlag:
+                            self.SExtractorFlag = True
+                        groups = SEmatch.groups()
+                        currcoll = int(groups[0])
+                        name = groups[1]
+                        if currcoll <= lastcoll:
+                            #ignore multiple and definitions out of order
+                            continue
+                        if currcoll >  (lastcoll +1):
+    #                        print currcoll,lastcoll
+                            # we jumped some lines, pad CollInfo
+                            vcounter = 1
+                            while (lastcoll +1) < currcoll:
+                                if lastname in self.SexVectorColls:
+                                    self.CollInfo.append({'NAME':lastname+str(vcounter)})
+                                    vcounter +=1
+                                else:
+                                    self.CollInfo.append(None)
+                                lastcoll +=1
+                        self.CollInfo.append({'NAME':name})
+                        lastcoll =  currcoll
+                        lastname = name
+                        if groups[3]:
+                            # a unit was extracted
+                            self.CollInfo[-1]['UNIT'] = str(groups[3].strip('[]'))
+                        if groups[2] or groups[4]:
+                                self.CollInfo[-1]['COMMENT'] =''
+                                self.CollInfo[-1]['COMMENT'] += groups[2].strip()
+                                if groups[2] and groups[4]:
+                                    self.CollInfo[-1]['COMMENT'] += ' '
+                                self.CollInfo[-1]['COMMENT'] += groups[4].strip()
+                    else:
+                        data.append(line_with_comment_char_stripped_off)
                 else:
-                    data.append(line_with_comment_char_stripped_off)
-            else:
-                # leave the file at the first
-                # non-comment line
-                break
+                    # leave the file at the first
+                    # non-comment line
+                    break
         return data
 
 

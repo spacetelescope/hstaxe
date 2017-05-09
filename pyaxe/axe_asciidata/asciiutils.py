@@ -143,7 +143,7 @@ class Separator(object):
         witems = []
 
         # split it conventionally
-        items = string.split(string.strip(line))
+        items = line.strip().split()
 
         # go again over the line and identify
         # the exact starting position of each
@@ -172,7 +172,7 @@ class Separator(object):
         @rtype: [string]
         """
         # split the line
-        items = string.split(line, self._delimiter)
+        items = line.split(self._delimiter)
 
         # return the list
         return items

@@ -7,7 +7,6 @@ config object cfgobj=teal.teal('axe',loadonly=True)
 
 """
 import os
-import tempfile
 from .axeException import DirError
 from astropy import config
 
@@ -244,8 +243,3 @@ def get_axe_names(image, ext_info):
 def isstringlike(item):
     """Checks whether a term is a string or not"""
     return isinstance(item, str)
-
-
-def get_random_filename(dirname, ext):
-    """Deliver a random file name"""
-    return tempfile.mkstemp(suffix=ext, prefix=dirname+"tmp", dir=dirname)
