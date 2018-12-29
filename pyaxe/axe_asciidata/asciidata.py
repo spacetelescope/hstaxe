@@ -62,16 +62,12 @@ class NullData(object):
 
 class AsciiData(NullData):
     """
-    Basic class in the AstroAsciiData project
-
     This class and its methods forms the complete API for the
     for the
     """
     def __init__(self, filename=None, ncols=0, nrows=0, null=None,
                  delimiter=None, comment_char=None, columnInfo=0, headerComment=1):
         """
-        Constructor for the AsciiData Class
-
         The data is taken from  a file specified in the input.
         As addition, a NULL string, a delimiter string and a comment_char
         string can be specified. The ascii data is read in from the

@@ -14,7 +14,8 @@ from . import mefobjects
 from . import mdrzobjects
 from . import pysex2gol
 
-from .. import axeutils
+from ..config import axe_setup
+
 
 def iolprep(drizzle_image='',
             input_cat='',
@@ -50,33 +51,29 @@ def axeprep(inlist='',
             gcorr=False,
             histogram=False):
     """Function for the aXe task AXEPREP"""
-    # only temporarily here
-    axeutils.axe_setup()
 
     # do all the input checks
     inchecks = inputchecks.InputChecker('AXEPREP', inlist, configs, backims)
     inchecks.check_axeprep(backgr, backims)
 
     # create a list with the basic aXe inputs
-    axe_inputs = axeinputs.aXeInputList(inlist, configs, backims)
+    axe_inputs = axeinputs.aXeInput(inlist, configs, backims)
 
     # go over all the input
-    for item in axe_inputs:
-
+    for row in axe_inputs:
         # make a prepare-object; run the prepare
-        aXePrep = axepreptor.aXePrepArator(item['GRISIM'],
-                                           axeutils.getIMAGE(item['OBJCAT']),
-                                           item['DIRIM'],
-                                           item['CONFIG'],
-                                           item['DMAG'],
+        aXePrep = axepreptor.aXePrepArator(row['grisim'],
+                                           row['objcat'],
+                                           row['dirim'],
+                                           row['config'],
+                                           row['dmag'],
                                            backgr=backgr,
-                                           master_bck=item['FRINGE'],
+                                           master_bck=row['fringe'],
                                            backped=backped,
                                            mfwhm=mfwhm,
                                            norm=norm,
                                            gcorr=gcorr)
 
-        # delete the object
         aXePrep.run()
 
 
@@ -108,7 +105,7 @@ def axecore(inlist='',
             sampling='drzizzle'):
     """Function for the aXe task AXECORE"""
     # only temporarily here
-    axeutils.axe_setup()
+    axe_setup()
 
     # do all the file checks
     inchecks = inputchecks.InputChecker('AXECORE', inlist, configs)
@@ -117,14 +114,14 @@ def axecore(inlist='',
                            sampling)
 
     # create a list with the basic aXe inputs
-    axe_inputs = axeinputs.aXeInputList(inlist, configs, fconfterm)
+    axe_inputs = axeinputs.aXeInput(inlist, configs, fconfterm)
 
     # go over all the input
     for item in axe_inputs:
 
         # make an extraction object
         aXeNator = axesingextr.aXeSpcExtr(item['GRISIM'],
-                                          axeutils.getIMAGE(item['OBJCAT']),
+                                          item['OBJCAT'],
                                           item['DIRIM'],
                                           item['CONFIG'],
                                           item['DMAG'],
@@ -161,7 +158,7 @@ def drzprep(inlist='',
     # make the general setup;
     # needed to define
     # the BIN-directory
-    axeutils.axe_setup()
+    axe_setup()
 
     # make the objects task object, run it an do the cleaning
     prepArator = axelowlev.aXe_DRZPREP(inlist, configs, back=back,
@@ -181,7 +178,7 @@ def axecrr(inlist='',
            driz_separate=False):
     """Function for aXedrizzle with CR-rejection"""
     # make the general setup
-    axeutils.axe_setup(tmpdir=True)
+    axe_setup(tmpdir=True)
 
     # do all the input checks
     inchecks = inputchecks.InputChecker('AXEDRIZZLE', inlist, configs)
@@ -279,7 +276,7 @@ def axeddd(inlist='',
            driz_separate=False):
     """Function for aXedrizzle"""
     # make the general setup
-    axeutils.axe_setup(tmpdir=True)
+    axe_setup(tmpdir=True)
 
     # do all the input checks
     inchecks = inputchecks.InputChecker('AXEDRIZZLE', inlist, configs)
@@ -332,7 +329,7 @@ def sex2gol(grism='',
             silent=False):
     """Function for the aXe task SEX2GOL"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     sex2gol = pysex2gol.Sex2GolPy(grism, config, in_sex=in_sex,
                                   dirname=direct, out_sex=out_sex,
@@ -354,7 +351,7 @@ def gol2af(grism='',
            silent=False):
     """Function for the aXe task GOL2AF"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     # run GOL2AF
     gol2af = axelowlev.aXe_GOL2AF(grism, config, back=back, mfwhm=mfwhm,
@@ -372,7 +369,7 @@ def af2pet(grism='',
            silent=False):
     """Function for the aXe task AF2PET"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     # run AF2PET
     af2pet = axelowlev.aXe_AF2PET(grism, config, back=back, in_af=in_af,
@@ -394,7 +391,7 @@ def petcont(grism='',
             silent=False):
     """Function for the aXe task PETCONT"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     # run PETCONT
     petcont = axelowlev.aXe_PETCONT(grism, config, cont_model=cont_model,
@@ -414,7 +411,7 @@ def petff(grism='',
           ffname=None):
     """Function for the aXe task PETFF"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     # run PETFF
     petff = axelowlev.aXe_PETFF(grism, config, back=back, ffname=ffname)
@@ -436,7 +433,7 @@ def backest(grism='',
             out_bck=None):
     """Function for the aXe task BACKEST"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     #  run BACKEST
     backest = axelowlev.aXe_BE(grism, config, np=np, interp=interp,
@@ -462,7 +459,7 @@ def pet2spc(grism='',
             silent=False):
     """Function for the aXe task PET2SPC"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     pet2spc = axelowlev.aXe_PET2SPC(grism, config, use_bpet=use_bpet,
                                     adj_sens=adj_sens, weights=weights,
@@ -482,7 +479,7 @@ def stamps(grism='',
            silent=False):
     """Function for the aXe task STAMPS"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     # run STAMPS
     stamps = axelowlev.aXe_STAMPS(grism, config, sampling=sampling,
@@ -500,7 +497,7 @@ def drz2pet(inlist='',
             out_pet=None):
     """Function for the aXe task DRZ2PET"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     # run the DRZ2PET task
     drz2pet = axelowlev.aXe_DRZ2PET(inlist=inlist, config=config,
@@ -516,7 +513,7 @@ def axegps(grism='',
            yval=None):
     """Function for the aXe task AXEGPS"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
     axegps = axelowlev.aXe_GPS(grism, config, beam_ref, xval, yval)
     axegps.runall()
 
@@ -531,7 +528,7 @@ def axedirim(dirname='',
              silent=False):
     """Function for the aXe task AXEDIRIM"""
     # make the general setup
-    axeutils.axe_setup()
+    axe_setup()
 
     # run the command and delete what's left
     axedirim = axelowlev.aXe_DIRIMAGE(dirname, config, tpass_direct,

@@ -3,17 +3,44 @@
 
 import os
 import sys
-import subprocess
+import importlib
+
 from glob import glob
-from setuptools import setup, find_packages, Extension, Command
+from setuptools import find_packages, Command
 from setuptools.command.test import test as TestCommand
+from subprocess import check_call, CalledProcessError
 
-# Get some values from the setup.cfg
 try:
-    from ConfigParser import ConfigParser
+    from setuptools import setup
+    from setuptools import Extension
+    from setuptools.command.build_ext import build_ext
 except ImportError:
-    from configparser import ConfigParser
+    from distutils.core import setup
+    from distutils.extension import Extension
+    from distutils.command.build_ext import build_ext
 
+from distutils.command.clean import clean
+from configparser import ConfigParser
+
+AXELIB_DIR = "cextern/aXe_c_code/"
+CONF_H_NAME = os.path.join(AXELIB_DIR, "config.h")
+
+# We only need to compile with these
+AXE_SOURCES = glob(AXELIB_DIR+"/src/*.c")
+AXELIB_DEFINES = [("HAVE_CONFIG_H", "1")]
+
+# Create the axe module extension
+# no-strict-prototypes is inserted in order
+# to cut back on the cfitsio lib warnings
+axe_module = Extension("axe",
+                       sources=AXE_SOURCES,
+                       include_dirs=[AXELIB_DIR],
+                       define_macros=AXELIB_DEFINES,
+                       depends=[CONF_H_NAME],
+                       language="C",
+                       extra_compile_args=['-Wno-strict-prototypes',
+                                           '-fcommon'],
+                       )
 
 # hack building the sphinx docs with C source
 try:
@@ -77,15 +104,47 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
+class my_clean:
+    def run(self):
+        try:
+            check_call(["make", "clean"], cwd=AXELIB_DIR)
+        except CalledProcessError as e:
+            print(e)
+            exit(1)
+
+        if os.access(CONF_H_NAME, os.F_OK):
+            os.remove(CONF_H_NAME)
+        # os.remove("wrappers/axe.c")
+        clean.run(self)
+        print("cleaning")
+
+
+class build_ext_with_configure(build_ext):
+    def build_extensions(self):
+        CURRENT_ENV = sys.prefix
+        try:
+            check_call(["make", "clean"], cwd=AXELIB_DIR)
+            check_call(["sh", "./configure",
+                        "--with-cfitsio="+CURRENT_ENV,
+                        "--with-wcstools="+CURRENT_ENV,
+                        "--with-gsl="+CURRENT_ENV], cwd=AXELIB_DIR)
+            check_call(["make"], cwd=AXELIB_DIR)
+        except CalledProcessError as e:
+            print(e)
+            exit(1)
+        build_ext.build_extensions(self)
+
+
 # Get some values from the setup.cfg
 conf = ConfigParser()
 conf.read(['setup.cfg'])
 metadata = dict(conf.items('metadata'))
-PACKAGENAME = metadata.get('package_name', 'axenoiraf')
+PACKAGENAME = metadata.get('package_name', 'pyaxe')
 DESCRIPTION = metadata.get('description', 'aXe - spectral extraction for HST')
-LONG_DESCRIPTION = metadata.get('long_description', 'aXe minus the IRAF')
+LONG_DESCRIPTION = metadata.get('long_description',
+                                'aXe spectral extraction for HST minus the IRAF')
 AUTHOR = metadata.get('author', 'STScI')
-AUTHOR_EMAIL = metadata.get('author_email', 'help@stsci.edu')
+AUTHOR_EMAIL = metadata.get('author_email', 'https://hsthelp.stsci.edu')
 LICENSE = metadata.get('license', '3-Clause BSD')
 URL = metadata.get('url', 'http://axe-info.stsci.edu')
 
@@ -98,54 +157,47 @@ else:
         import relic.release
     except ImportError:
         try:
-            subprocess.check_call(['git', 'clone',
-                                   'https://github.com/jhunkeler/relic.git'])
+            check_call(['git', 'clone',
+                        'https://github.com/spacetelescope/relic.git'])
             sys.path.insert(1, 'relic')
             import relic.release
-        except subprocess.CalledProcessError as e:
+        except CalledProcessError as e:
             print(e)
             exit(1)
-
 
 version = relic.release.get_info()
 relic.release.write_template(version, PACKAGENAME)
 
-# Modifiy this if C/BLAS are not in /usr/lib.
-BLAS_LIB_DIR = '/usr/lib'
+# # Modifiy this if C/BLAS are not in /usr/lib.
+# BLAS_LIB_DIR = '/usr/lib'
 
-# Default names of BLAS libraries
-BLAS_LIB = ['cblas']
-BLAS_EXTRA_LINK_ARGS = []
+# # Default names of BLAS libraries
+# BLAS_LIB = ['cblas']
+# BLAS_EXTRA_LINK_ARGS = []
 
-# Set environment variable BLAS_NOUNDERSCORES=1 if your BLAS does
-# not use trailing underscores
-BLAS_NOUNDERSCORES = False
+# # Set environment variable BLAS_NOUNDERSCORES=1 if your BLAS does
+# # not use trailing underscores
+# BLAS_NOUNDERSCORES = False
 
-BUILD_GSL = 1
-
-# Directory containing libgsl (used only when BUILD_GSL = 1).
-GSL_LIB_DIR = '/usr/local/lib'
-
-# Directory containing the GSL header files (used only when BUILD_GSL = 1).
-GSL_INC_DIR = 'cextern/gsl'
 
 # Treat everything in scripts except README.rst as a script to be installed
 scripts = [fname for fname in glob(os.path.join('scripts', '*'))
            if os.path.basename(fname) != 'README.rst']
-
 
 # Define entry points for command-line scripts
 # entry_points = {'console_scripts': []}
 
 # entry_point_list = conf.items('entry_points')
 # for entry_point in entry_point_list:
-#    entry_points['console_scripts'].append('{0} = {1}'.format(entry_point[0],
-#                                                              entry_point[1]))
+#     entry_points['console_scripts'].append('{0} = {1}'.format(entry_point[0],
+#                                                               entry_point[1]))
 
 
 # Note that requires and provides should not be included in the call to
 # ``setup``, since these are now deprecated. See this link for more details:
 # https://groups.google.com/forum/#!topic/astropy-dev/urYO8ckB2uM
+package_info = {}
+package_info['ext_modules'] = [axe_module]
 
 setup(
     name=PACKAGENAME,
@@ -159,10 +211,18 @@ setup(
     classifiers=[
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: C',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: C',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=['numpy', 'astropy'],
+    install_requires=['numpy',
+                      'astropy',
+                      'wcstools',
+                      'cfitsio',
+                      'gsl',
+                      'stwcs',
+                      'drizzlepac'],
     scripts=scripts,
     packages=find_packages(),
     tests_require=[
@@ -173,6 +233,10 @@ setup(
     ],
     cmdclass={
         'test': PyTest,
-        'build_sphinx': BuildSphinx
+        'build_sphinx': BuildSphinx,
+        'build_ext': build_ext_with_configure,
+        'clean': my_clean,
     },
+    #entry_points=entry_points,
+    **package_info
 )

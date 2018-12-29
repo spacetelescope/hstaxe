@@ -3,7 +3,7 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import math
 
-from .. import axeutils
+from .. import config
 from ..axeerror import aXeError
 
 
@@ -319,10 +319,10 @@ class ConfigList(object):
 
                 # if the keyvalue is NOT None but the file does not exist
                 if ((kvalue.upper() is not 'NONE') and
-                    (not os.path.isfile(axeutils.getCONF(kvalue)))):
+                    (not os.path.isfile(config.getCONF(kvalue)))):
                     # report an error
                     err_msg = ("The file: {0:s} does not exist!"
-                               .format(axeutils.getCONF(kvalue)))
+                               .format(config.getCONF(kvalue)))
                     raise aXeError(err_msg)
 
     def get_gkey(self, keyword):
@@ -958,10 +958,10 @@ class ConfigBeam(object):
                 if ((bkey.keyword is full_keyword) and
                      (bkey.keyvalue.upper() is not 'NONE')):
                     # check for the file
-                    if not os.path.isfile(axeutils.getCONF(bkey.keyvalue)):
+                    if not os.path.isfile(config.getCONF(bkey.keyvalue)):
                         # report an error
                         err_msg = ("The file: {0:s} does not exist!"
-                                   .format(axeutils.getCONF(bkey.keyvalue)))
+                                   .format(config.getCONF(bkey.keyvalue)))
                         raise aXeError(err_msg)
                     else:
                         n_sens += 1

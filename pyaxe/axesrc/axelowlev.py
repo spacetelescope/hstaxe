@@ -6,7 +6,7 @@ import subprocess
 
 from ..config import __AXE_BINDIR as AXE_BINDIR
 from ..axeerror import aXeError
-from .. import axeutils
+from ..config import getOUTPUT
 
 # define the good return
 # value for the binaries
@@ -31,10 +31,10 @@ class TaskWrapper(object):
         self.command_list = []
 
         # save a name for stdout
-        self.stdout = axeutils.getOUTPUT(tshort+'.stdout')
+        self.stdout = getOUTPUT(tshort+'.stdout')
 
         # save a name for stderr
-        self.stderr = axeutils.getOUTPUT(tshort+'.stderr')
+        self.stderr = getOUTPUT(tshort+'.stderr')
 
         # put the command into the list
         self.command_list.append("/".join([AXE_BINDIR, taskname]))
@@ -448,30 +448,30 @@ class aXe_GOL2AF(TaskWrapper):
         configs: str
             aXe configuration file term
         params: dict
-            all other parameters
+            all other possible parameters
         """
         # initialize via superclass
         super(aXe_GOL2AF, self).__init__('aXe_GOL2AF', 'gol2af')
 
-        # put the grism name to the list
+        # add the grism name to the list
         self.command_list.append(grism)
 
         # put the config file name to the list
         self.command_list.append(config)
 
         # append the parameter 'mfwhm'
-        if (params['mfwhm'] is not None):
+        if (('mfwhm' in params) and (params['mfwhm'] is not None)):
             # put the name to the list
             self.command_list.append('-mfwhm={0:s}'
                                      .format(str(params['mfwhm'])))
 
         # append the parameter 'dmag'
-        if (params['dmag'] is not None):
+        if (('dmag' in params) and (params['dmag'] is not None)):
             # put the name to the list
             self.command_list.append('-dmag={0:s}'.format(str(params['dmag'])))
 
         # append the parameter 'lambda_mark'
-        if (params['lambda_mark'] is not None):
+        if (('lambda_mark' in params) and (params['lambda_mark'] is not None)):
             # put the name to the list
             self.command_list.append('-lambda_mark={0:s}'
                                      .format(str(params['lambda_mark'])))
@@ -479,42 +479,42 @@ class aXe_GOL2AF(TaskWrapper):
             self.command_list.append('-lambda_mark=800.0')
 
         # append the parameter 'out_pet'
-        if (params['out_pet'] is not None):
+        if (('out_pet' in params) and (params['out_pet'] is not None)):
             # put the name to the list
             self.command_list.append('-out_PET={0:s}'
                                      .format(params['out_pet']))
 
         # append the parameter 'in_af'
-        if (params['out_af'] is not None):
+        if (('out_af' in params) and (params['out_af'] is not None)):
             # put the name to the list
             self.command_list.append('-out_AF={0:s}'.format(params['out_af']))
 
         # append the parameter 'in_gol'
-        if (params['in_gol'] is not None):
+        if (('in_gol' in params) and (params['in_gol'] is not None)):
             # put the name to the list
             self.command_list.append('-in_GOL={0:s}'.format(params['in_gol']))
 
         # append the flag 'slitless_geom'
-        if (params['slitless_geom']):
+        if (('slitless_geom' in params) and (params['slitless_geom'])):
             # put the exclude_faint-flag to the list
             self.command_list.append('-slitless_geom=1')
         else:
             self.command_list.append('-slitless_geom=0')
 
         # append the flag 'orient'
-        if (params['orient']):
+        if (('orient' in params) and (params['orient'])):
             # put the exclude_faint-flag to the list
             self.command_list.append('-orient=1')
         else:
             self.command_list.append('-orient=0')
 
         # append the flag 'exclude'
-        if (params['exclude']):
+        if (('exclude' in params) and (params['exclude'])):
             # put the exclude_faint-flag to the list
             self.command_list.append('-exclude_faint')
 
         #  append the flag 'bck'
-        if (params['back']):
+        if (('back' in params) and (params['back'])):
             # put the bck-flag to the list
             self.command_list.append('-bck')
 

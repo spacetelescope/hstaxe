@@ -7,60 +7,66 @@ config object cfgobj=teal.teal('axe',loadonly=True)
 
 """
 import os
+import shutil
 from .axeException import DirError
-from astropy import config
+from astropy.io import fits
 
 # defaults
-_user_paths = {"AXE_IMAGE_PATH": 'IMAGE',
-               "AXE_OUTPUT_PATH": 'OUTPUT',
-               "AXE_CONFIG_PATH": 'CONFIG',
-               "AXE_DRIZZLE_PATH": 'DRIZZLE'}
+__user_paths = {"AXE_IMAGE_PATH": './IMAGE',
+               "AXE_OUTPUT_PATH": './OUTPUT',
+               "AXE_CONFIG_PATH": './CONFIG',
+               "AXE_DRIZZLE_PATH": './DRIZZLE'}
 
 __AXE_DRZTMP_SUB = 'tmp'
-__AXE_BINDIR = './cextern/aXe_c_code/'
-__AXE_DRZTMP_LOC = os.path.join(_user_paths["AXE_DRIZZLE_PATH"],
-                                            __AXE_DRZTMP_SUB)
+__AXE_BINDIR = '../cextern/aXe_c_code/src'
+__AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
+                                __AXE_DRZTMP_SUB)
 
 
 def set_defaults():
     """defaults for the aXe directories"""
+    global __AXE_DRZTMP_LOC
+    global __AXE_DRZTMP_SUB
+    global __user_paths
 
     # override with user environment
     user_env = os.environ
-    for name in _user_paths:
+    for name in __user_paths:
         if name in user_env:
-            _user_paths[name] = user_env[name]
+            __user_paths[name] = user_env[name]
             print("{0:s} -> {1:s}".format(name, user_env[name]))
         else:
             print("{0:s} not defined, using {1:s}".format(name,
-                                                          _user_paths[name]))
+                                                          __user_paths[name]))
 
-            if os.access(_user_paths[name], os.R_OK):
+            if os.access(__user_paths[name], os.R_OK):
                 print("{0:s} already exists".format(name))
             else:
                 try:
-                    os.mkdir(_user_paths[name])
+                    os.mkdir(__user_paths[name])
                 except OSError:
-                    raise OSError("Problem creating {0:s} -> {1:s}".format(name, _user_paths[name]))
+                    raise OSError("Problem creating {0:s} -> {1:s}"
+                                  .format(name, __user_paths[name]))
 
-    __AXE_DRZTMP_LOC = os.path.join(_user_paths["AXE_DRIZZLE_PATH"],
-                                                __AXE_DRZTMP_SUB)
+    __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
+                                    __AXE_DRZTMP_SUB)
 
 
 def check_axe_dirs():
     """Check for usability of all axe directories"""
-    for location in _user_paths.values():
+    for location in __user_paths.values():
         if not os.access(location, os.W_OK):
             raise IOError("{0:s} not writeable".format(location))
 
 
+# TODO: add the environment check here
 def check_axesim_dirs():
     """Check for existence of all directories"""
-    user_env = os.environ
-    _user_paths["AXE_SIMDATA_PATH"] = './SIMDATA'
-    _user_paths["AXE_OUTSIM_PATH"] = './OUTSIM'
+    global __user_paths
+    __user_paths["AXE_SIMDATA_PATH"] = './SIMDATA'
+    __user_paths["AXE_OUTSIM_PATH"] = './OUTSIM'
 
-    for location in _user_paths:
+    for location in __user_paths:
         if not os.access(location, os.W_OK):
             raise IOError("{0:s} not writable".format(location))
 
@@ -69,15 +75,16 @@ def handle_drztmp_dir():
     """Set the drizzle temporary directory"""
 
     # delete an already existing directory
-    if os.path.isdir(_user_paths['AXE_DRZTMP_LOC']):
+    if os.path.isdir(__user_paths['AXE_DRZTMP_LOC']):
         print("Deleting old directory...")
-        shutil.rmtree(_user_paths['AXE_DRZTMP_LOC'])
+        shutil.rmtree(__user_paths['AXE_DRZTMP_LOC'])
 
     # create a new, empty directory
-    os.mkdir(_user_paths['AXE_DRZTMP_LOC'])
-    print('Creating temporary directory: ', _user_paths['AXE_DRZTMP_LOC'])
+    os.mkdir(__user_paths['AXE_DRZTMP_LOC'])
+    print('Creating temporary directory: ', __user_paths['AXE_DRZTMP_LOC'])
 
 
+# TODO: Update this for axesim
 def axe_setup(tmpdir=False, axesim=False):
     """Setup the aXe file and pathnames"""
 
@@ -117,9 +124,9 @@ def getCONF(name=None):
     # the pathname to the input file
     # in AXE_CONFIG_PATH
     if name is None:
-        return _user_paths['AXE_CONFIG_PATH']
+        return __user_paths['AXE_CONFIG_PATH']
     else:
-        return os.path.join(_user_paths['AXE_CONFIG_PATH'], name)
+        return os.path.join(__user_paths['AXE_CONFIG_PATH'], name)
 
 
 def getIMAGE(name=None):
@@ -127,9 +134,9 @@ def getIMAGE(name=None):
     # the pathname to the input file
     # in AXE_IMAGE_PATH
     if name is None:
-        return _user_paths['AXE_IMAGE_PATH']
+        return __user_paths['AXE_IMAGE_PATH']
     else:
-        return os.path.join(_user_paths['AXE_IMAGE_PATH'], name)
+        return os.path.join(__user_paths['AXE_IMAGE_PATH'], name)
 
 
 def getOUTPUT(name=None):
@@ -137,9 +144,9 @@ def getOUTPUT(name=None):
     # the pathname to the input file
     # in AXE_OUTPUT_PATH
     if name is None:
-        return _user_paths['AXE_OUTPUT_PATH']
+        return __user_paths['AXE_OUTPUT_PATH']
     else:
-        return os.path.join(_user_paths['AXE_OUTPUT_PATH'], name)
+        return os.path.join(__user_paths['AXE_OUTPUT_PATH'], name)
 
 
 def getOUTSIM(name=None):
@@ -167,19 +174,94 @@ def getDRIZZLE(name=None):
     # the pathname to the input file
     # in AXE_DRIZZLE_PATH
     if name is None:
-        return _user_paths['AXE_DRIZZLE_PATH']
+        return __user_paths['AXE_DRIZZLE_PATH']
     else:
-        return os.path.join(_user_paths['AXE_DRIZZLE_PATH'], name)
+        return os.path.join(__user_paths['AXE_DRIZZLE_PATH'], name)
 
 
 def getDRZTMP(name=None):
     # return either AXE_DRZTMP_LOC or
     # the pathname to the input file
     # in AXE_DRZTMP_LOC
+    global __AXE_DRZTMP_LOC
     if name is None:
         return __AXE_DRZTMP_LOC
     else:
         return os.path.join(__AXE_DRZTMP_LOC, name)
+
+
+def get_ext_info(image, conf):
+    """Determines the extension information on an image."""
+
+    # initialize a dictionary
+    ext_info = {}
+
+    # set default values
+    ext_info['ext_name'] = None
+    ext_info['axe_ext'] = None
+    ext_info['fits_ext'] = None
+    ext_info['ext_version'] = None
+
+    # open the image
+    with fits.open(image, 'readonly') as fits_image:
+
+        # check the keyword for string-like
+        if isstringlike(conf.get_gvalue('SCIENCE_EXT')):
+            # set the extension name
+            ext_info['ext_name'] = conf.get_gvalue('SCIENCE_EXT')
+
+            # check whether OPTKEY1 and OPTVAL1 are set
+            if ((conf.get_gvalue('OPTKEY1') is not None) and
+                    (conf.get_gvalue('OPTVAL1') is not None)):
+
+                # store the key
+                optkey = conf.get_gvalue('OPTKEY1')
+
+                # store the value, convert
+                # CCDCHIP value to integer type
+                if optkey == 'CCDCHIP':
+                    optval = int(conf.get_gvalue('OPTVAL1'))
+                else:
+                    optval = conf.get_gvalue('OPTVAL1')
+
+                # go over all fits extensions
+                for index in range(len(fits_image)):
+                    # check whether the extension name fits
+                    if (('EXTNAME' in fits_image[index].header) and
+                        (fits_image[index].header['EXTNAME'] == ext_info['ext_name'])):
+
+                        # check whether OPTKEY1 and OPTKEYVAL1 fits
+                        if optkey in fits_image[index].header and fits_image[index].header[optkey] == optval:
+
+                            # set the extension numbers
+                            ext_info['fits_ext'] = index
+                            ext_info['axe_ext'] = index + 1
+            else:
+                for index in range(len(fits_image)):
+                    if (('EXTNAME' in fits_image[index].header) and
+                        (fits_image[index].header['EXTNAME'] == ext_info['ext_name'])):
+                        ext_info['fits_ext'] = index
+                        ext_info['axe_ext']  = index + 1
+        else:
+            # set the axe extension number an axe extension number
+            ext_info['axe_ext'] = int(conf.get_gvalue('SCIENCE_EXT'))
+            ext_info['fits_ext'] = int(conf.get_gvalue('SCIENCE_EXT')) - 1
+
+            # get extension name, if possible
+            if 'EXTNAME' in fits_image[ext_info['fits_ext']].header:
+                ext_info['ext_name'] = fits_image[ext_info['fits_ext']].header['EXTNAME']
+
+        # check for success, complain and out if not
+        if ext_info['axe_ext'] is None:
+            err_msg = 'Unable to find the specified extensions in image %s!' % image
+            raise aXeError(err_msg)
+
+        # get extension version, if possible
+        if 'EXTVER' in fits_image[ext_info['fits_ext']].header:
+            ext_info['ext_version'] = fits_image[ext_info['fits_ext']].header['EXTVER']
+
+    # return the dictionary
+    return ext_info
 
 
 def get_axe_names(image, ext_info):

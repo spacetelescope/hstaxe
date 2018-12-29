@@ -4,11 +4,13 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 from stsci.tools import wcsutil
 
-from .. import axe_asciidata
-from ..axeerror import aXeError
-from .. import axeutils
 from . import configfile
 from . import axeiol
+
+from ..axeerror import aXeError
+from ..config import (getCONF, getIMAGE, getOUTPUT,
+                      getOUTSIM, getDRZTMP, get_ext_info)
+
 
 
 class Sex2GolPy(object):
@@ -40,7 +42,7 @@ class Sex2GolPy(object):
                                                              in_sex, out_sex)
 
         # save a name for stdout
-        self.stdout = axeutils.getOUTPUT("pysex2gol.stdout")
+        self.stdout = getOUTPUT("pysex2gol.stdout")
 
     def __str__(self):
         """String method for the class"""
@@ -75,9 +77,8 @@ class Sex2GolPy(object):
         if spec_hdu is None:
             # load the configuration file;
             # determine the extension information
-            conf = configfile.ConfigFile(axeutils.getCONF(config))
-            ext_info = axeutils.get_ext_info(axeutils.getIMAGE(grisim), conf)
-            del conf
+            conf = configfile.ConfigFile(getCONF(config))
+            ext_info = get_ext_info(getIMAGE(grisim), conf)
 
         else:
             # make by hand the extension information
@@ -87,14 +88,27 @@ class Sex2GolPy(object):
         return ext_info
 
     def _get_dirname_information(self,
-                                 dirname,
-                                 config,
-                                 grisim,
-                                 grism_extinfo,
+                                 dirname="",
+                                 config="",
+                                 grisim="",
+                                 grism_extinfo=None,
                                  dir_hdu=None):
-        """Determine the direct image information"""
+        """Determine the direct image information.
+
+        dirname : str
+            Diretory name
+        config : str
+            The name of the config file
+        grisim : str
+            The name of the grisim image
+        grism_extinfo : dict
+            Dictionary of header information
+        dir_hdu :  fits.HDU
+            FITS header data unit
+
+        """
         # check whether ANY direct image information exists
-        if ((dirname is None) and (dir_hdu is None)):
+        if (not (dirname) and (dir_hdu is None)):
             # set the grism image as direct image
             dirname = grisim
             dirname_extinfo = grism_extinfo
@@ -102,9 +116,8 @@ class Sex2GolPy(object):
         elif ((dirname is not None) and (dir_hdu is None)):
             # load the configuration file;
             # determine the extension information
-            conf = configfile.ConfigFile(axeutils.getCONF(config))
-            dirname_extinfo = axeutils.get_ext_info(axeutils.getIMAGE(grisim),
-                                                    conf)
+            conf = configfile.ConfigFile(getCONF(config))
+            dirname_extinfo = get_ext_info(getIMAGE(grisim), conf)
             del conf
 
         elif ((dirname is not None) and (dir_hdu is not None)):
@@ -131,11 +144,13 @@ class Sex2GolPy(object):
         # compose the default name
         if in_sex is None:
             # compose the filename from the direct image name
-            in_sex = dirname.replace(".fits", "_{0:d}.cat".format(dirname_extinfo['axe_ext']))
+            in_sex = dirname.replace(".fits", "_{0:d}.cat"
+                                     .format(dirname_extinfo['axe_ext']))
 
         # check whether the explicitly given filename exists
         if not os.path.isfile(in_sex):
-            err_msg = "The Input Object List: {0:s}  does not exist!".format(in_sex)
+            err_msg = ("The Input Object List: {0:s}  does not exist!"
+                       .format(in_sex))
             raise aXeError(err_msg)
 
         if out_sex is None:
@@ -145,83 +160,45 @@ class Sex2GolPy(object):
         # return the IOL and the GOL names
         return in_sex, out_sex
 
-    def _transfer_fromIOL_toGOL(self):
+    def _copy_catalog(self):
         """Copies relevant data from IOL to GOL"""
 
-        # load the IOL
-        iol = axeiol.InputObjectList(self.in_sex)
+        # load the IOL into an astropy table
+        # the table is in iol.catalog
+        self.iol = axeiol.InputObjectList(self.in_sex)
 
         # check for an empty table
-        if iol.nrows < 1:
-            # return only none's
-            return None, None
+        if len(self.iol.catalog) < 1:
+            return None
 
-        # determine the number of columns
-        ncols_gol = len(iol.mand_cols) + len(iol.wav_cols)
+        # create a new GOL that's a copy of the input list
+        self.gol = self.iol.catalog.copy()  # just make a copy
 
-        # create an empty GOL
-        gol = axe_asciidata.create(ncols_gol, iol.nrows)
-        gol.toSExtractor()
-
-        # go over all
-        # mandatory columns
-        c_index = 0
-        for one_col in iol.mand_cols:
-            # rename the GOL column
-            gol[c_index].rename(one_col['name'])
-
-            # go over all rows
-            for r_index in range(iol.nrows):
-
-                # transfer the value
-                gol[one_col['name']][r_index] = iol[one_col['name']][r_index]
-
-            # enhance the index
-            c_index += 1
-
-        # go over all wavelength columns
-        for one_col in iol.wav_cols:
-
-            # rename the GOL column
-            gol[c_index].rename(one_col['name'])
-
-            # go over all rows
-            for r_index in range(iol.nrows):
-
-                # transfer the value
-                gol[one_col['name']][r_index] = iol[one_col['name']][r_index]
-
-            # enhance the index
-            c_index += 1
-
-        # return the GOL
-        return iol, gol
-
-    def _transfer_coos(self, iol, gol):
+    def _transfer_coos(self):
         """Transfer coordinates from the IOL to the GOL"""
         # compose the WCS-term for the direct and grism images
-        dir_term = axeutils.getIMAGE("{0:s} [{1:d}]".format(self.dirname, self.dirname_extinfo['fits_ext']))
-        gri_term = axeutils.getIMAGE("{0:s} [{1:d}]".format(self.grisim, self.grism_extinfo['fits_ext']))
+        dir_term = getIMAGE("{0:s} [{1:d}]".format(self.dirname, self.dirname_extinfo['fits_ext']))
+        gri_term = getIMAGE("{0:s} [{1:d}]".format(self.grisim, self.grism_extinfo['fits_ext']))
 
         # generate the WCS objects
         dir_wcs = wcsutil.WCSObject(dir_term)
         gri_wcs = wcsutil.WCSObject(gri_term)
 
         # go over each row
-        for index in range(iol.nrows):
+        for row in self.gol:
 
             # make a position tuple
-            xy_dirname = (iol['X_IMAGE'][index], iol['Y_IMAGE'][index])
+            xy_direct= (row['X_IMAGE'], row['Y_IMAGE'])
 
             # convert to RADEC
-            radec_pos = dir_wcs.xy2rd(xy_dirname)
+            radec_pos = dir_wcs.xy2rd(xy_direct)
 
             # convert to XY on grism
             xy_grism = gri_wcs.rd2xy(radec_pos)
 
             # store projected vals in the GOL
-            gol['X_IMAGE'][index] = float(xy_grism[0])
-            gol['Y_IMAGE'][index] = float(xy_grism[1])
+            row['X_IMAGE'] = float(xy_grism[0])
+            row['Y_IMAGE'] = float(xy_grism[1])
 
     def _treat_NULL_table(self, out_name):
         """Transfer an empty table
@@ -245,7 +222,6 @@ class Sex2GolPy(object):
         """Make the SEX2GOL transformations"""
         # give feedback
         if not silent:
-            print(self)
             print("py_SEX2GOL:  Start processing ...",)
         else:
             # open stdout/stderr
@@ -253,26 +229,26 @@ class Sex2GolPy(object):
             sout.write(str(self)+"\n")
             sout.write("py_SEX2GOL:  Start processing ...")
 
-        # copy the relevant data to the GOL
-        iol, gol = self._transfer_fromIOL_toGOL()
+        # copy the relevant data to the GOL catalog
+        self._copy_catalog()
 
         # check whether something can be done
-        if ((iol is not None) and (gol is not None)):
+        if (self.iol and self.gol):
             # transfer the coordinates
-            self._transfer_coos(iol, gol)
+            self._transfer_coos()
 
             # store the GOL
-            gol.writeto(axeutils.getOUTPUT(self.out_sex))
+            self.gol.write(getOUTPUT(self.out_sex),
+                             format='ascii.commented_header')
 
         else:
             # if there are no objects, just copy the empty table
             # header to the GOL
-            self._treat_NULL_table(axeutils.getOUTPUT(self.out_sex))
+            self._treat_NULL_table(getOUTPUT(self.out_sex))
 
             # give feedback
             if not silent:
-                print(self)
-                print("py_SEX2GOL:  Warning! Empty table copied to GOL")
+                print("\npy_SEX2GOL:  Warning! Empty table copied to GOL")
             else:
                 # open stdout/stderr
                 sout.write("py_SEX2GOL:  Warning! Empty table copied to GOL")

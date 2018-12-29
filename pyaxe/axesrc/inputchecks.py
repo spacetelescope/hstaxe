@@ -4,11 +4,13 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import math
 from astropy.io import fits
-from .. import axeutils
+
+from . import axeinputs
 from . import configfile
 from . import axeiol
+
 from ..axeerror import aXeError, aXeSIMError
-from . import axeinputs
+from .. import config
 
 
 class InputChecker(object):
@@ -24,12 +26,8 @@ class InputChecker(object):
                        .format(self.taskname, inlist))
                 raise aXeError(msg)
 
-            # create a list with the basic aXe inputs
-            self.axe_inputs = axeinputs.aXeInputList(inlist, configs, backims)
-
-        else:
-            # set the parameter to None
-            self.axe_inputs = None
+            # create a table with the basic aXe inputs
+            self.axe_inputs = axeinputs.aXeInput(inlist, configs, backims)
 
     def _is_prism_data(self):
         # define the default
@@ -57,7 +55,7 @@ class InputChecker(object):
 
             # check whether it is prism data
             if ((filter1 and filter1.find('PR') > -1) or
-                (filter2 and filter2.find('PR') > -1)):
+                    (filter2 and filter2.find('PR') > -1)):
                 # switch to IS_PRISM
                 is_prism = 1
 
@@ -66,98 +64,6 @@ class InputChecker(object):
 
         # return the index
         return is_prism
-
-    def _check_grism(self):
-        """Check the presence of all grism images"""
-        # go over all inputs
-        for one_input in self.axe_inputs:
-            # check the prism image
-            if not os.path.isfile(axeutils.getIMAGE(one_input['GRISIM'])):
-                # error and out
-                msg = ("{0:s}: The grism image: {1:s} does not exist!"
-                       .format((self.taskname,
-                                axeutils.getIMAGE(one_input['GRISIM']))))
-                raise aXeError(msg)
-
-    def _check_direct(self):
-        """Check the presence of all grism images"""
-        # make an empty list
-        direct_list = []
-
-        # go over all inputs
-        for one_input in self.axe_inputs:
-
-            # go on if there is nor direct image
-            if not one_input['DIRIM']:
-                continue
-
-            # go on if the direct image has already been checked
-            if one_input['DIRIM'] in direct_list:
-                continue
-
-            # check the prism image
-            if not os.path.isfile(axeutils.getIMAGE(one_input['DIRIM'])):
-                # error and out
-                msg = ("{0:s}: The direct image: {1:s} does not exist!"
-                       .format(self.taskname,
-                               axeutils.getIMAGE(one_input['DIRIM'])))
-                raise aXeError(msg)
-
-            # put the direct image to the list
-            direct_list.append(one_input['DIRIM'])
-
-    def _check_IOL(self):
-        """Check the presence of all grism images"""
-        # make an empty list
-        IOL_list = []
-
-        # go over all inputs
-        for one_input in self.axe_inputs:
-
-            # go on if the list has been checked
-            if one_input['OBJCAT'] in IOL_list:
-                continue
-
-            # check the prism image
-            if not os.path.isfile(axeutils.getIMAGE(one_input['OBJCAT'])):
-                # error and out
-                err_msg = ("{0:s}: The direct image: {1:s} does not exist!"
-                           .format(self.taskname,
-                                   axeutils.getIMAGE(one_input['OBJCAT'])))
-                raise aXeError(err_msg)
-
-            # load the IOL to check its format
-            iol = axeiol.InputObjectList(axeutils.getIMAGE(one_input['OBJCAT']))
-
-            # put the IOL to the list
-            IOL_list.append(one_input['OBJCAT'])
-
-    def _check_config(self):
-        """Check the presence of all grism images"""
-        # make an empty list
-        conf_list = []
-
-        # go over all inputs
-        for one_input in self.axe_inputs:
-
-            # check whether the config was already tested
-            if one_input['CONFIG'] in conf_list:
-                continue
-
-            # check the prism image
-            if not os.path.isfile(axeutils.getCONF(one_input['CONFIG'])):
-                # error and out
-                err_msg = ("{0:s}: The configuration file: {1:s} does not "
-                           "exist!".format(self.taskname, axeutils.getCONF(one_input['CONFIG'])))
-                raise aXeError(err_msg)
-
-            # load the configuration file;
-            # make sure all files mentioned therein do exist
-            conf = configfile.ConfigFile(axeutils.getCONF(one_input['CONFIG']))
-            conf.check_files()
-
-            # put the config to the list
-            conf_list.append(one_input['CONFIG'])
 
     def _force_dirim(self):
         # go over all inputs
@@ -172,40 +78,16 @@ class InputChecker(object):
                                    axeutils.getIMAGE(one_input['GRISIM'])))
                 raise aXeError(err_msg)
 
-    def _check_masterbck(self):
-        """Check the presence of all grism images"""
-        # make an empty list
-        bck_list = []
-
-        # go over all inputs
-        for one_input in self.axe_inputs:
-
-            # check whether the config was already tested
-            if one_input['FRINGE'] in bck_list:
-                continue
-
-            # check the prism image
-            if not os.path.isfile(axeutils.getCONF(one_input['FRINGE'])):
-                # error and out
-                err_msg = ("{0:s}: The master background file: {1:s} does not "
-                           "exist!"
-                           .format(self.taskname,
-                                   axeutils.getCONF(one_input['FRINGE'])))
-                raise aXeError(err_msg)
-
-            # put the config to the list
-            bck_list.append(one_input['FRINGE'])
-
     def _check_fluxcubes(self):
         # go over all inputs
         for one_input in self.axe_inputs:
 
             # load the config file and get the extension information
-            conf = configfile.ConfigFile(axeutils.getCONF(one_input['CONFIG']))
-            ext_info = axeutils.get_ext_info(axeutils.getIMAGE(one_input['GRISIM']), conf)
+            conf = configfile.ConfigFile(config.getCONF(one_input['CONFIG']))
+            ext_info = axeutils.get_ext_info(config.getIMAGE(one_input['GRISIM']), conf)
 
             # derive the aXe names
-            axe_names = axeutils.get_axe_names(one_input['GRISIM'], ext_info)
+            axe_names = config.get_axe_names(one_input['GRISIM'], ext_info)
 
             # check the fluxcube
             if not os.path.isfile(axeutils.getIMAGE(axe_names['FLX'])):
@@ -254,7 +136,7 @@ class InputChecker(object):
             ext_info = axeutils.get_ext_info(axeutils.getIMAGE(one_input['GRISIM']), conf)
 
             # derive the aXe names
-            axe_names = axeutils.get_axe_names(one_input['GRISIM'], ext_info)
+            axe_names = config.get_axe_names(one_input['GRISIM'], ext_info)
 
             # check the DPP file
             if not os.path.isfile(axeutils.getOUTPUT(axe_names['DPP'])):
@@ -274,29 +156,16 @@ class InputChecker(object):
 
     def check_axeprep(self, backgr, backims):
         """Comprises all file and file format checks for AXEPREP"""
-        # check the grism images
-        self._check_grism()
-
-        # check the configuration files
-        self._check_config()
-
-        # check the direct images
-        self._check_direct()
-
-        # check the IOL's
-        self._check_IOL()
 
         # scheck for background subtraction
         if backgr:
-            # make sure that a background
-            # subtraction is possible
             if len(backims) < 1:
                 err_msg = ("{0:s}: A background image must be given for the "
                            "background subtraction!".format(self.taskname))
                 raise aXeError(err_msg)
 
             # check the existence of background images
-            self._check_masterbck()
+            #self._check_masterbck()
 
     def check_axecore(self, back, extrfwhm, drzfwhm, backfwhm, orient,
                       slitless_geom, np, interp, cont_model,
@@ -304,15 +173,6 @@ class InputChecker(object):
         """
         Comprises all file and file format checks for AXECORE
         """
-
-        # check the grism images
-        self._check_grism()
-
-        # check the configuration files
-        self._check_config()
-
-        # check the direct images
-        self._check_direct()
 
         # check the IOL's
         self._check_IOL()
@@ -423,12 +283,6 @@ class InputChecker(object):
 
     def check_axedrizzle(self, infwhm, outfwhm, back=False):
         """Comprises all file and file format checks for AXEDRIZZLE"""
-
-        # check the grism images
-        self._check_grism()
-
-        # check the configuration files
-        self._check_config()
 
         # check the DPP files
         self._check_dpps(back)
