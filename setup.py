@@ -10,14 +10,9 @@ from setuptools import find_packages, Command
 from setuptools.command.test import test as TestCommand
 from subprocess import check_call, CalledProcessError
 
-try:
-    from setuptools import setup
-    from setuptools import Extension
-    from setuptools.command.build_ext import build_ext
-except ImportError:
-    from distutils.core import setup
-    from distutils.extension import Extension
-    from distutils.command.build_ext import build_ext
+from setuptools import setup
+from setuptools import Command
+from setuptools.command.install import install
 
 from distutils.command.clean import clean
 from configparser import ConfigParser
@@ -26,21 +21,20 @@ AXELIB_DIR = "cextern/aXe_c_code/"
 CONF_H_NAME = os.path.join(AXELIB_DIR, "config.h")
 
 # We only need to compile with these
-AXE_SOURCES = glob(AXELIB_DIR+"/src/*.c")
+AXE_SOURCES = glob(AXELIB_DIR+"/src/aXe*.c")
 AXELIB_DEFINES = [("HAVE_CONFIG_H", "1")]
 
 # Create the axe module extension
 # no-strict-prototypes is inserted in order
 # to cut back on the cfitsio lib warnings
-axe_module = Extension("axe",
-                       sources=AXE_SOURCES,
-                       include_dirs=[AXELIB_DIR],
-                       define_macros=AXELIB_DEFINES,
-                       depends=[CONF_H_NAME],
-                       language="C",
-                       extra_compile_args=['-Wno-strict-prototypes',
-                                           '-fcommon'],
-                       )
+# axe_module = Extension("axe",
+#                        sources=AXE_SOURCES,
+#                        include_dirs=[AXELIB_DIR],
+#                        define_macros=AXELIB_DEFINES,
+#                        depends=[CONF_H_NAME],
+#                        language="C",
+#                        extra_compile_args=['-Wno-strict-prototypes'],
+#                        )
 
 # hack building the sphinx docs with C source
 try:
@@ -104,8 +98,17 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-class my_clean:
+class MyClean(Command):
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
     def run(self):
+        print("cleaning")
         try:
             check_call(["make", "clean"], cwd=AXELIB_DIR)
         except CalledProcessError as e:
@@ -114,13 +117,13 @@ class my_clean:
 
         if os.access(CONF_H_NAME, os.F_OK):
             os.remove(CONF_H_NAME)
-        # os.remove("wrappers/axe.c")
+
         clean.run(self)
-        print("cleaning")
 
 
-class build_ext_with_configure(build_ext):
-    def build_extensions(self):
+class BuildExtWithConfigure(install):
+    """Build and install the aXe C code."""
+    def run(self):
         CURRENT_ENV = sys.prefix
         try:
             check_call(["make", "clean"], cwd=AXELIB_DIR)
@@ -132,7 +135,7 @@ class build_ext_with_configure(build_ext):
         except CalledProcessError as e:
             print(e)
             exit(1)
-        build_ext.build_extensions(self)
+        install.run(self)
 
 
 # Get some values from the setup.cfg
@@ -197,7 +200,7 @@ scripts = [fname for fname in glob(os.path.join('scripts', '*'))
 # ``setup``, since these are now deprecated. See this link for more details:
 # https://groups.google.com/forum/#!topic/astropy-dev/urYO8ckB2uM
 package_info = {}
-package_info['ext_modules'] = [axe_module]
+# package_info['ext_modules'] = [axe_module]
 
 setup(
     name=PACKAGENAME,
@@ -234,8 +237,9 @@ setup(
     cmdclass={
         'test': PyTest,
         'build_sphinx': BuildSphinx,
-        'build_ext': build_ext_with_configure,
-        'clean': my_clean,
+        'build_ext': BuildExtWithConfigure,
+        'install': BuildExtWithConfigure,
+        'clean': MyClean,
     },
     #entry_points=entry_points,
     **package_info
