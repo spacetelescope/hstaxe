@@ -1,6 +1,3 @@
-from __future__ import (absolute_import, unicode_literals, division,
-                        print_function)
-
 """A Place to store global variables and constants required to
 configure axe modules. Use the teal interface to ConfigObj to return a
 config object cfgobj=teal.teal('axe',loadonly=True)
@@ -19,12 +16,13 @@ __user_paths = {"AXE_IMAGE_PATH": './IMAGE',
 
 __AXE_DRZTMP_SUB = 'tmp'
 # '../cextern/aXe_c_code/src'  # update for real install
-__AXE_BINDIR = sys.prefix + "bin/"
+__AXE_BINDIR = sys.prefix + "/bin/"
 __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
                                 __AXE_DRZTMP_SUB)
 
 # notification of python only axe
 print("Welcome to pyaxe! This version is independent of IRAF and PyRAF.")
+
 
 def set_defaults():
     """defaults for the aXe directories"""
