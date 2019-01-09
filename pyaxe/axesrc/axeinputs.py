@@ -1,8 +1,3 @@
-from __future__ import (absolute_import,
-                        unicode_literals,
-                        division,
-                        print_function)
-
 import numpy as np
 import os
 

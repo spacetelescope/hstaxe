@@ -1,6 +1,3 @@
-from __future__ import (absolute_import, unicode_literals, division,
-                        print_function)
-
 import re
 from astropy.table import Table
 from ..axeerror import aXeError

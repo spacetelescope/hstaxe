@@ -11,8 +11,6 @@ packages -- for now, you'll have to deal with packages separately.)
 See module py_compile for details of the actual byte-compilation.
 
 """
-from __future__ import print_function
-
 import os
 import sys
 import py_compile
