@@ -5,24 +5,20 @@ import os
 import sys
 import importlib
 
-from glob import glob
-from setuptools import find_packages, Command
-from setuptools.command.test import test as TestCommand
-from subprocess import check_call, CalledProcessError
-
-from setuptools import setup
-from setuptools import Command
-from setuptools.command.install import install
-
-from distutils.command.clean import clean
 from configparser import ConfigParser
+from glob import glob
+from setuptools import find_packages, Command, setup
+from setuptools.command.test import test as TestCommand
+from setuptools.command.install import install
+from distutils.command.clean import clean
+from subprocess import check_call, CalledProcessError
 
 AXELIB_DIR = "cextern/aXe_c_code/"
 CONF_H_NAME = os.path.join(AXELIB_DIR, "config.h")
 
 # We only need to compile with these
-AXE_SOURCES = glob(AXELIB_DIR+"/src/aXe*.c")
-AXELIB_DEFINES = [("HAVE_CONFIG_H", "1")]
+# AXE_SOURCES = glob(AXELIB_DIR+"/src/aXe*.c")
+# AXELIB_DEFINES = [("HAVE_CONFIG_H", "1")]
 
 # Create the axe module extension
 # no-strict-prototypes is inserted in order
@@ -102,19 +98,57 @@ class MyClean(Command):
     user_options = []
 
     def initialize_options(self):
-        pass
+        self.build_base = None
+        self.build_lib = None
+        self.build_temp = None
+        self.build_scripts = None
+        self.bdist_base = None
+        self.all = None
 
     def finalize_options(self):
-        pass
+        self.set_undefined_options('build',
+                                   ('build_base', 'build_base'),
+                                   ('build_lib', 'build_lib'),
+                                   ('build_scripts', 'build_scripts'),
+                                   ('build_temp', 'build_temp'))
+        self.set_undefined_options('bdist',
+                                   ('bdist_base', 'bdist_base'))
 
     def run(self):
         print("cleaning")
+        current_env = sys.prefix + "/bin/"
+        axe_bins = ["aXe_SEX2GOL",
+                    "aXe_GOL2AF",
+                    "aXe_AF2PET",
+                    "aXe_BE",
+                    "aXe_PET2SPC",
+                    "aXe_STAMPS",
+                    "aXe_DRZPREP",
+                    "aXe_PETCONT",
+                    "aXe_PETFF",
+                    "aXe_DRZ2PET",
+                    "aXe_GPS",
+                    "aXe_FILET",
+                    "aXe_FRIGEN",
+                    "aXe_FRINGECORR",
+                    "aXe_TFIT",
+                    "aXe_INTPIXCORR",
+                    "aXe_PETIPC",
+                    "aXe_NICBACK",
+                    "aXe_TEST",
+                    "aXe_DIRIMAGE",
+                    "aXe_SCALEBCK"]
+
         try:
             check_call(["make", "clean"], cwd=AXELIB_DIR)
         except CalledProcessError as e:
             print(e)
             exit(1)
 
+        for file in axe_bins:
+            myfile = current_env + file
+            if os.access(myfile, os.F_OK):
+                os.remove(myfile)
         if os.access(CONF_H_NAME, os.F_OK):
             os.remove(CONF_H_NAME)
 
@@ -122,27 +156,49 @@ class MyClean(Command):
 
 
 class BuildExtWithConfigure(install):
-    """Build and install the aXe C code."""
-    def run(self):
-        CURRENT_ENV = sys.prefix
-        try:
-            check_call(["make", "clean"], cwd=AXELIB_DIR)
-            check_call(["sh", "./configure",
-                        "--with-cfitsio="+CURRENT_ENV,
-                        "--with-wcstools="+CURRENT_ENV,
-                        "--with-gsl="+CURRENT_ENV], cwd=AXELIB_DIR)
-            check_call(["make"], cwd=AXELIB_DIR)
-        except CalledProcessError as e:
-            print(e)
-            exit(1)
-        install.run(self)
+    """Configure, build, and install the aXe C code."""
+    user_options = install.user_options +\
+        [('remake=', 'r', "remake the aXe C executables [default True]")]
 
+    def initialize_options(self):
+        super().initialize_options()
+        self.remake = True
+
+    def finalize_options(self):
+        super().finalize_options()
+        if not self.remake:
+            if not os.access(AXELIB_DIR + "Makefile", os.F_OK):
+                raise FileNotFoundError("Makefile doesn't exist, let axe build")
+
+    def run(self):
+        # only remake the C code if necessary
+        # This is a simple check to see if a
+        # Makefile already exists and skip
+        if self.remake:
+            CURRENT_ENV = sys.prefix
+            try:
+                check_call(["make", "clean"], cwd=AXELIB_DIR)
+                check_call(["sh", "./configure",
+                            "--with-cfitsio="+CURRENT_ENV,
+                            "--with-wcstools="+CURRENT_ENV,
+                            "--with-gsl="+CURRENT_ENV,
+                            "--libdir="+CURRENT_ENV+"/lib",
+                            "--prefix="+CURRENT_ENV],
+                            cwd=AXELIB_DIR)
+                check_call(["make"], cwd=AXELIB_DIR)
+                check_call(["make", "install"], cwd=AXELIB_DIR)
+            except CalledProcessError as e:
+                print(e)
+                exit(1)
+
+        install.run(self)
 
 # Get some values from the setup.cfg
 conf = ConfigParser()
 conf.read(['setup.cfg'])
 metadata = dict(conf.items('metadata'))
 PACKAGENAME = metadata.get('package_name', 'pyaxe')
+CLASSIFIER = metadata.get('classifier','Programming Language :: Python :: 3')
 DESCRIPTION = metadata.get('description', 'aXe - spectral extraction for HST')
 LONG_DESCRIPTION = metadata.get('long_description',
                                 'aXe spectral extraction for HST minus the IRAF')
@@ -171,36 +227,10 @@ else:
 version = relic.release.get_info()
 relic.release.write_template(version, PACKAGENAME)
 
-# # Modifiy this if C/BLAS are not in /usr/lib.
-# BLAS_LIB_DIR = '/usr/lib'
-
-# # Default names of BLAS libraries
-# BLAS_LIB = ['cblas']
-# BLAS_EXTRA_LINK_ARGS = []
-
-# # Set environment variable BLAS_NOUNDERSCORES=1 if your BLAS does
-# # not use trailing underscores
-# BLAS_NOUNDERSCORES = False
-
-
-# Treat everything in scripts except README.rst as a script to be installed
-scripts = [fname for fname in glob(os.path.join('scripts', '*'))
-           if os.path.basename(fname) != 'README.rst']
-
-# Define entry points for command-line scripts
-# entry_points = {'console_scripts': []}
-
-# entry_point_list = conf.items('entry_points')
-# for entry_point in entry_point_list:
-#     entry_points['console_scripts'].append('{0} = {1}'.format(entry_point[0],
-#                                                               entry_point[1]))
-
 
 # Note that requires and provides should not be included in the call to
 # ``setup``, since these are now deprecated. See this link for more details:
 # https://groups.google.com/forum/#!topic/astropy-dev/urYO8ckB2uM
-package_info = {}
-# package_info['ext_modules'] = [axe_module]
 
 setup(
     name=PACKAGENAME,
@@ -211,14 +241,7 @@ setup(
     author_email=AUTHOR_EMAIL,
     url=URL,
     license=LICENSE,
-    classifiers=[
-        'License :: OSI Approved :: BSD License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: C',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-    ],
+    classifiers=CLASSIFIER,
     install_requires=['numpy',
                       'astropy',
                       'wcstools',
@@ -226,7 +249,6 @@ setup(
                       'gsl',
                       'stwcs',
                       'drizzlepac'],
-    scripts=scripts,
     packages=find_packages(),
     tests_require=[
         'backports.tempfile',
@@ -241,6 +263,4 @@ setup(
         'install': BuildExtWithConfigure,
         'clean': MyClean,
     },
-    #entry_points=entry_points,
-    **package_info
 )

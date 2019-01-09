@@ -1,8 +1,7 @@
-from __future__ import (absolute_import, unicode_literals, division,
-                        print_function)
+
 import os
 
-import iolmaking
+from pyaxe.axesrc import iolmaking
 from stsci.tools import parseinput
 from stsci.tools import teal
 
@@ -14,15 +13,18 @@ def iolprep(drizzle_image='',
             dim_info='0,0,0,0'):
     """Function for the aXe task IOLPREP
 
-    drizzle_image [string]: the astrodrizzled image
-    input_cat [string]: the master catalog from source extractor
-    dim_info [string]: the extra dimensions to add to the output images
+    drizzle_image: string
+        the astrodrizzled image
+    input_cat: string
+        the master catalog from source extractor
+    dim_info: string
+        the extra padding dimensions to add to the output images
     """
 
     # run the main run object;
     # execute the run;
     # delete the object
-    iol_maker = iolmaking.IOL_Maker(drizzle_image,
+    iol_maker = iolmaking.IOLMaker(drizzle_image,
                                     input_cat,
                                     dim_info)
     iol_maker.run()

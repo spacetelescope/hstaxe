@@ -4,9 +4,9 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import subprocess
 
-from ..config import __AXE_BINDIR as AXE_BINDIR
-from ..axeerror import aXeError
-from ..config import getOUTPUT
+from pyaxe.config import __AXE_BINDIR as AXE_BINDIR
+from pyaxe.axeerror import aXeError
+from pyaxe.config import getOUTPUT
 
 # define the good return
 # value for the binaries

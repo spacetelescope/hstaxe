@@ -1,27 +1,24 @@
-from __future__ import (absolute_import, unicode_literals, division,
-                        print_function)
-
-from . import iolmaking
-from . import fcubeobjs
 from . import axeinputs
-from . import axepreptor
-from . import inputchecks
-from . import axesingextr
 from . import axelowlev
+from . import axepreptor
+from . import axesingextr
 from . import dppdumps
 from . import drizzleobjects
-from . import mefobjects
+from . import fcubeobjs
+from . import inputchecks
+from . import iolmaking
 from . import mdrzobjects
+from . import mefobjects
 from . import pysex2gol
 
-from ..config import axe_setup
+from pyaxe.config import axe_setup
 
 
 def iolprep(drizzle_image='',
             input_cat='',
             dimension_in='0,0,0,0'):
     """Function for the aXe task IOLPREP"""
-    iol_maker = iolmaking.IOL_Maker(drizzle_image,
+    iol_maker = iolmaking.IOLMaker(drizzle_image,
                                     input_cat,
                                     dimension_in)
     iol_maker.run()

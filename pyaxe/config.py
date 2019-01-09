@@ -7,21 +7,24 @@ config object cfgobj=teal.teal('axe',loadonly=True)
 
 """
 import os
+import sys
 import shutil
-from .axeException import DirError
 from astropy.io import fits
 
 # defaults
 __user_paths = {"AXE_IMAGE_PATH": './IMAGE',
-               "AXE_OUTPUT_PATH": './OUTPUT',
-               "AXE_CONFIG_PATH": './CONFIG',
-               "AXE_DRIZZLE_PATH": './DRIZZLE'}
+                "AXE_OUTPUT_PATH": './OUTPUT',
+                "AXE_CONFIG_PATH": './CONFIG',
+                "AXE_DRIZZLE_PATH": './DRIZZLE'}
 
 __AXE_DRZTMP_SUB = 'tmp'
-__AXE_BINDIR = '../cextern/aXe_c_code/src'
+# '../cextern/aXe_c_code/src'  # update for real install
+__AXE_BINDIR = sys.prefix + "bin/"
 __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
                                 __AXE_DRZTMP_SUB)
 
+# notification of python only axe
+print("Welcome to pyaxe! This version is independent of IRAF and PyRAF.")
 
 def set_defaults():
     """defaults for the aXe directories"""
@@ -36,12 +39,11 @@ def set_defaults():
             __user_paths[name] = user_env[name]
             print("{0:s} -> {1:s}".format(name, user_env[name]))
         else:
-            print("{0:s} not defined, using {1:s}".format(name,
-                                                          __user_paths[name]))
-
             if os.access(__user_paths[name], os.R_OK):
                 print("{0:s} already exists".format(name))
             else:
+                print("{0:s} not defined, using {1:s}".format(name,
+                                                              __user_paths[name]))
                 try:
                     os.mkdir(__user_paths[name])
                 except OSError:

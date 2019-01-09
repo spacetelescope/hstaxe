@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, unicode_literals, division,
-                        print_function)
 
 import os
 import math
@@ -9,8 +7,8 @@ from astropy.io import fits
 from astropy.table import Table
 from stsci.tools import fileutil
 
-from ..axeerror import aXeError
-from .. import axeutils
+from pyaxe.axeerror import aXeError
+from pyaxe import axeutils
 from . import axeiol
 
 
@@ -183,6 +181,10 @@ class ProjectionList:
         drizzle_image: str
             name of the drizzled image
 
+        Returns
+        -------
+        Nothing
+
         """
         print("\n >>>> Working on Input Object List: {0:s} >>>>\n"
               .format(self.iol_name))
@@ -263,7 +265,7 @@ class ProjectionList:
         print()
 
 
-class IOL_Maker:
+class IOLMaker:
     """Central class to take the input and to create Input Object Lists
 
     for the list of images extracted from the header of the

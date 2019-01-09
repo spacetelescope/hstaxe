@@ -1,6 +1,3 @@
-from __future__ import (absolute_import, unicode_literals, division,
-                        print_function)
-
 import os
 from astropy.io import fits
 import stsci.imagestats as imagestats
@@ -10,7 +7,8 @@ from . import configfile
 from . import axetasks
 
 from .. import config
-from ..axeerror import aXeError
+from pyaxe.axeerror import aXeError
+
 
 class aXePrepArator(object):
     def __init__(self, grisim, objcat, dirim, config, dmag, **params):
