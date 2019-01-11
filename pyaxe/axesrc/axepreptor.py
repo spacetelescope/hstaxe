@@ -6,11 +6,63 @@ from . import axelowlev
 from . import configfile
 from . import axetasks
 
-from .. import config
+from pyaxe import config as config_util
 from pyaxe.axeerror import aXeError
 
 
 class aXePrepArator(object):
+    """This task prepares the science files for further processing within aXe.
+
+    axeprep provides important keywords and is mandatory if axedrizzle is to be used later on.
+
+    Inputs
+    ------
+    grism: string
+        The input grism image
+    objcat: string
+        The input object catalog
+    dirim: string
+        The input direct image
+    config: string
+        The name of the aXe configuration file
+    dmag: float
+        a number to add to the MMAG_EXTRACT and MMAG_MARK values given in the
+        configuration file.
+
+        Sources which have magnitudes fainter than another cutoff magnitude are
+        marked so that they will be completely ignored. The dmag value can be
+        used to globally adjust these cutoffs (to account for a different
+        signal-to-noise ratio in one dataset for example without having to
+        resort to editing of the configuration file). (see GOL2AF) for the
+        grism image (optional)
+    master_bck: string
+        Name of the master background image
+
+    Notes
+    -----
+    axeprep provides three different processing steps:
+
+    background subtraction:  Provided that an Input Object List is given for
+        the grism image, axeprep uses the tasks sex2gol, gol2af and backest
+        to mark the beam areas on the grism image as well as on the master
+        background image. Using the IRAF task imstat with 3 cycles of
+        clipping pixels with values greater than 3 sigma, the median pixel
+        values are derived for the unmarked pixels on both the grism image
+        and on the master background image. The master background, scaled to
+        the level of the grism image, is finally subtracted from the grism
+        image.
+    exposure time normalization:
+        The input file is normalized by the exposure time to transform the
+        images into counts per second.
+    gain correction:
+        The input file is multiplied by the gain conversion factor
+        (electrons/ADU) to transform the images from units of detector
+        counts to electrons. For HST data, this is usually only necessary
+        for NICMOS images, because ACS and WFC3 images will normally
+        already be in units of electrons.
+
+    """
+
     def __init__(self, grisim, objcat, dirim, config, dmag, **params):
         # store the input
         self.grisim = grisim
@@ -18,24 +70,22 @@ class aXePrepArator(object):
         self.dirim = dirim
         self.config = config
         self.dmag = dmag
-        print(params)
-
-        print(self.grisim, self.objcat)
         self.params = params
+
         # store the master background
         if 'master_bck' in params:
-            self.master_bck = params['master_bck']
+            self.master_bck = config_util.getCONF(params['master_bck'])
 
     def _is_nicmos_data(self):
         """Check whether the data comes from NICMOS"""
         # open the image
-        header = fits.getvalue(config.getIMAGE(self.grisim), 'INSTRUME')
+        header = fits.getval(config_util.getIMAGE(self.grisim), 'INSTRUME')
         return "NICMOS" in header
 
     def _is_wfc3ir_data(self):
         """Check whether the data comes from WFC3 IR channel"""
         # open the image
-        header = fits.getvalue(config.getIMAGE(self.grisim), 'DETECTOR')
+        header = fits.getval(config_util.getIMAGE(self.grisim), 'DETECTOR')
         return "IR" in header
 
     def _make_mask(self):
@@ -92,27 +142,28 @@ class aXePrepArator(object):
     def _subtract_sky(self, ext_info):
         """Make a classical background subtraction"""
         # get the axe names
-        axe_names = config.get_axe_names(self.grisim, ext_info)
+        print("\nSubtract sky called in axepreptor\n")
+        axe_names = config_util.get_axe_names(self.grisim, ext_info)
 
         msk_image_sc = axe_names['MSK'] + '[SCI]'
 
         # check for a previous background subtraction
-        fits_img = fits.open(config.getIMAGE(self.grisim), 'readonly')
+        fits_img = fits.open(config_util.getIMAGE(self.grisim), 'readonly')
         fits_head = fits_img[ext_info['fits_ext']].header
         npix = int(fits_head['NAXIS1']) * int(fits_head['NAXIS1'])
 
         if 'AXEPRBCK' in fits_head:
             # warn that this is the second time
             print("WARNING: Image %25s seems to be already background "
-                  "subtracted!".format(config.getIMAGE(self.grisim)))
+                  "subtracted!".format(config_util.getIMAGE(self.grisim)))
 
         # close the fits
         fits_img.close()
 
         # Compute the ratio of the grism SCI image to the background image
-        sci_file = fits.open(config.getIMAGE(self.grisim), 'readonly')
+        sci_file = fits.open(config_util.getIMAGE(self.grisim), 'readonly')
         sci_data = sci_file['SCI', ext_info['ext_version']].data
-        bck_file = fits.open(config.getCONF(self.master_bck), 'readonly')
+        bck_file = fits.open(config_util.getCONF(self.master_bck), 'readonly')
         bck_data = bck_file[0].data
         sci_data /= bck_data
 
@@ -121,7 +172,7 @@ class aXePrepArator(object):
         sci_data[dq_data > 0.5] = -1.0e10
 
         # Flag pixels in the ratio image based on the grism image MSK file
-        msk_file = fits.open(config.getOUTPUT(msk_image_sc.split("[")[0]), 'readonly')
+        msk_file = fits.open(config_util.getOUTPUT(msk_image_sc.split("[")[0]), 'readonly')
         msk_data = msk_file['SCI'].data
         sci_data[msk_data < -900000] = -1.0e10
 
@@ -154,14 +205,14 @@ class aXePrepArator(object):
         msk_file.close()
 
         # Subtract the scaled background from the grism image
-        sci_file = fits.open(config.getIMAGE(self.grisim), 'update')
-        bck_file = fits.open(config.getCONF(self.master_bck), 'readonly')
+        sci_file = fits.open(config_util.getIMAGE(self.grisim), 'update')
+        bck_file = fits.open(config_util.getCONF(self.master_bck), 'readonly')
         sci_file['SCI', ext_info['ext_version']].data -= flt_ave*bck_file[0].data
         sci_file.close()
         bck_file.close()
 
         # open the fits image ands isolate the correct extension
-        grism_img = fits.open(config.getIMAGE(self.grisim), 'update')
+        grism_img = fits.open(config_util.getIMAGE(self.grisim), 'update')
         grism_header = grism_img[ext_info['fits_ext']].header
 
         # write some header iformation
@@ -179,17 +230,17 @@ class aXePrepArator(object):
     def _subtract_nicsky(self, ext_info):
         """Special sky subtraction for NICMOS images"""
         # get the axe names
-        axe_names = config.get_axe_names(self.grisim, ext_info)
+        axe_names = config_util.get_axe_names(self.grisim, ext_info)
 
         # check for a previous background subtraction
-        fits_img = fits.open(config.getIMAGE(self.grisim), 'readonly')
+        fits_img = fits.open(config_util.getIMAGE(self.grisim), 'readonly')
         fits_head = fits_img[ext_info['fits_ext']].header
         # npix = int(fits_head['NAXIS1']) * int(fits_head['NAXIS1'])
 
         if 'AXEPRBCK' in fits_head:
             # warn that this is the second time
             print("WARNING: Image {0:25s} seems to be already background "
-                  "subtracted!".format(config.getIMAGE(self.grisim)))
+                  "subtracted!".format(config_util.getIMAGE(self.grisim)))
 
         # close the fits
         fits_img.close()
@@ -208,25 +259,25 @@ class aXePrepArator(object):
         del nicback
 
         # check whether the background image exists
-        if not os.path.isfile(config.getOUTPUT(axe_names['NBCK'])):
+        if not os.path.isfile(config_util.getOUTPUT(axe_names['NBCK'])):
             err_msg = ("The background image: {0:s} does NOT exist!"
-                       .format(config.getOUTPUT(axe_names['NBCK'])))
+                       .format(config_util.getOUTPUT(axe_names['NBCK'])))
             raise aXeError(err_msg)
 
         # Subtract the scaled background image from the grism image
-        sci_file = fits.open(config.getIMAGE(self.grisim), 'update')
-        bck_file = fits.open(config.getOUTPUT(axe_names['NBCK']),'readonly')
+        sci_file = fits.open(config_util.getIMAGE(self.grisim), 'update')
+        bck_file = fits.open(config_util.getOUTPUT(axe_names['NBCK']),'readonly')
         sci_file['SCI', ext_info['ext_version']].data -= bck_file[1].data
         sci_file.close()
         bck_file.close()
 
         # open the background image
-        fits_img = fits.open(config.getOUTPUT(axe_names['NBCK']),
+        fits_img = fits.open(config_util.getOUTPUT(axe_names['NBCK']),
                                                 'readonly')
         fits_head = fits_img['BCK'].header
 
         # open the grism image and isolate the correct extension header
-        grism_img = fits.open(config.getIMAGE(self.grisim), 'update')
+        grism_img = fits.open(config_util.getIMAGE(self.grisim), 'update')
         grism_header = grism_img[ext_info['fits_ext']].header
 
         if 'SKY_SCAL' in fits_head and 'F_SKYPIX' in fits_head:
@@ -256,17 +307,17 @@ class aXePrepArator(object):
     def _subtract_wfc3irsky(self, ext_info):
         """Special sky subtraction for NICMOS images"""
         # get the axe names
-        axe_names = config.get_axe_names(self.grisim, ext_info)
+        axe_names = config_util.get_axe_names(self.grisim, ext_info)
 
         # check for a previous background subtraction
-        fits_img = fits.open(config.getIMAGE(self.grisim), 'readonly')
+        fits_img = fits.open(config_util.getIMAGE(self.grisim), 'readonly')
         fits_head = fits_img[ext_info['fits_ext']].header
         # npix = int(fits_head['NAXIS1']) * int(fits_head['NAXIS1'])
 
         if 'AXEPRBCK' in fits_head:
             # warn that this is the second time
             print("WARNING: Image {0:25s} seems to be already background "
-                  "subtracted!".format(config.getIMAGE(self.grisim)))
+                  "subtracted!".format(config_util.getIMAGE(self.grisim)))
 
         # close the fits
         fits_img.close()
@@ -281,7 +332,7 @@ class aXePrepArator(object):
             return False
 
         # check whether the background image exists
-        bckfilename = config.getOUTPUT(axe_names['SGRI'])
+        bckfilename = config_util.getOUTPUT(axe_names['SGRI'])
         if not os.path.isfile(bckfilename):
             err_msg = ("The background image: {0:s} does NOT exist!"
                        .format(bckfilename))
@@ -296,7 +347,7 @@ class aXePrepArator(object):
             return False
 
         # Subtract the scaled background image from the grism image
-        sci_file = fits.open(config.getIMAGE(self.grisim), 'update')
+        sci_file = fits.open(config_util.getIMAGE(self.grisim), 'update')
         bck_file = fits.open(bckfilename)
         sci_file['SCI', ext_info['ext_version']].data -= bck_file[1].data
         sci_file.close()
@@ -307,7 +358,7 @@ class aXePrepArator(object):
         fits_head = fits_img[0].header
 
         # open the grism image and isolate the correct extension header
-        grism_img = fits.open(config.getIMAGE(self.grisim), 'update')
+        grism_img = fits.open(config_util.getIMAGE(self.grisim), 'update')
         grism_header = grism_img[ext_info['fits_ext']].header
 
         # write some information into the
@@ -387,7 +438,7 @@ class aXePrepArator(object):
         dec = 1
 
         # check for a previous normalization
-        fits_img = fits.open(config.getIMAGE(self.grisim), 'readonly')
+        fits_img = fits.open(config_util.getIMAGE(self.grisim), 'readonly')
         fits_head = fits_img[ext_info['fits_ext']].header
 
         if 'AXEPRNOR' in fits_head:
@@ -412,13 +463,13 @@ class aXePrepArator(object):
             print(pstring)
 
             # Divide the grism image SCI and ERR arrays by exptime
-            file_a = fits.open(config.getIMAGE(self.grisim), 'update')
+            file_a = fits.open(config_util.getIMAGE(self.grisim), 'update')
             file_a['SCI', ext_info['ext_version']].data /= exptime
             file_a['ERR', ext_info['ext_version']].data /= exptime
             file_a.close()
 
             # open the grism image and isolate the correct header
-            grism_img = fits.open(config.getIMAGE(self.grisim), 'update')
+            grism_img = fits.open(config_util.getIMAGE(self.grisim), 'update')
             grism_header = grism_img[ext_info['fits_ext']].header
 
             # write a header entry
@@ -471,7 +522,7 @@ class aXePrepArator(object):
     def _apply_gain_correction(self, ext_info):
         """Apply the gain correction"""
         # open the fits image
-        fits_img = fits.open(config.getIMAGE(self.grisim), 'readonly')
+        fits_img = fits.open(config_util.getIMAGE(self.grisim), 'readonly')
 
         # get the gain
         # for NICMOS:
@@ -486,13 +537,13 @@ class aXePrepArator(object):
         fits_img.close()
 
         # multiply both the sci and the error array by the gain
-        file_a = fits.open(config.getIMAGE(self.grisim), 'update')
+        file_a = fits.open(config_util.getIMAGE(self.grisim), 'update')
         file_a["SCI"].data *= gain
         file_a["ERR"].data *= gain
         file_a.close()
 
         # open the fits image
-        fits_img = fits.open(config.getIMAGE(self.grisim), 'update')
+        fits_img = fits.open(config_util.getIMAGE(self.grisim), 'update')
 
         # write the flag into the science extension
         fits_img[ext_info['fits_ext']].header['AXEGAINC'] = ('Done', 'flag that gain correction was done')
@@ -508,8 +559,8 @@ class aXePrepArator(object):
 
         # load the configuration files;
         # get the extension info
-        conf = configfile.ConfigFile(config.getCONF(self.config))
-        ext_info = config.get_ext_info(config.getIMAGE(self.grisim), conf)
+        conf = configfile.ConfigFile(config_util.getCONF(self.config))
+        ext_info = config_util.get_ext_info(config_util.getIMAGE(self.grisim), conf)
 
         # make a background PET if necessary
         if 'backgr' in self.params and self.params['backgr']:

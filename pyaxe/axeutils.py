@@ -1,5 +1,3 @@
-from __future__ import (absolute_import, unicode_literals, division,
-                        print_function)
 import os
 import sys
 import shutil
@@ -12,6 +10,7 @@ def get_random_filename(dirname, ext):
     """Deliver a random file name"""
     fname = tempfile.mkstemp(suffix=ext, prefix=dirname+"tmp", dir=dirname)
     return fname[1]
+
 
 def is_quant_contam(contam_model):
     """Get the flag for quantitative contamination"""
@@ -32,7 +31,6 @@ def is_quant_contam(contam_model):
 
 def get_ext_info(image, conf):
     """Determines the extension information on an image"""
-    # initialize a dictionary
     ext_info = {}
 
     # set default values

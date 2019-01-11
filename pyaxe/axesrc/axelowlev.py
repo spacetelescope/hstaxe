@@ -35,6 +35,7 @@ class TaskWrapper(object):
 
         # put the command into the list
         self.command_list.append("/".join([AXE_BINDIR, taskname]))
+        print(self.command_list)
 
     def _cleanup(self):
         """The method deletes the files created for stdout and stderr.
@@ -172,7 +173,7 @@ class aXe_AF2PET(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_AF2PET, self).__init__('aXe_AF2PET', 'af2pet')
+        super().__init__('aXe_AF2PET', 'af2pet')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -219,7 +220,7 @@ class aXe_GPS(TaskWrapper):
             y-position to check
         """
         # initialize via superclass
-        super(aXe_GPS, self).__init__('aXe_GPS', 'axegps')
+        super().__init__('aXe_GPS', 'axegps')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -255,7 +256,7 @@ class aXe_BE(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_BE, self).__init__('aXe_BE', 'backest')
+        super().__init__('aXe_BE', 'backest')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -333,7 +334,7 @@ class aXe_DRZ2PET(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_DRZ2PET, self).__init__('aXe_DRZ2PET', 'drz2pet')
+        super().__init__('aXe_DRZ2PET', 'drz2pet')
 
         # put the grism name to the list
         self.command_list.append(inlist)
@@ -380,7 +381,7 @@ class aXe_DRZPREP(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_DRZPREP, self).__init__('aXe_DRZPREP', 'drzprep')
+        super().__init__('aXe_DRZPREP', 'drzprep')
 
         # store the 'back'-flag
         if (('back' in params) and (params['back'])):
@@ -418,7 +419,7 @@ class aXe_DRZPREP(TaskWrapper):
             the return code of the C-executable
         """
         # run the method of the super class
-        super(aXe_DRZPREP, self).runall(silent=silent)
+        super().runall(silent=silent)
 
         # check for the background flag
         if self.bck:
@@ -426,7 +427,7 @@ class aXe_DRZPREP(TaskWrapper):
             self.command_list.append('-bck')
 
             # run the method of the super class
-            super(aXe_DRZPREP, self).runall(silent=silent)
+            super().runall(silent=silent)
 
 
 class aXe_GOL2AF(TaskWrapper):
@@ -448,7 +449,7 @@ class aXe_GOL2AF(TaskWrapper):
             all other possible parameters
         """
         # initialize via superclass
-        super(aXe_GOL2AF, self).__init__('aXe_GOL2AF', 'gol2af')
+        super().__init__('aXe_GOL2AF', 'gol2af')
 
         # add the grism name to the list
         self.command_list.append(grism)
@@ -534,7 +535,7 @@ class aXe_INTPIXCORR(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_INTPIXCORR, self).__init__('aXe_INTPIXCORR', 'ipixcorr')
+        super().__init__('aXe_INTPIXCORR', 'ipixcorr')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -598,7 +599,7 @@ class aXe_NICBACK(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_NICBACK, self).__init__('aXe_NICBACK', 'nicback')
+        super().__init__('aXe_NICBACK', 'nicback')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -620,28 +621,31 @@ class aXe_SCALEBCK(TaskWrapper):
     """
     def __init__(self, grism, mask, config, master_sky, to_master=False,
                  make_plis=False):
-        """
-        Initializer for the class
+        """This method is a simple initializer for the class.
 
-        This method is a simple initializer for the class. All
-        variables a transferred to a list, if necessary with the
+        All variables a transferred to a list, if necessary with the
         appropriate leading parameter name
 
-        @param grism: name of the dispersed image
-        @type grism: string
-        @param mask: name of the mask image
-        @type mask: string
-        @param config: name of the aXe configuration file
-        @type config: string
-        @param master_sky: name of the master sky image
-        @type master_sky: string
-        @param to_master: scale grism to master
-        @type to_master: boolean
-        @param make_plis: generate the pixel list
-        @type make_plis: boolean
+        Inputs
+        ------
+        grism : string
+            Name of the dispersed image
+        mask : string
+            Name of the mask image
+        config : string
+            Name of the aXe configuration file
+        master_sky : string
+            Name of the master sky image
+        to_master : boolean
+            Scale grism to master
+        make_plis : boolean
+            Generate the pixel list
+
+        Outputs
+        -------
         """
         # initialize via superclass
-        super(aXe_SCALEBCK, self).__init__('aXe_SCALEBCK', 'scalebck')
+        super().__init__('aXe_SCALEBCK', 'scalebck')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -684,7 +688,7 @@ class aXe_PET2SPC(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_PET2SPC, self).__init__('aXe_PET2SPC', 'pet2spc')
+        super().__init__('aXe_PET2SPC', 'pet2spc')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -757,7 +761,7 @@ class aXe_PETCONT(TaskWrapper):
         params: dict
             all other parameters        """
         # initialize via superclass
-        super(aXe_PETCONT, self).__init__('aXe_PETCONT', 'petcont')
+        super().__init__('aXe_PETCONT', 'petcont')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -851,7 +855,7 @@ class aXe_PETFF(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_PETFF, self).__init__('aXe_PETFF', 'petff')
+        super().__init__('aXe_PETFF', 'petff')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -889,7 +893,7 @@ class aXe_PETIPC(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_PETIPC, self).__init__('aXe_PETIPC', 'petipc')
+        super().__init__('aXe_PETIPC', 'petipc')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -954,7 +958,7 @@ class aXe_SEX2GOL(TaskWrapper):
 
         """
         # initialize via superclass
-        super(aXe_SEX2GOL, self).__init__('aXe_SEX2GOL', 'sex2gol')
+        super().__init__('aXe_SEX2GOL', 'sex2gol')
 
         # check whether a direct image exists
         if (('use_direct' in params) and (params['use_direct'])):
@@ -1016,7 +1020,7 @@ class aXe_STAMPS(TaskWrapper):
         @type **params: dictionary
         """
         # initialize via superclass
-        super(aXe_STAMPS, self).__init__('aXe_STAMPS', 'stamps')
+        super().__init__('aXe_STAMPS', 'stamps')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -1073,7 +1077,7 @@ class aXe_TRACEFIT(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_TRACEFIT, self).__init__('aXe_TRACEFIT', 'tracefit')
+        super().__init__('aXe_TRACEFIT', 'tracefit')
 
         # put the grism name to the list
         self.command_list.append(grism)
@@ -1102,7 +1106,7 @@ class aXe_FILET(TaskWrapper):
         @type **params: dictionary
         """
         # initialize via superclass
-        super(aXe_FILET, self).__init__('aXe_FILET', 'filet')
+        super().__init__('aXe_FILET', 'filet')
 
         # put the grism name to the list
         self.command_list.append(dppfile)
@@ -1136,7 +1140,7 @@ class aXe_DIRIMAGE(TaskWrapper):
             all other parameters
         """
         # initialize via superclass
-        super(aXe_DIRIMAGE, self).__init__('aXe_DIRIMAGE', 'dirimage')
+        super().__init__('aXe_DIRIMAGE', 'dirimage')
 
         # put the direct image name to the list
         self.command_list.append(dirname)

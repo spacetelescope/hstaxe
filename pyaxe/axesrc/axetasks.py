@@ -17,7 +17,51 @@ from pyaxe.config import axe_setup
 def iolprep(drizzle_image='',
             input_cat='',
             dimension_in='0,0,0,0'):
-    """Function for the aXe task IOLPREP"""
+    """Convenience function for the aXe task IOLPREP.
+
+    This task produces Input Object Lists for every input image of a
+    MultiDrizzle combined image. It projects the object positions from a
+    master catalogue, which contains all objects in the coordinate system
+    of the MultiDrizzled image, out into the coordinate system of each
+    input image. For each input image an Input Object List is generated,
+    which contains only the objects within the boundaries of the given input image.
+
+    Inputs
+    ------
+    drizzle_image : string
+      The name of the drizzled image
+    input_cat : string
+      The name of the input SExtractor master catalog
+    dimension_in : string
+      The numbers of border pixels to extend the output image.
+      [left, right, bottom, top] to the target area on the input
+      images. E.g. 100,500,10,0 would include in the Input Object
+      Lists all objects with -100 < x < x_size + 500 and
+      -10 < y < y_size.
+
+    Outputs
+    -------
+    Creates the catalog for each input grism image.
+
+    Notes
+    -----
+    The names and drizzle parameters of the input images are retrieved from
+    the header of the Astrodrizzle combined image. The projection of the object
+    positions into the coordinate system of the input images is done with the
+    STSDAS task wtranback.
+
+    There is a parameter to influence the sensitive area to include objects
+    in the IOL's. This allows objects beyond the physical boundaries of the
+    input image to be included in the IOL's, to take into account partly
+    covered objects or to include bright objects outside of the FOV in
+    contamination estimates derived from those IOL's.
+
+    During the task execution, the drizzle coefficient files and the input
+    images must be available. For this reason it would be best practice to
+    run it in the directory that was used to combine the input images with
+    MultiDrizzle.
+
+    """
     iol_maker = iolmaking.IOLMaker(drizzle_image,
                                     input_cat,
                                     dimension_in)
@@ -30,7 +74,7 @@ def fcubeprep(grism_image='',
               AB_zero=True,
               dim_info='0,0,0,0',
               interpol='nearest'):
-    """Function for the aXe task FCUBEPREP"""
+    """Convenience function for the aXe task FCUBEPREP"""
 
     # run the main command
     fcmaker = fcubeobjs.FluxCube_Maker(grism_image, segm_image, filter_info,
@@ -45,9 +89,61 @@ def axeprep(inlist='',
             backped=None,
             mfwhm=None,
             norm=True,
-            gcorr=False,
-            histogram=False):
-    """Function for the aXe task AXEPREP"""
+            gcorr=False):
+    """Convenience function for the aXe task AXEPREP.
+
+    Inputs
+    ------
+    inlist: string
+      Input Image List which gives on each line
+        a) the name of the grism image to be processed (mandatory)
+        b) the object catalog(s) (mandatory if back='yes',
+           comma separated list if there is more than one catalogue)
+        c) the direct image associated with the grism image (optional)
+
+        The file used by axeprep as inlist can be reused again in axecore,
+        drzprep and axedrizzle, perhaps extended with different dmag-values
+        for the grism images.
+
+    configs: string
+      name of the aXe configuration file. If several image
+      extensions are to be processed (e.g. for WFC images), one
+      configuration file per extension must be given in a comma
+      separated list.
+
+    background: boolean
+      Switch on/off background subtraction
+
+    backims: string
+      name of the background image. If several image extensions
+      are to be processed (e.g. for WFC images), one background 
+      image per extension must be specified in a comma separated 
+      list.
+    backped: None
+      UNKNOWN
+
+    mfwhm: float
+      real number to specify the extent (as a multiple of A_IMAGE
+      or B_IMAGE) of the area that is masked out perpendicular to
+      the trace of each object before the background level is
+      determined (see parameter mfwhm in gol2af).
+
+    norm: boolean
+      switch on/off the exposure time normalization
+
+    gcorr: boolean
+      switch on/off the gain conversion
+
+    Notes
+    -----
+    AXEPREP changes the SCI (and potentially ERR) extensions
+    of the grism images! It is highly recommended to work only
+    on copies of the original files in order to be able to repeat
+    the reduction with different parameters.
+
+
+
+    """
 
     # do all the input checks
     inchecks = inputchecks.InputChecker('AXEPREP', inlist, configs, backims)
@@ -100,8 +196,8 @@ def axecore(inlist='',
             adj_sens=True,
             weights=False,
             sampling='drzizzle'):
-    """Function for the aXe task AXECORE"""
-    # only temporarily here
+    """Convenience unction for the aXe task AXECORE"""
+    # only temporarily here ????
     axe_setup()
 
     # do all the file checks
@@ -151,7 +247,7 @@ def drzprep(inlist='',
             configs='',
             back=False,
             opt_extr=False):
-    """Function for the aXe task DRZPREP"""
+    """Convenience function for the aXe task DRZPREP"""
     # make the general setup;
     # needed to define
     # the BIN-directory

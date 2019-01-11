@@ -12,6 +12,8 @@ class aXeInput(object):
     def __init__(self, inlist, configterm="", fringeterm=None):
         # load the Input Image List
         self._inimlist = Table.read(inlist, format='ascii.no_header')
+        print("Using inlist: {}".format(inlist))
+        print("fringeterm is {}".format(fringeterm))
 
         # find out what data has been read and assign column names
         self._validate_columns()
@@ -104,9 +106,10 @@ class aXeInput(object):
             self._inimlist.add_column(col)
 
         # check whether there are fringe configs
-        if fringeterm:
+        if fringeterm is not None:
+            print("\nfringe configs: {}: \n num images:{}\n".format(self._inimlist, len(self._inimlist)))
             col = Column(name='fringe',
-                         data=['fringe']*len(self._inimlist))
+                         data=[fringeterm] * len(self._inimlist))
             # add a column for the fringes
             self._inimlist.add_column(col)
 

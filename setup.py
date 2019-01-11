@@ -16,21 +16,6 @@ from subprocess import check_call, CalledProcessError
 AXELIB_DIR = "cextern/aXe_c_code/"
 CONF_H_NAME = os.path.join(AXELIB_DIR, "config.h")
 
-# We only need to compile with these
-# AXE_SOURCES = glob(AXELIB_DIR+"/src/aXe*.c")
-# AXELIB_DEFINES = [("HAVE_CONFIG_H", "1")]
-
-# Create the axe module extension
-# no-strict-prototypes is inserted in order
-# to cut back on the cfitsio lib warnings
-# axe_module = Extension("axe",
-#                        sources=AXE_SOURCES,
-#                        include_dirs=[AXELIB_DIR],
-#                        define_macros=AXELIB_DEFINES,
-#                        depends=[CONF_H_NAME],
-#                        language="C",
-#                        extra_compile_args=['-Wno-strict-prototypes'],
-#                        )
 
 # hack building the sphinx docs with C source
 try:
@@ -158,17 +143,20 @@ class MyClean(Command):
 class BuildExtWithConfigure(install):
     """Configure, build, and install the aXe C code."""
     user_options = install.user_options +\
-        [('remake=', 'r', "remake the aXe C executables [default True]")]
+        [('noremake', None, "Don't remake the aXe C executables [default True]")]
 
     def initialize_options(self):
         super().initialize_options()
+        self.noremake = None
         self.remake = True
 
     def finalize_options(self):
         super().finalize_options()
-        if not self.remake:
+        if self.noremake:
             if not os.access(AXELIB_DIR + "Makefile", os.F_OK):
                 raise FileNotFoundError("Makefile doesn't exist, let axe build")
+            else:
+                self.remake = False
 
     def run(self):
         # only remake the C code if necessary
@@ -248,7 +236,7 @@ setup(
                       'cfitsio',
                       'gsl',
                       'stwcs',
-                      'drizzlepac'],
+                      'pydrizzle'],
     packages=find_packages(),
     tests_require=[
         'backports.tempfile',

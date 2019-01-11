@@ -15,8 +15,7 @@ __user_paths = {"AXE_IMAGE_PATH": './IMAGE',
                 "AXE_DRIZZLE_PATH": './DRIZZLE'}
 
 __AXE_DRZTMP_SUB = 'tmp'
-# '../cextern/aXe_c_code/src'  # update for real install
-__AXE_BINDIR = sys.prefix + "/bin/"
+__AXE_BINDIR = sys.prefix + "/bin"
 __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
                                 __AXE_DRZTMP_SUB)
 
@@ -276,46 +275,46 @@ def get_axe_names(image, ext_info):
     # FILL the dictionary with names of aXe products
     #
     # the GOL:
-    axe_names['GOL'] = ("{0:s}_{1:i}.cat".format(root, ext_info['axe_ext']))
+    axe_names['GOL'] = ("{0:s}_{1:d}.cat".format(root, ext_info['axe_ext']))
 
     # the OAF/BAF:
-    axe_names['OAF'] = ("{0:s}_{1:i}.OAF".format(root, ext_info['axe_ext']))
-    axe_names['BAF'] = ("{0:s}_{1:i}.BAF".format(root, ext_info['axe_ext']))
+    axe_names['OAF'] = ("{0:s}_{1:d}.OAF".format(root, ext_info['axe_ext']))
+    axe_names['BAF'] = ("{0:s}_{1:d}.BAF".format(root, ext_info['axe_ext']))
 
     # the PET:
-    axe_names['PET'] = ("{0:s}_{1:i}.PET.fits"
+    axe_names['PET'] = ("{0:s}_{1:d}.PET.fits"
                         .format(root, ext_info['axe_ext']))
-    axe_names['BCK_PET'] = ("{0:s}_{1:i}.BCK.PET.fits"
+    axe_names['BCK_PET'] = ("{0:s}_{1:d}.BCK.PET.fits"
                             .format(root, ext_info['axe_ext']))
 
     # the DPP:
-    axe_names['DPP'] = ("{0:s}_{1:i}.DPP.fits"
+    axe_names['DPP'] = ("{0:s}_{1:d}.DPP.fits"
                         .format(root, ext_info['axe_ext']))
-    axe_names['BCK_DPP'] = ("{0:s}_{1:i}.BCK.DPP.fits"
+    axe_names['BCK_DPP'] = ("{0:s}_{1:d}.BCK.DPP.fits"
                             .format(root, ext_info['axe_ext']))
 
     # the SPC:
-    axe_names['SPC'] = ("{0:s}_{1:i}SPC.fits"
+    axe_names['SPC'] = ("{0:s}_{1:d}SPC.fits"
                         .format(root, ext_info['axe_ext']))
 
     # the STP:
-    axe_names['STP'] = ("{0:s}_{1:i}.STP.fits"
+    axe_names['STP'] = ("{0:s}_{1:d}.STP.fits"
                         .format(root, ext_info['axe_ext']))
 
     # the background mask:
-    axe_names['MSK'] = ("{0:s}_{1:i}.MSK.fits"
+    axe_names['MSK'] = ("{0:s}_{1:d}.MSK.fits"
                         .format(root, ext_info['axe_ext']))
 
     # the background mask:
-    axe_names['NBCK'] = ("{0:s}_{1:i}.NBCK.fits"
+    axe_names['NBCK'] = ("{0:s}_{1:d}.NBCK.fits"
                          .format(root, ext_info['axe_ext']))
 
     # the background mask:
-    axe_names['SGRI'] = ("{0:s}_{1:i}.SGRISM.fits"
+    axe_names['SGRI'] = ("{0:s}_{1:d}.SGRISM.fits"
                          .format(root, ext_info['axe_ext']))
 
     # the background mask:
-    axe_names['FLX'] = ("{0:s}_{1:i}FLX.fits"
+    axe_names['FLX'] = ("{0:s}_{1:d}FLX.fits"
                         .format(root, ext_info['axe_ext']))
 
     # return the dictionary
