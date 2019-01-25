@@ -1,13 +1,12 @@
 import os
 from stsci.tools import wcsutil
 
+from pyaxe.axeerror import aXeError
+from pyaxe.config import (getCONF, getDATA, getOUTPUT,
+                          getOUTSIM, getDRZTMP, get_ext_info)
+
 from . import configfile
 from . import axeiol
-
-from ..axeerror import aXeError
-from ..config import (getCONF, getIMAGE, getOUTPUT,
-                      getOUTSIM, getDRZTMP, get_ext_info)
-
 
 
 class Sex2GolPy(object):
@@ -75,7 +74,7 @@ class Sex2GolPy(object):
             # load the configuration file;
             # determine the extension information
             conf = configfile.ConfigFile(getCONF(config))
-            ext_info = get_ext_info(getIMAGE(grisim), conf)
+            ext_info = get_ext_info(getDATA(grisim), conf)
 
         else:
             # make by hand the extension information
@@ -114,7 +113,7 @@ class Sex2GolPy(object):
             # load the configuration file;
             # determine the extension information
             conf = configfile.ConfigFile(getCONF(config))
-            dirname_extinfo = get_ext_info(getIMAGE(grisim), conf)
+            dirname_extinfo = get_ext_info(getDATA(grisim), conf)
             del conf
 
         elif ((dirname is not None) and (dir_hdu is not None)):
@@ -174,8 +173,8 @@ class Sex2GolPy(object):
     def _transfer_coos(self):
         """Transfer coordinates from the IOL to the GOL"""
         # compose the WCS-term for the direct and grism images
-        dir_term = getIMAGE("{0:s} [{1:d}]".format(self.dirname, self.dirname_extinfo['fits_ext']))
-        gri_term = getIMAGE("{0:s} [{1:d}]".format(self.grisim, self.grism_extinfo['fits_ext']))
+        dir_term = getDATA("{0:s} [{1:d}]".format(self.dirname, self.dirname_extinfo['fits_ext']))
+        gri_term = getDATA("{0:s} [{1:d}]".format(self.grisim, self.grism_extinfo['fits_ext']))
 
         # generate the WCS objects
         dir_wcs = wcsutil.WCSObject(dir_term)

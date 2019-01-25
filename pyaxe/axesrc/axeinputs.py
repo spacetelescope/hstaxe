@@ -4,7 +4,9 @@ import os
 from astropy.io import fits
 from astropy.table import Table, Column
 from astropy.io.registry import IORegistryError
-from ..axeerror import aXeError
+
+from pyaxe.axeerror import aXeError
+from pyaxe import config as config_utils
 
 
 class aXeInput(object):
@@ -12,8 +14,6 @@ class aXeInput(object):
     def __init__(self, inlist, configterm="", fringeterm=None):
         # load the Input Image List
         self._inimlist = Table.read(inlist, format='ascii.no_header')
-        print("Using inlist: {}".format(inlist))
-        print("fringeterm is {}".format(fringeterm))
 
         # find out what data has been read and assign column names
         self._validate_columns()
@@ -65,7 +65,7 @@ class aXeInput(object):
         # do a check on the first object catalog to make sure it's a format
         # that we can read
         try:
-            __ = Table.read(self._inimlist[0]['objcat'], format='ascii')
+            __ = Table.read(config_utils.getDATA(self._inimlist[0]['objcat']), format='ascii')
         except IORegistryError:
             raise aXeError("Catalog format not recognized , checked for: {0:s}"
                            .format(self._inimlist[name][0]))
@@ -107,7 +107,6 @@ class aXeInput(object):
 
         # check whether there are fringe configs
         if fringeterm is not None:
-            print("\nfringe configs: {}: \n num images:{}\n".format(self._inimlist, len(self._inimlist)))
             col = Column(name='fringe',
                          data=[fringeterm] * len(self._inimlist))
             # add a column for the fringes
@@ -209,7 +208,7 @@ class aXeInput(object):
         for row in self._inimlist:
 
             # check the existence of the Input Image List
-            image = row['grisim']
+            image = config_utils.getDATA(row['grisim'])
             subarray = fits.getval(image, "SUBARRAY", ext=0)
             if subarray:
                 err_msg = ("Grism image: {0:s} is a subarray"
@@ -217,7 +216,7 @@ class aXeInput(object):
                 raise aXeError(err_msg)
 
             if 'dirim' in self._inimlist.colnames:
-                image = row['dirim']
+                image = config_utils.getDATA(row['dirim'])
                 subarray = fits.getval(image, "SUBARRAY", ext=0)
                 if subarray:
                     err_msg = ("Direct image: {0:s} is a subarray"

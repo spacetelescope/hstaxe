@@ -185,7 +185,7 @@ class aXeSpcExtr(object):
         # load the configuration files;
         # get the extension info
         conf = configfile.ConfigFile(axeutils.getCONF(self.config))
-        ext_info = axeutils.get_ext_info(axeutils.getIMAGE(self.grisim), conf)
+        ext_info = axeutils.get_ext_info(axeutils.getDATA(self.grisim), conf)
         del conf
 
         if (('drzfwhm' in self.params) and
@@ -195,7 +195,7 @@ class aXeSpcExtr(object):
 
             # generate the non-linear distortions from the IDCTAB;
             # store them in the fits-file header
-            nlins = nlincoeffs.NonLinCoeffs(axeutils.getIMAGE(self.grisim),
+            nlins = nlincoeffs.NonLinCoeffs(axeutils.getDATA(self.grisim),
                                             ext_info)
             nlins.make()
             nlins.store_coeffs()

@@ -3,7 +3,7 @@ from __future__ import (absolute_import, unicode_literals, division,
 import os
 import shutil
 from .axeerror import aXeSIMError
-from ..axeutils import (getIMAGE, getOUTSIM, getCONF, get_random_filename,
+from ..axeutils import (getDATA, getOUTSIM, getCONF, get_random_filename,
                         getSIMDATA, getOUTPUT, axe_setup)
 
 
@@ -272,7 +272,7 @@ def simdirim(incat=None, config=None, tpass_direct=None, dirim_name=None,
 
     # make a full path to the
     # direct image as dummy and as final output
-    dummy_dirima_path = getIMAGE(dirima_name)
+    dummy_dirima_path = getDATA(dirima_name)
     final_dirima_path = getOUTSIM(dirima_name)
 
     try:
@@ -304,17 +304,17 @@ def simdirim(incat=None, config=None, tpass_direct=None, dirim_name=None,
     # load the simulation configuration file
     conf_simul = configfile.ConfigFile(getCONF(config_simul))
 
-    print("SIMDIRIM: Input Model Object List:\t{0:s}".format(getIMAGE(incat)))
+    print("SIMDIRIM: Input Model Object List:\t{0:s}".format(getDATA(incat)))
     print("SIMDIRIM: Input aXe configuration file:\t{0:s}"
           .format(getCONF(config)))
     print("SIMDIRIM: Input Total Passband file:\t{0:s}"
           .format(getSIMDATA(tpass_direct)))
     if (model_spectra is not None):
         print("SIMDIRIM: Input Model Spectra:\t{0:s}"
-              .format(getIMAGE(model_spectra)))
+              .format(getDATA(model_spectra)))
     if (model_images is not None):
         print("SIMDIRIM: Input Model Spectra:\t{0:s}"
-              .format(getIMAGE(model_images)))
+              .format(getDATA(model_images)))
     print("SIMDIRIM: Background flux/image:\t{0:s}".format(str(bck_flux)))
     if (exptime is not None):
         print("SIMDIRIM: Input exposure time:\t{0:s}".format(str(exptime)))
@@ -351,14 +351,14 @@ def simdirim(incat=None, config=None, tpass_direct=None, dirim_name=None,
     i_maker.makeImages()
 
     # load the model object table
-    inobjects = modspeclist.ModelObjectTable(getIMAGE(incat))
+    inobjects = modspeclist.ModelObjectTable(getDATA(incat))
     # fill the model object table
     inobjects.fill_columns(i_maker.WCSimage, i_maker.WCSext)
 
     # load the object to make the grism simulations
     dirmator = axecommands.DirImator(i_maker,
                                      config_simul,
-                                     getIMAGE(incat),
+                                     getDATA(incat),
                                      tpass_direct,
                                      model_spectra,
                                      model_images,
@@ -477,8 +477,8 @@ def simdispim(incat=None, config=None, lambda_psf=None, dispim_name=None,
 
     # make a full path to the
     # direct image as dummy and as final output
-    dummy_dirima_path = getIMAGE(get_random_filename('t', '.fits'))
-    dummy_grisima_path = getIMAGE(get_random_filename('t', '.fits'))
+    dummy_dirima_path = getDATA(get_random_filename('t', '.fits'))
+    dummy_grisima_path = getDATA(get_random_filename('t', '.fits'))
 
     final_dirima_path = getOUTSIM(dirima_name)
     final_grisima_path = getOUTSIM(grisima_name)
@@ -517,15 +517,15 @@ def simdispim(incat=None, config=None, lambda_psf=None, dispim_name=None,
     if (lambda_psf is None):
         lambda_psf = conf_simul.confirm_lambda_psf()
 
-    print("SIMDISPIM: Input Model Object List:\t{0:s}".format(getIMAGE(incat)))
+    print("SIMDISPIM: Input Model Object List:\t{0:s}".format(getDATA(incat)))
     print("SIMDISPIM: Input aXe configuration file:\t{0:s}"
           .format(getCONF(config)))
     if (model_spectra is not None):
         print("SIMDISPIM: Input Model Spectra:\t{0:s}"
-              .format(getIMAGE(model_spectra)))
+              .format(getDATA(model_spectra)))
     if (model_images is not None):
         print("SIMDISPIM: Input Model Spectra:\t{0:s}"
-              .format(getIMAGE(model_images)))
+              .format(getDATA(model_images)))
     print("SIMDISPIM: Fixed wavlength for PSF:\t{0:s}".format(str(lambda_psf)))
     print("SIMDISPIM: Background flux/image:\t{0:s}".format(str(bck_flux)))
     if (exptime is not None):
@@ -556,12 +556,12 @@ def simdispim(incat=None, config=None, lambda_psf=None, dispim_name=None,
     i_maker.makeImages()
 
     # load the model object table
-    inobjects = modspeclist.ModelObjectTable(getIMAGE(incat))
+    inobjects = modspeclist.ModelObjectTable(getDATA(incat))
     # fill the model object table
     inobjects.fill_columns(i_maker.WCSimage, i_maker.WCSext)
 
     # load the object to make the grism simulations
-    grismator = axecommands.DispImator(i_maker, config_simul, getIMAGE(incat),
+    grismator = axecommands.DispImator(i_maker, config_simul, getDATA(incat),
                                        lambda_psf, model_spectra, model_images)
     grismator.run(silent=silent)
     grismator.mopup()
@@ -593,7 +593,7 @@ def simdispim(incat=None, config=None, lambda_psf=None, dispim_name=None,
         extractor = axecommands.DummyExtractor(i_maker,
                                                final_grisima_path,
                                                config_simul,
-                                               getIMAGE(incat),
+                                               getDATA(incat),
                                                bck_flux,
                                                extrfwhm,
                                                orient,
@@ -651,7 +651,7 @@ def prepimages(inlist=None, model_images=None, indata_copy=0):
           .format(getOUTSIM(model_images)))
     if indata_copy:
         print("PREPIMAGES: Output Model Image:\t{0:s}\n"
-              .format(getIMAGE(model_images)))
+              .format(getDATA(model_images)))
 
     # load the images defined in the image template list
     imglist = templateimages.ArtImaList(inlist)
@@ -704,7 +704,7 @@ def prepspectra(inlist=None, incat=None, tpass_flux=None,
     # give user feedback onto the screen
     print("PREPSPECTRA: Input Spectrum Template List:\t{0:s}".format(inlist))
     print("PREPSPECTRA: Input Model Object Table:\t{0:s}"
-          .format(getIMAGE(incat)))
+          .format(getDATA(incat)))
     if (len(tpass_flux.split(',')) > 1):
         print("PREPSPECTRA: Input Total Passband expression:\t{0:s}"
               .format(tpass_flux))
@@ -715,7 +715,7 @@ def prepspectra(inlist=None, incat=None, tpass_flux=None,
           .format(getOUTSIM(model_spectra)))
     if indata_copy:
         print("PREPSPECTRA: Output Model Spectra:\t{0:s}\n"
-              .format(getIMAGE(model_spectra)))
+              .format(getDATA(model_spectra)))
 
     # load the spectra given in the spectrum template list
     speclist = templatespectra.TemplateSpectrumList(inlist, incat, tpass_flux)

@@ -6,8 +6,8 @@ from . import axeinputs
 from . import configfile
 from . import axeiol
 
-from ..axeerror import aXeError, aXeSIMError
-from .. import config
+from pyaxe.axeerror import aXeError, aXeSIMError
+from pyaxe import config as config_utils
 
 
 class InputChecker(object):
@@ -36,7 +36,7 @@ class InputChecker(object):
             one_grisim = self.axe_inputs[0]['GRISIM']
 
             # open the fits
-            one_fits = fits.open(axeutils.getIMAGE(one_grisim), 'readonly')
+            one_fits = fits.open(config_utils.getDATA(one_grisim), 'readonly')
 
             # read the keyword 'FILTER1'
             if 'FILTER1' in one_fits[0].header:
@@ -72,7 +72,7 @@ class InputChecker(object):
                 err_msg = ("{0:s}: The grism image: {1:s} does NOT have an "
                            "associated direct image!"
                            .format(self.taskname,
-                                   axeutils.getIMAGE(one_input['GRISIM'])))
+                                   config_utils.getDATA(one_input['GRISIM'])))
                 raise aXeError(err_msg)
 
     def _check_fluxcubes(self):
@@ -81,17 +81,17 @@ class InputChecker(object):
 
             # load the config file and get the extension information
             conf = configfile.ConfigFile(config.getCONF(one_input['CONFIG']))
-            ext_info = axeutils.get_ext_info(config.getIMAGE(one_input['GRISIM']), conf)
+            ext_info = config_utils.get_ext_info(config.getDATA(one_input['GRISIM']), conf)
 
             # derive the aXe names
-            axe_names = config.get_axe_names(one_input['GRISIM'], ext_info)
+            axe_names = config_utils.get_axe_names(one_input['GRISIM'], ext_info)
 
             # check the fluxcube
-            if not os.path.isfile(axeutils.getIMAGE(axe_names['FLX'])):
+            if not os.path.isfile(config_utils.getDATA(axe_names['FLX'])):
                 # error and out
                 err_msg = ("{0:s}: The fluxcube file: {1:s} does not exist!"
                            .format(self.taskname,
-                                   axeutils.getIMAGE(axe_names['FLX'])))
+                                   config_utils.getDATA(axe_names['FLX'])))
                 raise aXeError(err_msg)
 
     def _check_global_backsub(self):
@@ -100,11 +100,11 @@ class InputChecker(object):
         for one_input in self.axe_inputs:
 
             # load the config file and get the extension information
-            conf = configfile.ConfigFile(axeutils.getCONF(one_input['CONFIG']))
-            ext_info = axeutils.get_ext_info(axeutils.getIMAGE(one_input['GRISIM']), conf)
+            conf = configfile.ConfigFile(config_utils.getCONF(one_input['CONFIG']))
+            ext_info = config_utils.get_ext_info(config_utils.getDATA(one_input['GRISIM']), conf)
 
             # open the fits image
-            gri_fits = fits.open(axeutils.getIMAGE(one_input['GRISIM']), 'readonly')
+            gri_fits = fits.open(config_utils.getDATA(one_input['GRISIM']), 'readonly')
 
             # go to the correct header
             act_header = gri_fits[ext_info['fits_ext']].header
@@ -121,7 +121,7 @@ class InputChecker(object):
                            "it had NO global\nsky subtraction, which is "
                            "required for the CRR version of aXedrizzle!"
                            .format(self.taskname,
-                                   axeutils.getIMAGE(one_input['GRISIM']),
+                                   config_utils.getDATA(one_input['GRISIM']),
                                    ext_info['fits_ext']))
                 raise aXeError(err_msg)
 
@@ -129,26 +129,26 @@ class InputChecker(object):
         # go over all inputs
         for one_input in self.axe_inputs:
             # load the config file and get the extension information
-            conf = configfile.ConfigFile(axeutils.getCONF(one_input['CONFIG']))
-            ext_info = axeutils.get_ext_info(axeutils.getIMAGE(one_input['GRISIM']), conf)
+            conf = configfile.ConfigFile(config_utils.getCONF(one_input['CONFIG']))
+            ext_info = config_utils.get_ext_info(config_utils.getDATA(one_input['GRISIM']), conf)
 
             # derive the aXe names
-            axe_names = config.get_axe_names(one_input['GRISIM'], ext_info)
+            axe_names = config_utils.get_axe_names(one_input['GRISIM'], ext_info)
 
             # check the DPP file
-            if not os.path.isfile(axeutils.getOUTPUT(axe_names['DPP'])):
+            if not os.path.isfile(config_utils.getOUTPUT(axe_names['DPP'])):
                 # error and out
                 err_msg = ("{0s:}: The DPP file: {1:s} does not exist!"
                            .format(self.taskname,
-                                   axeutils.getOUTPUT(axe_names['DPP'])))
+                                   config_utils.getOUTPUT(axe_names['DPP'])))
                 raise aXeError(err_msg)
 
             # check for the background DPP file
-            if back and not os.path.isfile(axeutils.getOUTPUT(axe_names['BCK_DPP'])):
+            if back and not os.path.isfile(config_utils.getOUTPUT(axe_names['BCK_DPP'])):
                 # error and out
                 err_msg = ("{0:s}: The background DPP file: {1:s} does not "
                            "exist!".format(self.taskname,
-                                           axeutils.getOUTPUT(axe_names['BCK_DPP'])))
+                                           config_utils.getOUTPUT(axe_names['BCK_DPP'])))
                 raise aXeError(err_msg)
 
     def check_axeprep(self, backgr, backims):
@@ -156,13 +156,10 @@ class InputChecker(object):
 
         # scheck for background subtraction
         if backgr:
-            if len(backims) < 1:
+            if not backims:
                 err_msg = ("{0:s}: A background image must be given for the "
                            "background subtraction!".format(self.taskname))
                 raise aXeError(err_msg)
-
-            # check the existence of background images
-            #self._check_masterbck()
 
     def check_axecore(self, back, extrfwhm, drzfwhm, backfwhm, orient,
                       slitless_geom, np, interp, cont_model,
@@ -364,25 +361,25 @@ class InputChecker(object):
         """
 
         # do the setup
-        axeutils.axe_setup(axesim=True)
+        config_utils.axe_setup(axesim=True)
 
         # check the existence of the
         # model object table
-        if not os.path.isfile(axeutils.getIMAGE(incat)):
+        if not os.path.isfile(config_utils.getDATA(incat)):
             msg = ("The Model Object Table does not exist: {}"
-                   .format(axeutils.getIMAGE(incat)))
+                   .format(config_utils.getDATA(incat)))
             raise aXeSIMError(msg)
 
         # check the existence of the
         # axe configuration file
-        if not os.path.isfile(axeutils.getCONF(config)):
+        if not os.path.isfile(config_utils.getCONF(config)):
             msg = ("The aXe configuration file does not exist: {}"
-                   .format(axeutils.getCONF(config)))
+                   .format(config_utils.getCONF(config)))
             raise aXeSIMError(msg)
 
         else:
             # load the aXe configuration file
-            conf = configfile.ConfigFile(axeutils.getCONF(config))
+            conf = configfile.ConfigFile(config_utils.getCONF(config))
 
             # make the internal checks
             n_sens = conf.check_files(check_glob=False)
@@ -391,7 +388,7 @@ class InputChecker(object):
             # at least one sens. file
             if n_sens < 1:
                 msg = ("There must be at least one sensitivity file in: {}"
-                       .format(axeutils.getCONF(config)))
+                       .format(config_utils.getCONF(config)))
                 raise aXeSIMError(msg)
 
         # check whether the configuration files
@@ -417,17 +414,17 @@ class InputChecker(object):
         if (model_spectra is not None):
             # check the existence of the
             # model spectra file
-            if not os.path.isfile(axeutils.getIMAGE(model_spectra)):
+            if not os.path.isfile(config_utils.getDATA(model_spectra)):
                 msg = ("The model spectra file does not exist: {}"
-                       .format(axeutils.getIMAGE(model_spectra)))
+                       .format(config_utils.getDATA(model_spectra)))
                 raise aXeSIMError(msg)
 
         if model_images is not None:
             # check the existence of the
             # model images file
-            if not os.path.isfile(axeutils.getIMAGE(model_images)):
+            if not os.path.isfile(config_utils.getDATA(model_images)):
                 msg = ("The model images file does not exist: "
-                       .format(axeutils.getIMAGE(model_images)))
+                       .format(config_utils.getDATA(model_images)))
                 raise aXeSIMError(msg)
 
         # check the nx-value
@@ -475,9 +472,9 @@ class InputChecker(object):
         # catch a string
         except ValueError:
             # check for existence of file
-            if not os.path.isfile(axeutils.getCONF(bck_flux)):
+            if not os.path.isfile(config_utils.getCONF(bck_flux)):
                 error_message = ("The background file does not exist: {0}"
-                                 .format(axeutils.getCONF(bck_flux)))
+                                 .format(config_utils.getCONF(bck_flux)))
                 raise aXeSIMError(error_message)
 
     def check_simdirim_input(self, incat, config, tpass_direct,
@@ -513,25 +510,25 @@ class InputChecker(object):
         """
 
         # do the setup
-        axeutils.axe_setup(axesim=True)
+        config_utils.axe_setup(axesim=True)
 
         # check the existence of the
         # model object table
-        if not os.path.isfile(axeutils.getIMAGE(incat)):
+        if not os.path.isfile(config_utils.getDATA(incat)):
             error_message = ("The Model Object Table does not exist: {0}"
-                             .format(axeutils.getIMAGE(incat)))
+                             .format(config_utils.getDATA(incat)))
             raise aXeSIMError(error_message)
 
         # check the existence of the
         # axe configuration file
-        if not os.path.isfile(axeutils.getCONF(config)):
+        if not os.path.isfile(config_utils.getCONF(config)):
             error_message = ("The aXe configuration file does not exist: {0}"
-                             .format(axeutils.getCONF(config)))
+                             .format(config_utils.getCONF(config)))
             raise aXeSIMError(error_message)
 
         else:
             # load the aXe configuration file
-            conf = configfile.ConfigFile(axeutils.getCONF(config))
+            conf = configfile.ConfigFile(config_utils.getCONF(config))
 
             # make the internal checks
             n_sens = conf.check_files(check_glob=False)
@@ -540,30 +537,30 @@ class InputChecker(object):
             # at least one sens. file
             if n_sens < 1:
                 error_message = ("There must be at least one sensitivity "
-                                 "file in: {0}".format(axeutils.getCONF(config)))
+                                 "file in: {0}".format(config_utils.getCONF(config)))
                 raise aXeSIMError(error_message)
 
         # check the existence of the
         # total passband file
-        if not os.path.isfile(axeutils.getSIMDATA(tpass_direct)):
+        if not os.path.isfile(config_utils.getSIMDATA(tpass_direct)):
             error_message = ("The total passband file does not exist: {0}"
-                             .format(axeutils.getSIMDATA(tpass_direct)))
+                             .format(config_utils.getSIMDATA(tpass_direct)))
             raise aXeSIMError(error_message)
 
         if model_spectra is not None:
             # check the existence of the
             # model spectra file
-            if not os.path.isfile(axeutils.getIMAGE(model_spectra)):
+            if not os.path.isfile(config_utils.getDATA(model_spectra)):
                 error_message = ("The model spectra file does not exist: {0}"
-                                 .format(axeutils.getIMAGE(config)))
+                                 .format(config_utils.getDATA(config)))
                 raise aXeSIMError(error_message)
 
         if model_images is not None:
             # check the existence of the
             # model images file
-            if not os.path.isfile(axeutils.getIMAGE(model_images)):
+            if not os.path.isfile(config_utils.getDATA(model_images)):
                 error_message = ("The model images file does not exist: {0}"
-                                 .format(axeutils.getIMAGE(config)))
+                                 .format(config_utils.getDATA(config)))
                 raise aXeSIMError(error_message)
 
         # check the nx-value
@@ -600,7 +597,7 @@ class InputChecker(object):
                 # catch a string
             except ValueError:
                 # check for existence of file
-                if not os.path.isfile(axeutils.getCONF(bck_flux)):
+                if not os.path.isfile(config_utils.getCONF(bck_flux)):
                     error_message = ("The background file does not exist: {0}"
-                                     .format(axeutils.getCONF(bck_flux)))
+                                     .format(config_utils.getCONF(bck_flux)))
                     raise aXeSIMError(error_message)

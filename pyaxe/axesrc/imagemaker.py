@@ -1,7 +1,8 @@
 from astropy.io import fits as pyfits
 from . import configfile
-from .axeerror import *
-from .axeutils import *
+from . import axeerror
+from . import axeutils
+
 
 class DummyImages(object):
     """
@@ -50,33 +51,33 @@ class DummyImages(object):
 
         # check whether a direct image
         # shall be created
-        if dirname != None:
-            self.dirname  = dirname
+        if dirname is not None:
+            self.dirname = dirname
             self.WCSimage = dirname
-            self.WCSext   = '[SCI]'
+            self.WCSext = '[SCI]'
 
-            if image_data['direct'] != None:
-                self.dirdata  = image_data['direct']
+            if image_data['direct'] is not None:
+                self.dirdata = image_data['direct']
             else:
-                self.dirdata  = image_data['grism']
+                self.dirdata = image_data['grism']
         else:
             self.dirname = None
             self.dirdata = None
 
         # store the drizzle metadata
         if 'drizzle' in image_data:
-            self.drzdata  = image_data['drizzle']
+            self.drzdata = image_data['drizzle']
         else:
-            self.drzdata  = None
+            self.drzdata = None
 
         # store the x-dimension
-        if nx != None:
+        if nx is not None:
             self.nx = nx
         else:
             self.nx = image_data['dimension'][0]
 
         # store the y-dimension
-        if ny != None:
+        if ny is not None:
             self.ny = ny
         else:
             self.ny = image_data['dimension'][1]
@@ -140,13 +141,13 @@ class DummyImages(object):
         The method deletes the dummy images of the class instance.
         """
         # check whether there should exist a grism image
-        if self.griname != None:
+        if self.griname is not None:
             # check whether it exists and delete it
             if os.path.isfile(self.griname):
                 os.unlink(self.griname)
 
         # check whether there should exist a direct image
-        if self.dirname != None:
+        if self.dirname is not None:
             # check whether it exists and delete it
             if os.path.isfile(self.dirname):
                 os.unlink(self.dirname)
@@ -159,16 +160,15 @@ class DummyImages(object):
         """
         # check whether a grism image
         # shall be created
-        if self.griname != None:
+        if self.griname is not None:
             # make the grism image
             self.makeOneImage(self.griname, self.nx, self.ny, self.gridata, self.drzdata)
 
         # check whether a direct image
         # shall be created
-        if self.dirname != None:
+        if self.dirname is not None:
             # make the direct image
             self.makeOneImage(self.dirname, self.nx, self.ny, self.dirdata, self.drzdata)
-
 
     def makeOneImage(self, imgname, nx, ny, metadata, drzmeta=None):
         """
@@ -207,13 +207,12 @@ class DummyImages(object):
         # go the the header and put
         # the exposure time
         hdr = mex_hdu[0].header
-        hdr.update('EXPTIME', 1.0, 'dummy exposure time')
+        hdr['EXPTIME'] = (1.0, 'dummy exposure time')
 
         if drzmeta != None:
             # update the header
             for item in drzmeta:
-                hdr.update(item[0], item[1], item[2])
-
+                hdr[item[0]] = (item[1], item[2])
 
         # write the image and close it
         mex_hdu.writeto(imgname)
@@ -240,7 +239,7 @@ class DummyImages(object):
 
         # update the header
         for item in metadata:
-            hdr.update(item[0], item[1], item[2])
+            hdr[item[0]] = (item[1], item[2])
 
         # write to disk and close
         img.flush()

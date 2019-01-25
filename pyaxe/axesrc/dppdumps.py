@@ -1,11 +1,12 @@
 import os
 from astropy.io import fits
 
-from .. import axeutils
+from pyaxe.axeerror import aXeError
+from pyaxe import axeutils
+
 from . import axeinputs
 from . import configfile
 from . import axelowlev
-from ..axeerror import aXeError
 
 
 class DPPdumps(object):
@@ -33,7 +34,7 @@ class DPPdumps(object):
             conf = configfile.ConfigFile(axeutils.getCONF(an_input['CONFIG']))
 
             # get the image extensions
-            ext_info = axeutils.get_ext_info(axeutils.getIMAGE(an_input['GRISIM']), conf)
+            ext_info = axeutils.get_ext_info(axeutils.getDATA(an_input['GRISIM']), conf)
 
             # get the name of all axe files
             axe_names = axeutils.get_axe_names(an_input['GRISIM'], ext_info)

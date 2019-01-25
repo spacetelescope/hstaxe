@@ -1,10 +1,10 @@
 import os
 import os.path
 from astropy.io import fits
-from .. import axe_asciidata
+from pyaxe import axe_asciidata
 
-from ..axeerror import aXeSIMError
-from ..config import getIMAGE, getOUTSIM, getSIMDATA
+from pyaxe.axeerror import aXeSIMError
+from pyaxe.config import getDATA, getOUTSIM, getSIMDATA
 
 
 class ArtImaList(object):
@@ -103,13 +103,13 @@ class ArtImaList(object):
         if indata_copy:
             # delete older versions
             # of the fits name
-            if os.path.isfile(getIMAGE(fitsname)):
-                os.unlink(getIMAGE(fitsname))
+            if os.path.isfile(getDATA(fitsname)):
+                os.unlink(getDATA(fitsname))
 
             print("Writing images to file: {0:s} ..."
-                  .format(getIMAGE(fitsname)))
+                  .format(getDATA(fitsname)))
             # write it to fits
-            hdulist.writeto(getIMAGE(fitsname))
+            hdulist.writeto(getDATA(fitsname))
             # give an end notice
             print('Done')
 

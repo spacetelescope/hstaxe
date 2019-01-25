@@ -6,7 +6,7 @@ from . import modspeclist
 
 from .. import axe_asciidata
 from ..axeerror import aXeSIMError
-from ..axeutils import getIMAGE, getSIMDATA, getOUTSIM
+from ..axeutils import getDATA, getSIMDATA, getOUTSIM
 
 
 class TemplateSpectrumList(object):
@@ -34,7 +34,7 @@ class TemplateSpectrumList(object):
         self.piv_wav = tpass.pivot()
 
         # load the model spectrum list
-        self.modspeclist = modspeclist.ModelSpectrumList(getIMAGE(incat),
+        self.modspeclist = modspeclist.ModelSpectrumList(getDATA(incat),
                                                          self.piv_wav)
         maxnum = self.modspeclist.find_tempmax()
 
@@ -264,13 +264,13 @@ class TemplateSpectrumList(object):
         if indata_copy:
             # delete older versions
             # of the fits name
-            if os.path.isfile(getIMAGE(fitsname)):
-                os.unlink(getIMAGE(fitsname))
+            if os.path.isfile(getDATA(fitsname)):
+                os.unlink(getDATA(fitsname))
 
             print("Writing model spectra to file: {0:s} ..."
-                  .format(getIMAGE(fitsname)))
+                  .format(getDATA(fitsname)))
             # write it to fits
-            hdulist.writeto(getIMAGE(fitsname))
+            hdulist.writeto(getDATA(fitsname))
             print('Done')
 
         # add an extra linefeed
@@ -291,10 +291,10 @@ class TemplateSpectrumList(object):
         # look whether a new name is given
         if (mspec_name_new is not None):
             # compose the new full name
-            new_mspec = getIMAGE(mspec_name_new)
+            new_mspec = getDATA(mspec_name_new)
         else:
             # compose the new full name
-            new_mspec = getIMAGE(self.modspeclist.filename)
+            new_mspec = getDATA(self.modspeclist.filename)
 
         # write the model spectrum list out
         print("Writing model spectrum list to file: {0:s} ..."

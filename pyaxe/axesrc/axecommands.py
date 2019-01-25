@@ -2,10 +2,11 @@ import sys
 import shutil
 from astropy.io import fits
 
+from pyaxe import config
 from .axeerror import aXeSIMError
 from . import axeutils
 from . import axetasks
-from ..config import *
+
 
 
 class DispImator(object):
@@ -257,9 +258,9 @@ class DummyExtractor(object):
     def _check_files(self):
         """Checks the existence of the input files"""
         # check the direct image
-        if not os.path.isfile(axeutils.getIMAGE(self.direct_image)):
+        if not os.path.isfile(axeutils.getDATA(self.direct_image)):
             err_msg = ("\nThe direct image is not available: {0:s}"
-                       .format(axeutils.getIMAGE(self.direct_image)))
+                       .format(axeutils.getDATA(self.direct_image)))
             raise aXeSIMError(err_msg)
 
         # check the configuration file
@@ -327,15 +328,15 @@ class DummyExtractor(object):
 
         # copy the grism image to AXE_IMAGE_PATH
         shutil.copy(axeutils.getOUTSIM(self.simul_grisim),
-                    axeutils.getIMAGE(tmpfile1))
+                    axeutils.getDATA(tmpfile1))
 
         # subtract the background from
         # the grism image
         # expression = "(a - b)"
         # iraf.imexpr(expr=expression, output=tmpfile2,
-        #    a=axeutils.getIMAGE(tmpfile1)+'[SCI]', b=self.bck_flux, Stdout=1)
+        #    a=axeutils.getDATA(tmpfile1)+'[SCI]', b=self.bck_flux, Stdout=1)
 
-        in_image = fits.open(axeutils.getIMAGE(tmpfile1))
+        in_image = fits.open(axeutils.getDATA(tmpfile1))
         in_image['sci'].data -= self.bck_flux
         in_image.close()
 
@@ -364,7 +365,7 @@ class DummyExtractor(object):
 
         # delete the background subtracted
         # grism image
-        os.unlink(axeutils.getIMAGE(self.dispersed_image))
+        os.unlink(axeutils.getDATA(self.dispersed_image))
 
         # delete the GOL, the OAF and the PET
         result_cat = axeutils.getOUTPUT(root_name + '_2.cat')

@@ -256,7 +256,7 @@ class ProjectionList:
                 grism_cat.remove_row(r_index)
 
         # save the new IOL
-        grism_cat.write(self.iol_name, format='ascii')
+        grism_cat.write(self.iol_name, format='ascii', overwrite=True)
 
         print()
         print(" >>>> Catalog: {0:s} written with {1:d} entries.>>>> "
@@ -404,8 +404,8 @@ class IOLMaker:
             angle_tab[i]['Y_SHIFT'] = y_shift
 
         # write the two lists to disk
-        data_tab.write(data_name, format='ascii.no_header')
-        angle_tab.write(data_angle, format='ascii.no_header')
+        data_tab.write(data_name, format='ascii.no_header', overwrite=True)
+        angle_tab.write(data_angle, format='ascii.no_header', overwrite=True)
 
         self.data_name = data_name
         self.data_angle = data_angle

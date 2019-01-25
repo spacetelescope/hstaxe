@@ -1,6 +1,5 @@
-from math import *
-
 import sys
+import math
 from drizzlepac import astrodrizzle
 from stsci.tools import fileutil
 """
@@ -85,9 +84,6 @@ Howard Bushouse, STScI, 08-Mar-2001, version 1.3
 Updated 'raise' statements to use Exception class, to conform to latest python
 syntax rules.
 """
-
-
-PY3K = sys.version_info[0] >= 3
 
 # Some convenient definitions
 yes=iraf.yes

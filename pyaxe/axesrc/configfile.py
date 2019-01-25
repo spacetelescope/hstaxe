@@ -1,8 +1,8 @@
 import os
 import math
 
-from .. import config
-from ..axeerror import aXeError
+from pyaxe import config as config_util
+from pyaxe.axeerror import aXeError
 
 
 class ConfigList(object):
@@ -317,10 +317,10 @@ class ConfigList(object):
 
                 # if the keyvalue is NOT None but the file does not exist
                 if ((kvalue.upper() is not 'NONE') and
-                    (not os.path.isfile(config.getCONF(kvalue)))):
+                    (not os.path.isfile(config_util.getCONF(kvalue)))):
                     # report an error
                     err_msg = ("The file: {0:s} does not exist!"
-                               .format(config.getCONF(kvalue)))
+                               .format(config_util.getCONF(kvalue)))
                     raise aXeError(err_msg)
 
     def get_gkey(self, keyword):
@@ -956,10 +956,10 @@ class ConfigBeam(object):
                 if ((bkey.keyword is full_keyword) and
                      (bkey.keyvalue.upper() is not 'NONE')):
                     # check for the file
-                    if not os.path.isfile(config.getCONF(bkey.keyvalue)):
+                    if not os.path.isfile(config_util.getCONF(bkey.keyvalue)):
                         # report an error
                         err_msg = ("The file: {0:s} does not exist!"
-                                   .format(config.getCONF(bkey.keyvalue)))
+                                   .format(config_util.getCONF(bkey.keyvalue)))
                         raise aXeError(err_msg)
                     else:
                         n_sens += 1

@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from pyaxe.config import __AXE_BINDIR as AXE_BINDIR
+# from pyaxe.config import __AXE_BINDIR as AXE_BINDIR
 from pyaxe.axeerror import aXeError
 from pyaxe.config import getOUTPUT
 
@@ -34,8 +34,8 @@ class TaskWrapper(object):
         self.stderr = getOUTPUT(tshort+'.stderr')
 
         # put the command into the list
-        self.command_list.append("/".join([AXE_BINDIR, taskname]))
-        print(self.command_list)
+        # self.command_list.append("/".join([AXE_BINDIR, taskname]))
+        self.command_list.append(taskname)
 
     def _cleanup(self):
         """The method deletes the files created for stdout and stderr.
@@ -118,7 +118,6 @@ class TaskWrapper(object):
 
             # execute the task with the default stdout and
             # stderr, which is the system one
-            print(self.command_list)
             retcode = subprocess.call(self.command_list)
 
         # return the result
@@ -962,19 +961,19 @@ class aXe_SEX2GOL(TaskWrapper):
 
         # check whether a direct image exists
         if (('use_direct' in params) and (params['use_direct'])):
-            # put the direct image name to the list
+            # add the direct image name to the list
             self.command_list.append(params['dirname'])
 
-            # put the grism name to the list
+            # add the grism name to the list
             self.command_list.append(grism)
 
-            # put the grism name to the list
+            # add the grism name to the list
             self.command_list.append(config)
         else:
-            # put the grism name to the list
+            # add the grism name to the list
             self.command_list.append(grism)
 
-            # put the grism name to the list
+            # add the grism name to the list
             self.command_list.append(config)
 
             # mark that there is no direct image

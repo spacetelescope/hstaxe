@@ -154,6 +154,7 @@ def axeprep(inlist='',
 
     # go over all the input
     for row in axe_inputs:
+        print(row)
         # make a prepare-object; run the prepare
         aXePrep = axepreptor.aXePrepArator(row['grisim'],
                                            row['objcat'],
@@ -168,6 +169,7 @@ def axeprep(inlist='',
                                            gcorr=gcorr)
 
         aXePrep.run()
+        del aXePrep
 
 
 def axecore(inlist='',
@@ -241,6 +243,7 @@ def axecore(inlist='',
                                           weights=weights,
                                           sampling=sampling)
         aXeNator.run()
+        del aXeNator
 
 
 def drzprep(inlist='',
@@ -423,10 +426,13 @@ def sex2gol(grism='',
     """Function for the aXe task SEX2GOL"""
     # make the general setup
     axe_setup()
-
-    sex2gol = pysex2gol.Sex2GolPy(grism, config, in_sex=in_sex,
-                                  dirname=direct, out_sex=out_sex,
-                                  spec_hdu=spec_hdu, dir_hdu=dir_hdu)
+    print("Using sex config {}\n".format(config))
+    sex2gol = pysex2gol.Sex2GolPy(grism, config,
+                                  in_sex=in_sex,
+                                  dirname=direct,
+                                  out_sex=out_sex,
+                                  spec_hdu=spec_hdu,
+                                  dir_hdu=dir_hdu)
     sex2gol.runall(silent)
 
 
@@ -443,14 +449,20 @@ def gol2af(grism='',
            in_gol=None,
            silent=False):
     """Function for the aXe task GOL2AF"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
     # run GOL2AF
-    gol2af = axelowlev.aXe_GOL2AF(grism, config, back=back, mfwhm=mfwhm,
-                                  orient=orient, slitless_geom=slitless_geom,
-                                  exclude=exclude, lambda_mark=lambda_mark,
-                                  dmag=dmag, in_gol=in_gol, out_af=out_af)
+    gol2af = axelowlev.aXe_GOL2AF(grism, config,
+                                  back=back,
+                                  mfwhm=mfwhm,
+                                  orient=orient,
+                                  slitless_geom=slitless_geom,
+                                  exclude=exclude,
+                                  lambda_mark=lambda_mark,
+                                  dmag=dmag,
+                                  in_gol=in_gol,
+                                  out_af=out_af)
     gol2af.runall(silent)
 
 
@@ -461,11 +473,13 @@ def af2pet(grism='',
            out_pet=None,
            silent=False):
     """Function for the aXe task AF2PET"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
     # run AF2PET
-    af2pet = axelowlev.aXe_AF2PET(grism, config, back=back, in_af=in_af,
+    af2pet = axelowlev.aXe_AF2PET(grism, config,
+                                  back=back,
+                                  in_af=in_af,
                                   out_pet=out_pet)
     af2pet.runall(silent)
 
@@ -483,17 +497,20 @@ def petcont(grism='',
             no_pet=False,
             silent=False):
     """Function for the aXe task PETCONT"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
     # run PETCONT
-    petcont = axelowlev.aXe_PETCONT(grism, config, cont_model=cont_model,
+    petcont = axelowlev.aXe_PETCONT(grism, config,
+                                    cont_model=cont_model,
                                     model_scale=model_scale,
                                     spec_models=spec_models,
                                     object_models=object_models,
                                     inter_type=inter_type,
-                                    lambda_psf=lambda_psf, cont_map=cont_map,
-                                    in_af=in_af, no_pet=no_pet)
+                                    lambda_psf=lambda_psf,
+                                    cont_map=cont_map,
+                                    in_af=in_af,
+                                    no_pet=no_pet)
 
     petcont.runall(silent)
 
@@ -503,7 +520,7 @@ def petff(grism='',
           back=False,
           ffname=None):
     """Function for the aXe task PETFF"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
     # run PETFF
@@ -525,15 +542,21 @@ def backest(grism='',
             in_af=None,
             out_bck=None):
     """Function for the aXe task BACKEST"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
     #  run BACKEST
-    backest = axelowlev.aXe_BE(grism, config, np=np, interp=interp,
-                               niter_med=niter_med, niter_fit=niter_fit,
-                               kappa=kappa, smooth_length=smooth_length,
+    backest = axelowlev.aXe_BE(grism, config,
+                               np=np,
+                               interp=interp,
+                               niter_med=niter_med,
+                               niter_fit=niter_fit,
+                               kappa=kappa,
+                               smooth_length=smooth_length,
                                smooth_fwhm=smooth_fwhm,
-                               old_bck=old_bck, mask=mask, in_af=in_af,
+                               old_bck=old_bck,
+                               mask=mask,
+                               in_af=in_af,
                                out_bck=out_bck)
     backest.runall()
 
@@ -551,13 +574,18 @@ def pet2spc(grism='',
             out_spc=None,
             silent=False):
     """Function for the aXe task PET2SPC"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
-    pet2spc = axelowlev.aXe_PET2SPC(grism, config, use_bpet=use_bpet,
-                                    adj_sens=adj_sens, weights=weights,
-                                    do_flux=do_flux, drzpath=drzpath,
-                                    in_af=in_af, opet=opet, bpet=bpet,
+    pet2spc = axelowlev.aXe_PET2SPC(grism, config,
+                                    use_bpet=use_bpet,
+                                    adj_sens=adj_sens,
+                                    weights=weights,
+                                    do_flux=do_flux,
+                                    drzpath=drzpath,
+                                    in_af=in_af,
+                                    opet=opet,
+                                    bpet=bpet,
                                     out_spc=out_spc)
     pet2spc.runall(silent)
 
@@ -571,13 +599,16 @@ def stamps(grism='',
            out_stp=None,
            silent=False):
     """Function for the aXe task STAMPS"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
     # run STAMPS
-    stamps = axelowlev.aXe_STAMPS(grism, config, sampling=sampling,
-                                  drzpath=drzpath, in_af=in_af,
-                                  in_pet=in_pet, out_stp=out_stp)
+    stamps = axelowlev.aXe_STAMPS(grism, config,
+                                  sampling=sampling,
+                                  drzpath=drzpath,
+                                  in_af=in_af,
+                                  in_pet=in_pet,
+                                  out_stp=out_stp)
 
     stamps.runall(silent)
 
@@ -589,13 +620,16 @@ def drz2pet(inlist='',
             in_af=None,
             out_pet=None):
     """Function for the aXe task DRZ2PET"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
     # run the DRZ2PET task
-    drz2pet = axelowlev.aXe_DRZ2PET(inlist=inlist, config=config,
-                                    opt_extr=opt_extr, back=back,
-                                    in_af=in_af, out_pet=out_pet)
+    drz2pet = axelowlev.aXe_DRZ2PET(inlist=inlist,
+                                    config=config,
+                                    opt_extr=opt_extr,
+                                    back=back,
+                                    in_af=in_af,
+                                    out_pet=out_pet)
     drz2pet.runall()
 
 
@@ -605,7 +639,7 @@ def axegps(grism='',
            xval=None,
            yval=None):
     """Function for the aXe task AXEGPS"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
     axegps = axelowlev.aXe_GPS(grism, config, beam_ref, xval, yval)
     axegps.runall()
@@ -620,7 +654,7 @@ def axedirim(dirname='',
              tel_area=None,
              silent=False):
     """Function for the aXe task AXEDIRIM"""
-    # make the general setup
+    # check for required environment variables
     axe_setup()
 
     # run the command and delete what's left

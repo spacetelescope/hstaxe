@@ -9,13 +9,13 @@ import shutil
 from astropy.io import fits
 
 # defaults
-__user_paths = {"AXE_IMAGE_PATH": './IMAGE',
-                "AXE_OUTPUT_PATH": './OUTPUT',
-                "AXE_CONFIG_PATH": './CONFIG',
-                "AXE_DRIZZLE_PATH": './DRIZZLE'}
+__user_paths = {"AXE_IMAGE_PATH": 'DATA',
+                "AXE_OUTPUT_PATH": 'OUTPUT',
+                "AXE_CONFIG_PATH": 'CONF',
+                "AXE_DRIZZLE_PATH": 'DRIZZLE'}
 
 __AXE_DRZTMP_SUB = 'tmp'
-__AXE_BINDIR = sys.prefix + "/bin"
+# __AXE_BINDIR = sys.prefix + "/bin"
 __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
                                 __AXE_DRZTMP_SUB)
 
@@ -37,7 +37,7 @@ def set_defaults():
             print("{0:s} -> {1:s}".format(name, user_env[name]))
         else:
             if os.access(__user_paths[name], os.R_OK):
-                print("{0:s} already exists".format(name))
+                print("{0:s} already exists, using.".format(name))
             else:
                 print("{0:s} not defined, using {1:s}".format(name,
                                                               __user_paths[name]))
@@ -46,6 +46,7 @@ def set_defaults():
                 except OSError:
                     raise OSError("Problem creating {0:s} -> {1:s}"
                                   .format(name, __user_paths[name]))
+            os.environ[name] = __user_paths[name]
 
     __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
                                     __AXE_DRZTMP_SUB)
@@ -124,33 +125,44 @@ def getCONF(name=None):
     # in AXE_CONFIG_PATH
     if name is None:
         return __user_paths['AXE_CONFIG_PATH']
+    elif len(os.path.split(name)) > 1:
+        return os.path.join(__user_paths['AXE_CONFIG_PATH'],
+                            os.path.split(name)[-1])
     else:
         return os.path.join(__user_paths['AXE_CONFIG_PATH'], name)
 
 
-def getIMAGE(name=None):
+def getDATA(name=None):
     # return either AXE_IMAGE_PATH or
     # the pathname to the input file
     # in AXE_IMAGE_PATH
     if name is None:
         return __user_paths['AXE_IMAGE_PATH']
+    elif len(os.path.split(name)) > 1:
+        return os.path.join(__user_paths['AXE_IMAGE_PATH'],
+                            os.path.split(name)[-1])
     else:
         return os.path.join(__user_paths['AXE_IMAGE_PATH'], name)
 
 
 def getOUTPUT(name=None):
     # return either AXE_OUTPUT_PATH or
-    # the pathname to the input file
+    # the pathname to the output file
     # in AXE_OUTPUT_PATH
     if name is None:
+        print("No name passed")
         return __user_paths['AXE_OUTPUT_PATH']
+    elif len(os.path.split(name)) > 1:
+        return os.path.join(__user_paths['AXE_OUTPUT_PATH'],
+                            os.path.split(name)[-1])
     else:
+        print("adding output path to name")
         return os.path.join(__user_paths['AXE_OUTPUT_PATH'], name)
 
 
 def getOUTSIM(name=None):
     # return either AXE_OUTSIM_PATH or
-    # the pathname to the input file
+    # the pathname to the output file
     # in AXE_OUTSIM_PATH
     if name is None:
         return AXE_OUTSIM_PATH

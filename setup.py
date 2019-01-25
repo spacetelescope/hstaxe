@@ -3,14 +3,12 @@
 
 import os
 import sys
-import importlib
 
 from configparser import ConfigParser
-from glob import glob
+from distutils.command.clean import clean
 from setuptools import find_packages, Command, setup
 from setuptools.command.test import test as TestCommand
 from setuptools.command.install import install
-from distutils.command.clean import clean
 from subprocess import check_call, CalledProcessError
 
 AXELIB_DIR = "cextern/aXe_c_code/"
@@ -100,7 +98,7 @@ class MyClean(Command):
                                    ('bdist_base', 'bdist_base'))
 
     def run(self):
-        print("cleaning")
+        print("** cleaning python and C binaries for aXe **")
         current_env = sys.prefix + "/bin/"
         axe_bins = ["aXe_SEX2GOL",
                     "aXe_GOL2AF",
@@ -165,15 +163,14 @@ class BuildExtWithConfigure(install):
         if self.remake:
             CURRENT_ENV = sys.prefix
             try:
-                check_call(["make", "clean"], cwd=AXELIB_DIR)
                 check_call(["sh", "./configure",
                             "--with-cfitsio="+CURRENT_ENV,
                             "--with-wcstools="+CURRENT_ENV,
                             "--with-gsl="+CURRENT_ENV,
-                            "--libdir="+CURRENT_ENV+"/lib",
+                            "--libdir="+CURRENT_ENV,
                             "--prefix="+CURRENT_ENV],
                             cwd=AXELIB_DIR)
-                check_call(["make"], cwd=AXELIB_DIR)
+                check_call(["make", "clean"], cwd=AXELIB_DIR)
                 check_call(["make", "install"], cwd=AXELIB_DIR)
             except CalledProcessError as e:
                 print(e)
@@ -186,7 +183,7 @@ conf = ConfigParser()
 conf.read(['setup.cfg'])
 metadata = dict(conf.items('metadata'))
 PACKAGENAME = metadata.get('package_name', 'pyaxe')
-CLASSIFIER = metadata.get('classifier','Programming Language :: Python :: 3')
+CLASSIFIER = metadata.get('classifier', 'Programming Language :: Python :: 3')
 DESCRIPTION = metadata.get('description', 'aXe - spectral extraction for HST')
 LONG_DESCRIPTION = metadata.get('long_description',
                                 'aXe spectral extraction for HST minus the IRAF')
