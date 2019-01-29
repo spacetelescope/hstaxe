@@ -1,7 +1,9 @@
 import os
 from astropy.io import fits
-from ..axeerror import aXeError
-from .. import axeutils
+# from drizzlepac import astrodrizzle
+import pydrizzle
+from pyaxe.axeerror import aXeError
+from pyaxe import config as config_util
 
 DEFAULT_COEFF_FILE = 'default_coeffs.dat'
 
@@ -122,7 +124,7 @@ cubic
 """
 
 
-class NonLinCoeffs(object):
+class NonLinCoeffs:
     def __init__(self, image, ext_info):
         """Initializes the class"""
         # store the input internally
@@ -320,7 +322,7 @@ class NonLinCoeffs(object):
                 first = 1
 
             # neglect also lines starting with a string
-            elif axeutils.isstringlike(line.strip().split()[0]) == 1:
+            elif config_util.isstringlike(line.strip().split()[0]) == 1:
                 continue
 
             # here are the data lines
@@ -343,33 +345,31 @@ class NonLinCoeffs(object):
         # return the lists
         return xcoeffs, ycoeffs
 
-    def mopup_pydrizzle(self, coeff_filename):
-        """Delete al files created by pydrizzle"""
-        # compose the file names
-        msk1name = self.image.replace('.fits', '_final_mask1.fits')
-        msk2name = self.image.replace('.fits', '_final_mask2.fits')
-        sing1name = self.image.replace('.fits', '_single_mask1.fits')
-        sing2name = self.image.replace('.fits', '_single_mask2.fits')
+    # def mopup_pydrizzle(self, coeff_filename):
+    #     """Delete al files created by pydrizzle"""
+    #     # compose the file names
+    #     msk1name = self.image.replace('.fits', '_final_mask1.fits')
+    #     msk2name = self.image.replace('.fits', '_final_mask2.fits')
+    #     sing1name = self.image.replace('.fits', '_single_mask1.fits')
+    #     sing2name = self.image.replace('.fits', '_single_mask2.fits')
 
-        # check if the files exist;
-        # delete them if yes
-        if os.path.isfile(msk1name):
-            os.unlink(msk1name)
-        if os.path.isfile(msk2name):
-            os.unlink(msk2name)
-        if os.path.isfile(sing1name):
-            os.unlink(sing1name)
-        if os.path.isfile(sing2name):
-            os.unlink(sing2name)
+    #     # check if the files exist;
+    #     # delete them if yes
+    #     if os.path.isfile(msk1name):
+    #         os.unlink(msk1name)
+    #     if os.path.isfile(msk2name):
+    #         os.unlink(msk2name)
+    #     if os.path.isfile(sing1name):
+    #         os.unlink(sing1name)
+    #     if os.path.isfile(sing2name):
+    #         os.unlink(sing2name)
 
-        # also delete the coefficients file
-        if os.path.isfile(coeff_filename):
-            os.unlink(coeff_filename)
+    #     # also delete the coefficients file
+    #     if os.path.isfile(coeff_filename):
+    #         os.unlink(coeff_filename)
 
     def make(self):
         """Generate the non-linear coefficients"""
-        from pyraf import iraf
-        import pydrizzle
 
         # get the name of the coefficients file
         coeff_filename, detector = self._get_coeff_filename()
@@ -387,9 +387,9 @@ class NonLinCoeffs(object):
         try:
             # create a distortion coefficient file
             pydrizzle.PyDrizzle(os.path.basename(self.image),
-                                bits_single=None,
-                                bits_final=None,
-                                updatewcs=False)
+                                          bits_single=None,
+                                          bits_final=None,
+                                          updatewcs=False)
         except:
             # if this fails, create a default coefficients file
             coeff_filename = self._create_dummy_coeffs(detector)

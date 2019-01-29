@@ -1,50 +1,44 @@
 import os
 import numpy as np
 import math
+
 from astropy.io import fits
-from stwcs.wcsutil import HSTWCS
+from astropy.table import Table, Column
+
 from drizzlepac import astrodrizzle
+
 from stsci.tools import fileutil
-from .. import axe_asciidata
-from ..axeerror import aXeError
-from .. import axeutils
+from stwcs.wcsutil import HSTWCS
+
+from pyaxe.axeerror import aXeError
+from pyaxe import config as config_util
 
 
-class MDrizzle_Image(object):
-    """Class for multidrizzled images"""
-    def __init__(self, mdrizzle_image, ext=0):
+class DrizzleImage:
+    """Class for working with drizzled images"""
+    def __init__(self, drizzle_image, ext=0):
         # store the image name
-        self.image = mdrizzle_image
+        self.image = drizzle_image
 
         # store the extension number
         self.ext = ext
 
         # determine and store the
         # number of drizzled images
-        self.ndrizzle = self._get_nfcube(mdrizzle_image, ext)
+        self._get_nfcube()
 
-    def _get_nfcube(self, image, ext):
+    def _get_nfcube(self):
         """Get the number of requested fluxcubes
 
         The method looks in the header of the grism image
         for the name of the input images used in the multidrizzle
-        process. This number is returned
-
-        Parameters
-        ----------
-        image: str
-            the name of the multidrizzled grism image
-
-        Returns
-        -------
-        number: int
-            the number of input images
+        process. This number is saved to the object.
 
         """
 
         # open the fits file and get the header
-        img = fits.open(image, 'readonly')
-        head = img[ext].header
+        img = fits.open(self.image, 'readonly')
+        head = img[self.ext].header
 
         # create the keyname for the first input image
         ID = 1
@@ -63,76 +57,20 @@ class MDrizzle_Image(object):
         ID = ID-1
 
         # return the number
-        return ID
-
-    def delete_drizzlekeys(self):
-        """Delete all drizzle keywords
-
-        The method deletes all MultiDrizzle related keywords.
-        For each input frame there exist around 30 keywords
-        describing the drizzle parameters. Due to a bug
-        in the fits kernel the multitude of descriptors
-        crashes the blot algorithm.
-        Deleting some keywords helps.
-        """
-
-        print('Deleting drizzle descriptors in: {0:s}...'.format(self.image))
-
-        # open the fits file and get the header
-        img = fits.open(self.image, 'update')
-        head = img[self.ext].header
-
-        # list of keyord names to be deleted
-        keynames = ['D{0:03d}DATA', 'D{0:03d}DEXP', 'D{0:03d}OUDA', 'D{0:03d}OUWE',
-                    'D{0:03d}OUCO', 'D{0:03d}MASK', 'D{0:03d}WTSC', 'D{0:03d}KERN',
-                    'D{0:03d}PIXF', 'D{0:03d}COEF', 'D{0:03d}XGIM', 'D{0:03d}YGIM',
-                    'D{0:03d}LAM',  'D{0:03d}SCAL', 'D{0:03d}ROT',  'D{0:03d}XSH',
-                    'D{0:03d}YSH',  'D{0:03d}SFTU', 'D{0:03d}SFTF', 'D{0:03d}EXKY',
-                    'D{0:03d}INUN', 'D{0:03d}OUUN', 'D{0:03d}FVAL', 'D{0:03d}INXC',
-                    'D{0:03d}INYC', 'D{0:03d}OUXC', 'D{0:03d}OUYC', 'D{0:03d}GEOM',
-                    'D{0:03d}VER']
-
-        # go over an index indicating
-        # an input image for multidrizzle
-        for index in range(self.ndrizzle-1):
-
-            # go over all keyword frames
-            for key in keynames:
-
-                # form the actual keyword
-                drizz_keyname = key % (index+1)
-
-                # check whether the keywird exists
-                try:
-                    if drizz_keyname in head:
-                        # delete the keyword
-                        del head[drizz_keyname]
-                except:
-                    print("failed to delete key %s".format(drizz_keyname))
-                    # continue and pray
-        # update the image
-        img.flush()
-
-        # close the image
-        img.close()
-        print(' Done')
+        self.ndrizzle = ID
 
 
-class Flux_Cube(object):
+class FluxCube:
     """The class for the fluxcube images.
 
-    The creation of those
-    fluxcube images is the main purpose of the module.
-    Correspondingly the class is oriented to mainly serve
-    this purpose.
+    The creation of the fluxcube images is the main purpose of the module.
     """
     def __init__(self, grism_image, index):
-        """extracts the name of an input file from the header
+        """Extracts the name of an input file from the header of a drizzled image
 
-        of a multidrizzled grism image. Then the name
-        of the corresponding fluxcube is derived and stored.
+        The name of the corresponding fluxcube is derived and stored.
         Also all other drizzle information for the input image
-        image is extraced and stored
+        image is extracted and stored
 
         Parameters
         ----------
@@ -148,8 +86,7 @@ class Flux_Cube(object):
         """
         self.grism_image_name = grism_image
         # open the image and get the header
-        grism_img = fits.open(grism_image, 'readonly')
-        grism_head = grism_img[0].header
+        grism_head = fits.getheader(grism_image)
 
         # subsequently extract all information
         # on the particular input
@@ -188,9 +125,6 @@ class Flux_Cube(object):
 
         keyname = 'D{0:03d}FVAL'.format(index)
         self.fval = grism_head[keyname]
-
-        # close the image
-        grism_img.close()
 
         # get information on the flux cube
         self.fcube_info = self._get_fcube_info(self.data)
@@ -238,51 +172,6 @@ class Flux_Cube(object):
 
         # return the extension information
         return fcube_info
-
-    def _renormalize_image(self, in_image):
-        """Re-normalize the blotted image - assumes SIMPLE FITS
-
-        Blotting applies a scaling witha scaling factor
-        stored in the header of the blotted image.
-        When blotting the segmentation images, this
-        scaling falsifies the object ID's stored as
-        pixel values. This function undoes the
-        renormalization to get back the integer
-        object ID's
-
-        Parameters
-        ----------
-        in_image: str
-            the name of the multidrizzled grism image
-        """
-
-        # open the image and take the header
-        inima = fits.open(in_image, mode='readonly')
-        in_header = inima[0].header
-
-        # check for the keyword
-        if self.useMdriz:
-            if 'BLOTSCAL' in in_header:
-                # read the keyword and comute the
-                # correction factor
-                blotscal = in_header['BLOTSCAL']
-                factor = blotscal*blotscal
-            else:
-                # raise an exception
-                # if the keyword is missed
-                err_msg = 'FCUBEPREP: Blotted image needs keyword "BLOTSCAL"!'
-                raise aXeError(err_msg)
-        else:
-            err_msg = "Astrodrizzle doesn't have a blotting scale factor"
-            raise aXeError(err_msg)
-
-        # close the fits image
-        inima.close()
-
-        # apply the correction
-        inima = fits.open(in_image, mode='update')
-        inima[0].data *= factor
-        inima.close()
 
     def _a_blot_image(self,
                       image_to_blot,
@@ -602,12 +491,8 @@ class Flux_Cube(object):
         x_start = x_excess - dim_info[0] + 1
         y_start = y_excess - dim_info[2] + 1
 
-        x_offs = -1*dim_info[0]
-        y_offs = -1*dim_info[2]
-
-        # this is a fix for the dimension_ offset in mdriz only
-        self.x_offs = x_offs
-        self.y_offs = y_offs
+        self.x_offs = -1 * dim_info[0]
+        self.y_offs = -1 * dim_info[2]
 
         x_end = self.inima_dims[0] + 2*x_excess - (x_excess - dim_info[1])
         y_end = self.inima_dims[1] + 2*y_excess - (y_excess - dim_info[3])
@@ -625,12 +510,13 @@ class Flux_Cube(object):
         hdrpr = fits.PrimaryHDU()
         mex_hdu.append(hdrpr)
         hdr = mex_hdu[0].header
-        hdr['XOFFS'] = (x_offs, 'X-OFFSET between flt and fluxcube')
-        hdr['YOFFS'] = (y_offs, 'Y-OFFSET between flt and fluxcube')
+        hdr['XOFFS'] = (self.x_offs, 'X-OFFSET between flt and fluxcube')
+        hdr['YOFFS'] = (self.y_offs, 'Y-OFFSET between flt and fluxcube')
         mex_hdu.writeto(self.fcube_name)
 
         # get a tmp-filename
-        tmpname = axeutils.get_random_filename('', '.fits')
+        tmpname = config_util.get_random_filename('', '.fits')
+
         # blot the segmenation image
         self._a_blot_segment_image(segm_image,
                                    tmpname,
@@ -660,7 +546,7 @@ class Flux_Cube(object):
             wavelength = fimage.get_wavelength()
 
             # get a tmp-filename
-            tmpname = axeutils.get_random_filename('', '.fits')
+            tmpname = config_util.get_random_filename('', '.fits')
 
             print("Using excess pixels of x,y ", x_excess, y_excess)
             self._a_blot_image(fluximg,
@@ -688,14 +574,14 @@ class Flux_Cube(object):
         print(' Done')
 
 
-class Flux_Image(object):
+class FluxImage:
     """The class for the flux images.
 
     The flux images are the drizzled filter images, however transformed
     from counts per second to flux. An according segment of each
     flux image is stored in the fluxcubes.
     """
-    def __init__(self, image_name, wavelength, mag_zero, AB_input, useMdriz):
+    def __init__(self, image_name='', wavelength=0., mag_zero=0., AB_input=0):
         """
         Parameters
         ----------
@@ -845,13 +731,13 @@ class Flux_Image(object):
         print("\n{0:s} --> {1:s}".format(self.image_name, self.flux_name))
 
 
-class FluxCube_Maker(object):
+class FluxCubeMaker:
     """Central class to take the input and to create the fluxcubes
     for the list of images extracted from the header of the
-    multidrizzled grism image.
+    drizzled grism image.
     """
     def __init__(self, grism_image, segm_image, filter_info, AB_input,
-                 dim_term, interpol, useMdriz):
+                 dim_term, interpol):
         """
         The class data is set. While doing that, basic checks
         on the input is done. The existence of the images is
@@ -861,11 +747,11 @@ class FluxCube_Maker(object):
         Parameters
         ----------
         grism_image: str
-            the name of the multidrizzled grism image
+            the name of the drizzled grism image
         segm_image: str
             the name of the segmentation image
         filter_info: list or string
-            information on multidrizzled direct images
+            information on drizzled direct images
         dim_term: str
             description of the additional rows/column for the fluxcubes
         interpol: str
@@ -941,35 +827,35 @@ class FluxCube_Maker(object):
         # return the array
         return dim_info
 
-    def _fill_fcubelist(self, grism_image):
+    def _fill_fcubelist(self):
         """Makes a list of fluxcubes to be created
 
         The method determines the number of input images
-        in the header of the multidrizzled grism images
+        in the header of the drizzled grism images
         and then creates for each input image a fluxcube
         object
         """
         fcubes = []
 
         # determine the number of iput images
-        n_fcubes = self._get_nfcube(grism_image)
+        n_fcubes = self._get_nfcube(self.grism_image)
 
         # create a fluxcube object for each input image
         for index in range(1, n_fcubes+1):
-            fcubes.append(Flux_Cube(grism_image, index, self.useMdriz))
+            fcubes.append(FluxCube(self.grism_image, index))
 
         # return the fluxcube list
         return fcubes
 
-    def _get_nfcube(self, grism_image):
+    def _get_nfcube(self):
         """Get the number of fluxcubes to be created
 
         The method looks in the header of the grism image
-        for the name of the input images used in the multidrizzle
+        for the name of the input images used in the drizzle
         process. This number is returned
         """
         # open the fits file and get the header
-        grism_img = fits.open(grism_image, 'readonly')
+        grism_img = fits.open(self.grism_image, 'readonly')
         grism_head = grism_img[0].header
 
         # create the keyname for the first input image
@@ -1039,14 +925,13 @@ class FluxCube_Maker(object):
             raise aXeError(err_msg)
 
         # create a new fluximage and return it
-        return Flux_Image(img_name,
-                          float(wav_pivot),
-                          float(zeropoint),
-                          AB_zero,
-                          self.useMdriz)
+        return FluxImage(img_name,
+                         float(wav_pivot),
+                         float(zeropoint),
+                         AB_zero)
 
-    def _evaluate_finfolist(self, filter_file, AB_zero):
-        """Evaluate the filter list
+    def _evaluate_finfolist(self, filter_file='', AB_zero=0.):
+        """Evaluate the filter list.
 
         The method opens and extracts direct image information
         from the file given in the input. For each direct image
@@ -1070,15 +955,15 @@ class FluxCube_Maker(object):
         filter_images = []
 
         # open the file
-        f_list = axe_asciidata.open(filter_file, delimiter=',')
+        f_list = Table.read(filter_file, format='ascii.no_header')
 
         # go over all rows
-        for index in range(f_list.nrows):
+        for row in f_list:
 
             # get image name, pivot wavelength and zeropoint
-            img_name = f_list[0][index].strip()
-            wav_pivot = f_list[1][index]
-            zeropoint = f_list[2][index]
+            img_name = row[0].strip()
+            wav_pivot = row[1]
+            zeropoint = row[2]
 
             filter_images.append(self._make_fluxim(img_name,
                                                    wav_pivot,
@@ -1096,7 +981,7 @@ class FluxCube_Maker(object):
         methods of aother classes are successively
         called to create the fluxcubes associated to the
         grism images listed in the header of the
-        multidrizzled grism image.
+        drizzled grism image.
         """
         # create the list of fluxcube instances that
         # will be created

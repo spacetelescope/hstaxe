@@ -7,11 +7,10 @@ from ..axeerror import aXeError
 from .. import axe_asciidata
 
 
-class MEFExtractor(object):
+class MEFExtractor:
     """MEF Extractor class"""
-    def __init__(self, drizzle_params, obj_dol, bck_dol=None, opt_extr=None):
-        """Initializes the class"""
-        # determine and store the file names
+    def __init__(self, drizzle_params, obj_dol=None, bck_dol=None, opt_extr=None):
+        # determine and store the file extension names
         self.ext_names = self._get_ext_names(drizzle_params)
 
         # store the optimal extraction boolean
@@ -21,16 +20,19 @@ class MEFExtractor(object):
             self.opt_names = self._get_opt_names(drizzle_params)
 
         # save the object lists
-        self.obj_dol = obj_dol
-        self.bck_dol = bck_dol
+        if obj_dol is not None:
+            self.obj_dol = obj_dol.sort()
+
+        if bck_dol is not None:
+            self.bck_dol = bck_dol
 
         # generate a list with all MEF files;
         # write the list to a file
-        self.obj_dol.sort()
         obj_list = MEFList(self.obj_dol.get_mef_files())
         obj_list.writeto(self.ext_names['OLIS'])
         del obj_list
-        if bck_dol:
+
+        if self.bck_dol is not None:
             self.bck_dol.sort()
             bck_list = MEFList(self.bck_dol.get_mef_files())
             bck_list.writeto(self.ext_names['BLIS'])
@@ -57,8 +59,8 @@ class MEFExtractor(object):
         del dummy_fits
 
     def _get_ext_names(self, drizzle_params):
-        """Define the file names for extracting the drizzled spectra"""
-        # make an empty dictionary
+        """Define the file names for extracting the drizzled spectra."""
+
         ext_names = {}
 
         # check that a root name is given;
@@ -414,7 +416,7 @@ class DrizzleConf(configfile.ConfigList):
         return keylist
 
 
-class DummyImage(object):
+class DummyImage:
     """Class for the dummy image"""
     def __init__(self, filename):
         """Initializes the class"""

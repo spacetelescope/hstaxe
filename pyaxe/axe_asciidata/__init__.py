@@ -1,2 +1,0 @@
-
-from .asciifunction import *

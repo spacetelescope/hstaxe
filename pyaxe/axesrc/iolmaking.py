@@ -1,14 +1,13 @@
 import os
 import math
 import numpy as np
+
 from stwcs.wcsutil import HSTWCS
 from astropy.io import fits
 from astropy.table import Table
-from stsci.tools import fileutil
 
 from pyaxe.axeerror import aXeError
-from pyaxe import axeutils
-from . import axeiol
+from pyaxe import config as config_util
 
 
 class ProjectionList:
@@ -156,12 +155,12 @@ class ProjectionList:
         return coeffname
 
     def make_grismcat(self,
-                      data_name,
-                      data_angle,
-                      grism_cat,
-                      drizzle_image):  # odd_signs=None
+                      data_name='',
+                      data_angle='',
+                      grism_cat='',
+                      drizzle_image=''):
 
-        """Make the grism catalog
+        """Make the grism catalog.
 
         The method creates a new input object list. The positional
         information on objects in a drizzled image are projected
@@ -174,7 +173,7 @@ class ProjectionList:
         data_name: str
             filename of the position data
         data_angle: str
-            filename of the displaced positions
+            filename of the displaced angle positions
         grism_cat: str
             reference to the SExtractor catalog
         drizzle_image: str
@@ -214,7 +213,7 @@ class ProjectionList:
                                    skypoints[i, 0],
                                    skypoints[i, 1]))
 
-        # now the same for the ang file points
+        # now the same for the angle file points
         angfile = open(data_angle, 'r')
         angpoints = angfile.readlines()
         data = [list(map(float, line.split())) for line in angpoints]
@@ -383,9 +382,6 @@ class IOLMaker:
                           masked=False,
                           dtype=(mcat['X_IMAGE'].dtype, mcat['Y_IMAGE'].dtype))
 
-        # data_tab = axe_asciidata.create(2, master_cat.nrows)
-        # angle_tab = axe_asciidata.create(2, master_cat.nrows)
-
         # go over all rows
         # for index in range(master_cat.nrows):
         for i, (x, y, t) in enumerate(zip(mcat['X_IMAGE'],
@@ -411,25 +407,22 @@ class IOLMaker:
         self.data_angle = data_angle
 
     def _fill_iollist(self):
-        """Derive the names for the input parameters
+        """Derive the names for the input parameters from input images.
 
-        Parameters
-        ----------
-        drizzle_image: str
-            the name of the image
+        The method derives the names for the input
+        images from the header of the drizzled images
+        and then creates an Input Object List instance
+        for each input image.
 
         Returns
         -------
         iolists: list
             the list of new IOL instances
 
-        Notes
-        -----
-        The method derives the names for the input
-        images from the header of the drizzled images
-        and then creates an Input Object List instance
-        for each input image. The list with the
-        IOL instances is then returned.
+        Returns
+        -------
+        The list with the IOL instances is then returned.
+
         """
         iolists = []
 
@@ -532,47 +525,16 @@ class IOLMaker:
             return None
         return iret
 
-    # def _make_odd_signs(self):
-    #     """Determine odd number of pixels"""
-    #     # get the x-and y-dimension
-    #     ftype = fileutil.isFits(self.drizzle_image)
-    #     if ftype[1] is "mef":
-    #         ext = 1
-    #     else:
-    #         ext = 0
-    #     fits_im = fits.open(self.drizzle_image, 'readonly')
-    #     x_dim = fits_im[ext].data.shape[1]
-    #     y_dim = fits_im[ext].data.shape[0]
-    #     fits_im.close()
-    #
-    #     # return a tuple with odd-signs for x and y
-    #     return (math.fmod(float(x_dim), 2.0) > 0.0,
-    #             (math.fmod(float(y_dim), 2.0) > 0.0))
-
     def run(self):
-        """actually create the Input Object Lists
+        """Create the Input Object Lists.
 
-        This method is responsible to actually create the
+        This method is responsible for creating the
         Input Object Lists. Other internal methods as well as
         methods of other classes are successively
-        called to create the Input Object Lists associated to the
+        called to create the Input Object Lists associated with the
         input images listed in the header of the
         drizzled image.
         """
-
-        # TODO: I think this can be removed and the
-        # issue is fixed in drizzlepac.astrodrizzle
-        # determine odd dimensions
-        # Note: this is only necessary
-        #       as long as there are two different
-        #       flavors in pydrizzle and iraf.drizzle
-        # odd_signs = self._make_odd_signs()
-
-        # load the input catalogue twice.
-        # once as a reference for the input
-        # and once as a template to build
-        # and save the new IOL's from
-        # master_cat = Table.read(self.input_cat, format='ascii')
 
         # name and create the two temporary files
         # with object positions. the task 'tran'
@@ -580,8 +542,8 @@ class IOLMaker:
         # files
         grism_cat = Table.read(self.input_cat, format='ascii')
 
-        data_name = axeutils.get_random_filename('', '.dat')
-        data_angle = axeutils.get_random_filename('', '.dat')
+        data_name = config_util.get_random_filename('', '.dat')
+        data_angle = config_util.get_random_filename('', '.dat')
         if os.access(data_name, os.W_OK):
             os.unlink(data_name)
         if os.access(data_angle, os.W_OK):

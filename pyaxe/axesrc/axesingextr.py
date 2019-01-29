@@ -1,10 +1,10 @@
-from .. import axeutils
+from pyaxe import config as config_util
 from . import axetasks
 from . import configfile
 from . import nlincoeffs
 
 
-class aXeSpcExtr(object):
+class aXeSpcExtr:
     def __init__(self, grisim, objcat, dirim, config, dmag, **params):
         # store the input
         self.grisim = grisim
@@ -16,11 +16,7 @@ class aXeSpcExtr(object):
         self.params = params
 
     def _make_bckPET(self):
-        """
-        Generate the object PET
-        """
-        from . import axetasks
-
+        """Generate the object PET."""
         # run GOL2AF
         axetasks.gol2af(grism=self.grisim,
                         config=self.config,
@@ -62,7 +58,7 @@ class aXeSpcExtr(object):
                        ffname=None)
 
     def _make_objPET(self):
-        """Generate the object PET"""
+        """Generate the object PET."""
 
         # set the use_direct flag
         # NOTE: the flag is only usefull
@@ -75,10 +71,10 @@ class aXeSpcExtr(object):
 
         # run SEX2GOL
         axetasks.sex2gol(grism=self.grisim,
-                         config=self.config,
-                         in_sex=self.objcat,
+                         config=config_util.getCONF(self.config),
+                         in_sex=config_util.getDATA(self.objcat),
                          use_direct=use_direct,
-                         direct=self.dirim,
+                         direct=config_util.getDATA(self.dirim),
                          dir_hdu=None,
                          spec_hdu=None,
                          out_sex=None)
@@ -119,7 +115,7 @@ class aXeSpcExtr(object):
                        ffname=None)
 
     def _make_spectra(self):
-        """Extract the spectra"""
+        """Extract the spectra."""
         # set the switch for using
         # a background PET
         if (('back' in self.params) and (self.params['back'])):
@@ -151,10 +147,10 @@ class aXeSpcExtr(object):
 
     def _make_drzgeocont(self, ext_info):
         # get the aXe names
-        axe_names = axeutils.get_axe_names(self.grisim, ext_info)
+        axe_names = config_util.get_axe_names(self.grisim, ext_info)
 
         # for the name of a special contamination OAF
-        cont_oaf = axeutils.getOUTPUT(axe_names['OAF'].replace('.OAF', '_{0:s}.OAF'.format(int(self.params['drzfwhm']*10.0))))
+        cont_oaf = config_util.getOUTPUT(axe_names['OAF'].replace('.OAF', '_{0:s}.OAF'.format(int(self.params['drzfwhm']*10.0))))
 
         # run GOL2AF,
         # getting the special OAF as output
@@ -184,18 +180,19 @@ class aXeSpcExtr(object):
     def run(self):
         # load the configuration files;
         # get the extension info
-        conf = configfile.ConfigFile(axeutils.getCONF(self.config))
-        ext_info = axeutils.get_ext_info(axeutils.getDATA(self.grisim), conf)
+        conf = configfile.ConfigFile(config_util.getCONF(self.config))
+        ext_info = config_util.get_ext_info(config_util.getDATA(self.grisim), conf)
         del conf
 
+        # Does this harm data that was astrodrizzled?
         if (('drzfwhm' in self.params) and
             (self.params['drzfwhm']) or
             (('cont_model' in self.params) and
-            (axeutils.is_quant_contam(self.params['cont_model'])))):
+            (config_util.is_quant_contam(self.params['cont_model'])))):
 
             # generate the non-linear distortions from the IDCTAB;
             # store them in the fits-file header
-            nlins = nlincoeffs.NonLinCoeffs(axeutils.getDATA(self.grisim),
+            nlins = nlincoeffs.NonLinCoeffs(config_util.getDATA(self.grisim),
                                             ext_info)
             nlins.make()
             nlins.store_coeffs()
@@ -214,5 +211,5 @@ class aXeSpcExtr(object):
 
         # make the proper non-quantitative contamination
         if ('drzfwhm' in self.params and self.params['drzfwhm']) and \
-            ('cont_model' in self.params and not axeutils.is_quant_contam(self.params['cont_model'])):
+           ('cont_model' in self.params and not config_util.is_quant_contam(self.params['cont_model'])):
             self._make_drzgeocont(ext_info)

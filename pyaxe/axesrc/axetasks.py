@@ -7,7 +7,7 @@ from . import drizzleobjects
 from . import fcubeobjs
 from . import inputchecks
 from . import iolmaking
-from . import mdrzobjects
+# from . import mdrzobjects
 from . import mefobjects
 from . import pysex2gol
 
@@ -20,9 +20,9 @@ def iolprep(drizzle_image='',
     """Convenience function for the aXe task IOLPREP.
 
     This task produces Input Object Lists for every input image of a
-    MultiDrizzle combined image. It projects the object positions from a
+    Drizzle combined image. It projects the object positions from a
     master catalogue, which contains all objects in the coordinate system
-    of the MultiDrizzled image, out into the coordinate system of each
+    of the Drizzled image, out into the coordinate system of each
     input image. For each input image an Input Object List is generated,
     which contains only the objects within the boundaries of the given input image.
 
@@ -59,7 +59,7 @@ def iolprep(drizzle_image='',
     During the task execution, the drizzle coefficient files and the input
     images must be available. For this reason it would be best practice to
     run it in the directory that was used to combine the input images with
-    MultiDrizzle.
+    Drizzle.
 
     """
     iol_maker = iolmaking.IOLMaker(drizzle_image,
@@ -77,7 +77,7 @@ def fcubeprep(grism_image='',
     """Convenience function for the aXe task FCUBEPREP"""
 
     # run the main command
-    fcmaker = fcubeobjs.FluxCube_Maker(grism_image, segm_image, filter_info,
+    fcmaker = fcubeobjs.FluxCubeMaker(grism_image, segm_image, filter_info,
                                        AB_zero, dim_info, interpol)
     fcmaker.run()
 
@@ -212,14 +212,14 @@ def axecore(inlist='',
     axe_inputs = axeinputs.aXeInput(inlist, configs, fconfterm)
 
     # go over all the input
-    for item in axe_inputs:
+    for row in axe_inputs:
 
         # make an extraction object
-        aXeNator = axesingextr.aXeSpcExtr(item['GRISIM'],
-                                          item['OBJCAT'],
-                                          item['DIRIM'],
-                                          item['CONFIG'],
-                                          item['DMAG'],
+        aXeNator = axesingextr.aXeSpcExtr(row['grisim'],
+                                          row['objcat'],
+                                          row['dirim'],
+                                          row['config'],
+                                          row['dmag'],
                                           back=back,
                                           extrfwhm=extrfwhm,
                                           drzfwhm=drzfwhm,
@@ -426,7 +426,6 @@ def sex2gol(grism='',
     """Function for the aXe task SEX2GOL"""
     # make the general setup
     axe_setup()
-    print("Using sex config {}\n".format(config))
     sex2gol = pysex2gol.Sex2GolPy(grism, config,
                                   in_sex=in_sex,
                                   dirname=direct,

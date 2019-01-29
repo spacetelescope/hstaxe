@@ -4,9 +4,9 @@ config object cfgobj=teal.teal('axe',loadonly=True)
 
 """
 import os
-import sys
 import shutil
 from astropy.io import fits
+from pyaxe.axeerror import aXeError
 
 # defaults
 __user_paths = {"AXE_IMAGE_PATH": 'DATA',
@@ -15,7 +15,6 @@ __user_paths = {"AXE_IMAGE_PATH": 'DATA',
                 "AXE_DRIZZLE_PATH": 'DRIZZLE'}
 
 __AXE_DRZTMP_SUB = 'tmp'
-# __AXE_BINDIR = sys.prefix + "/bin"
 __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
                                 __AXE_DRZTMP_SUB)
 
@@ -336,3 +335,26 @@ def get_axe_names(image, ext_info):
 def isstringlike(item):
     """Checks whether a term is a string or not"""
     return isinstance(item, str)
+
+
+def get_random_filename(dirname, ext):
+    """Deliver a random file name."""
+    import uuid
+    return dirname + 'tmp' + uuid.uuid4().hex + ext
+
+
+def is_quant_contam(contam_model):
+    """Get the flag for quantitative contamination"""
+    # the list of quantitative models
+    quant_models = ['GAUSS', 'FLUXCUBE']
+
+    # set the default value
+    isquantcont = True
+
+    # check whether the contamination is not quantitative
+    if not contam_model.upper() in quant_models:
+        # re-set the flag
+        isquantcont = False
+
+    # return the flag
+    return isquantcont

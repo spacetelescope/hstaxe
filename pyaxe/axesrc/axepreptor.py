@@ -11,7 +11,7 @@ from . import configfile
 from . import axetasks
 
 
-class aXePrepArator(object):
+class aXePrepArator:
     """This task prepares the science files for further processing within aXe.
 
     axeprep provides important keywords and is mandatory if axedrizzle is to be
@@ -53,9 +53,11 @@ class aXePrepArator(object):
         and on the master background image. The master background, scaled to
         the level of the grism image, is finally subtracted from the grism
         image.
+
     exposure time normalization:
         The input file is normalized by the exposure time to transform the
         images into counts per second.
+
     gain correction:
         The input file is multiplied by the gain conversion factor
         (electrons/ADU) to transform the images from units of detector
@@ -65,7 +67,12 @@ class aXePrepArator(object):
 
     """
 
-    def __init__(self, grisim="", objcat="", dirim="", config="", dmag=0, **params):
+    def __init__(self, grisim="",
+                       objcat="",
+                       dirim="",
+                       config="",
+                       dmag=0,
+                       **params):
         self.grisim = config_util.getDATA(grisim)
         self.objcat = config_util.getDATA(objcat)
         self.dirim = config_util.getDATA(dirim)
@@ -87,6 +94,7 @@ class aXePrepArator(object):
             header = fits.getval(self.grisim, 'INSTRUME')
             return "NICMOS" in header
         except KeyError:
+            print("\nData is not from NICMOS\n")
             return False
 
     def _is_wfc3ir_data(self):
@@ -99,6 +107,7 @@ class aXePrepArator(object):
                     return True
             return False
         except KeyError:
+            print("\nData is not from HST/WFC3")
             return False
 
     def _make_mask(self):

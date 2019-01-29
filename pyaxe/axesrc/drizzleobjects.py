@@ -3,12 +3,14 @@ import re
 import math
 import numpy
 import shutil
-from .. import axeutils
-from drizzlepac import astrodrizzle
-from ..axeerror import aXeError
-from . import configfile
-from .. import axe_asciidata
+
 from astropy.io import fits
+from drizzlepac import astrodrizzle
+
+from pyaxe import config as config_util
+from pyaxe.axeerror import aXeError
+
+from . import configfile
 
 
 class DrizzleParams(dict):
@@ -56,7 +58,7 @@ class DrizzleParams(dict):
         drizzle_params = {}
 
         # load the first configuration file
-        config = configfile.ConfigFile(axeutils.getCONF(config_file))
+        config = configfile.ConfigFile(config_util.getCONF(config_file))
 
         # get and store the readout noise
         if config['RDNOISE'] is not None:
@@ -100,7 +102,7 @@ class DrizzleParams(dict):
         return drizzle_params
 
 
-class DrizzleObjectList(object):
+class DrizzleObjectList:
     """List class for all objects to be drizzled"""
     def __init__(self, drizzle_params, cont_info, opt_extr=False,
                  back=False, drztmp_dir=None, drizzle_dir=None):
@@ -118,7 +120,7 @@ class DrizzleObjectList(object):
         if drztmp_dir is not None:
             self.drztmp_dir = drztmp_dir
         else:
-            self.drztmp_dir = axeutils.getDRZTMP()
+            self.drztmp_dir = config_util.getDRZTMP()
 
         # save then back flag
         self.back = back
@@ -128,7 +130,7 @@ class DrizzleObjectList(object):
         if drizzle_dir is not None:
             self.drizzle_dir = drizzle_dir
         else:
-            self.drizzle_dir = axeutils.getDRIZZLE()
+            self.drizzle_dir = config_util.getDRIZZLE()
 
         # get the identifier for drizzle objects
         self.regexp = self._get_regexp(back)
@@ -329,34 +331,35 @@ class DrizzleObjectList(object):
         # sort the list of drizzle objects
         self.drizzle_objects.sort()
 
-    def sort_drz_contrib(self, inima):
-        """Sort the contributors of the drizzle objects"""
-        # generate an empty list
-        sortList = []
+    # def sort_drz_contrib(self, inima):
+    #     """Sort the contributors of the drizzle objects"""
+    #     # generate an empty list
+    #     sortList = []
 
-        # open the input image list
-        inlist = axe_asciidata.open(inima)
+    #     # open the input image list
+    #     if os.access(inima, os.F_OK):
+    #         inlist = open(inima, 'r')
 
-        # go over the list
-        for index in range(inlist.nrows):
-            # extract the name of the grism image
-            grism = os.path.basename(inlist[0][index].strip())
+    #     # go over the list
+    #     for index in range(inlist.nrows):
+    #         # extract the name of the grism image
+    #         grism = os.path.basename(inlist[0][index].strip())
 
-            # check for the fits-extension
-            rpos = grism.rfind(".fits")
+    #         # check for the fits-extension
+    #         rpos = grism.rfind(".fits")
 
-            # append the root to the list
-            if rpos > -1:
-                sortList.append(grism[:rpos])
+    #         # append the root to the list
+    #         if rpos > -1:
+    #             sortList.append(grism[:rpos])
 
-        # go over all drizzle objects
-        for dObject in self.drizzle_objects:
+    #     # go over all drizzle objects
+    #     for dObject in self.drizzle_objects:
 
-            # generate the sort index
-            dObject.make_sortIndex(sortList)
+    #         # generate the sort index
+    #         dObject.make_sortIndex(sortList)
 
-            # sort the drizzle object
-            dObject.sort()
+    #         # sort the drizzle object
+    #         dObject.sort()
 
     def check_files(self):
         """Check the files in the the whole list"""
@@ -409,7 +412,7 @@ class DrizzleObjectList(object):
             drizzleObject.make_mef()
 
 
-class DrizzleObject(object):
+class DrizzleObject:
     """List class for all objects to be drizzled"""
     def __init__(self, objID, file_list, drizzle_params, cont_info,
                  opt_extr, back, drztmp_dir, drizzle_dir):
@@ -881,9 +884,8 @@ class DrizzleObject(object):
         for one_file in self.ext_names.values():
             # if the file exists
             if os.path.isfile(one_file):
-                # delete
                 os.unlink(one_file)
-                print('Deleting previous file: {0:s}!'.format(one_file))
+                print('Deleted previous file: {0:s}!'.format(one_file))
 
         # iterate backwards over
         # the contributors
@@ -972,7 +974,8 @@ class DrizzleObject(object):
         # go over all contributing objects
         self.wht_info = []
         for one_contrib in self.contrib_list:
-            self.wht_info.append(one_contrib.get_wht_info())
+            one_contrib.get_wht_info()
+            self.wht_info.append(self.npix, self.nwht)
 
     def get_reject_info(self):
         """Get information on the weights"""
@@ -984,19 +987,19 @@ class DrizzleObject(object):
 
             # store the number of good pixel
             # before rejection
-            ngood_old = one_contrib.nwht
+            ngood_old = deepcopy(one_contrib.nwht)
 
             # get the number of good pixels
             # now (presumably after rejection)
-            npix, ngood_new = one_contrib.get_wht_info()
+            one_contrib.get_wht_info()
 
             # check whether there exists statistics
-            if (ngood_old and npix and ngood_new):
+            if (ngood_old and self.npix and self.nwht):
                 # compute the number of rejected pixels
-                nreject = ngood_old - ngood_new
+                nreject = ngood_old - self.nwht
 
                 # compute the fraction of rejected pixels
-                frac_reject = float(ngood_old - ngood_new) / float(ngood_old)
+                frac_reject = float(ngood_old - self.nwht) / float(ngood_old)
 
                 # put the information to the dictionary
                 reject_info[one_contrib.rootname] = [nreject, frac_reject]
@@ -1099,8 +1102,7 @@ class DrizzleObject(object):
             img_ny = 2*int(math.ceil(one_contrib.info['OWIDTH'])) + 10
 
             # run drizzle for the object data
-            print('drizzle input filename is')
-            print(one_contrib.ext_names['FLT'])
+            print('drizzle input filename is: '.format(one_contrib.ext_names['FLT']))
             drizzleObject.run(one_contrib.ext_names['FLT'],
                               one_contrib.ext_names['WHT'],
                               self.ext_names['FLT'],
@@ -1151,10 +1153,10 @@ class DrizzleObject(object):
 
         # give feedback
         print('Done!')
-        sys.stdout.flush()
 
     def make_mef(self):
-        """Generate a MEF image"""
+        """Generate a MultiExtension FITS image."""
+
         # check for geometric contamination
         if ((self.cont_info is not None) and (not self.cont_info[1])):
             # correct the contamination image
@@ -1192,10 +1194,11 @@ class DrizzleObject(object):
         # return the big string
         return big_string
 
-class DrizzleObjectContrib(object):
-    """Class for a contributing image to a drizzle object"""
+
+class DrizzleObjectContrib:
+    """Class for a contributing image to a drizzle object."""
+
     def __init__(self, file_root, objID, opt_extr, back, drztmp_dir):
-        # get and save the root name
         self.rootname = self._get_rootname(file_root)
         self.objID = objID
         self.opt_extr = opt_extr
@@ -1203,31 +1206,31 @@ class DrizzleObjectContrib(object):
 
         # determine the names of all possible input
         # files for the drizzle process
-        self.ext_names = self._get_ext_names(file_root, objID, back,
+        self.ext_names = self._get_ext_names(file_root,
+                                             objID,
+                                             back,
                                              drztmp_dir)
 
         # initialize the sort index
         self.sortIndex = 0
 
     def __cmp__(self, compObject):
-        """Define a comparison for the object"""
+        """Define a comparison for the object."""
+
         # make the comparison according
         # to the member 'sortIndex'
         if self.sortIndex < compObject.sortIndex:
             return -1
-        elif self.sortIndex == compObject.sortIndex:
-            return 0
         else:
-            return 1
+            return self.sortIndex == compObject.sortIndex
 
     def _get_rootname(self, file_root_path):
         """Find the root name for a file"""
-        # the the root file name
         file_root = os.path.basename(file_root_path)
 
         # check for underscores
         if file_root.find('_') > 0:
-            # set the name to the first underscore as root name
+            # set the name to the first section as root name
             rootname = file_root.split('_')[0]
         else:
             # set everything as root name
@@ -1238,7 +1241,6 @@ class DrizzleObjectContrib(object):
 
     def _get_ext_names(self, file_root, objID, back, drztmp_dir):
         """Determine all possible filenames for drizzle input"""
-        # create an empty dictionary
         ext_names = {}
 
         if back:
@@ -1315,8 +1317,8 @@ class DrizzleObjectContrib(object):
         return ext_names
 
     def _get_header_info(self):
-        """Set the exposure time from the object contributor"""
-        # create a dictionary
+        """Set the exposure time from the object contributor."""
+
         # for self-information
         self.info = {}
 
@@ -1356,7 +1358,7 @@ class DrizzleObjectContrib(object):
         fits_img.close()
 
     def _create_weight_image(self):
-        """Generate a weight image"""
+        """Generate a weight image."""
 
         # Set WHT image to 0.0 at masked FLT pixels, and 1.0 elsewhere
         flt_file = fits.open(self.ext_names['FLT'], mode='readonly')
@@ -1371,49 +1373,6 @@ class DrizzleObjectContrib(object):
         flt_file = fits.open(self.ext_names['FLT'], 'update')
         flt_file[0].data[flt_file[0].data < -900000.0] = 0.0
         flt_file.close()
-
-    def _transfer_exptime(self):
-        """Transfer the exposure time from the DPP to the contributors
-
-        TODO: This copying of the exposure time MUST be done
-              either in drizzleprep or in the aXe_FILET program.
-              Then things should be much much faster.
-        """
-
-        # list of keys to check
-        checklist = ['FLT', 'ERR', 'CON']
-
-        # get the name of the dpp file
-        dpp_file = axeutils.getOUTPUT(self.file_root+'.DPP.fits')
-
-        # open the fits file
-        dpp_fits = fits.open(dpp_file, mode='readonly')
-
-        # get the exposure time
-        exptime = dpp_fits[0].header['EXPTIME']
-
-        # close the fits
-        dpp_fits.close()
-
-        # define the list of keys,
-        # differentiate between normal
-        # and optimal extraction
-        if self.opt_extr:
-            checklist = ['FLT', 'ERR', 'CON', 'MOD', 'VAR']
-        else:
-            checklist = ['FLT', 'ERR', 'CON']
-
-        # go over all keys
-        for one_check in checklist:
-
-            # open the fits
-            contrib_fits = fits.open(self.ext_names[one_check], 'update')
-
-            # write the exposure time
-            contrib_fits[0].header['EXPTIME'] = exptime
-
-            # close the fits
-            contrib_fits.close()
 
     def make_sortIndex(self, sortList):
         """Generate the sort index of the object"""
@@ -1430,7 +1389,8 @@ class DrizzleObjectContrib(object):
                 break
 
     def check_files(self):
-        """Check for all files"""
+        """Check for all files."""
+
         # list of keys to check all the time
         checklist = ['FLT', 'ERR', 'CON']
 
@@ -1456,14 +1416,8 @@ class DrizzleObjectContrib(object):
                                .format(self.ext_names[one_check]))
                     raise aXeError(err_msg)
 
-        # transfer the exposure time from the
-        # DPP to the contributors
-        # no longer necessary!!
-        # self._transfer_exptime()
-
     def isempty(self):
         """Checks whether the files contain meaningful data"""
-        # make default
         isempty = 0
 
         # open the image
@@ -1491,14 +1445,12 @@ class DrizzleObjectContrib(object):
         """Delete all files"""
         # go over all drizzle filenames
         for one_file in self.ext_names.values():
-            # if the file exists
             if os.path.isfile(one_file):
-                # delete
                 os.unlink(one_file)
 
     def prepare_drizzle(self):
-        """Prepare the drizzling"""
-        # get information from the header
+        """Prepare the drizzling."""
+
         self._get_header_info()
 
         # create the weight image
@@ -1509,8 +1461,8 @@ class DrizzleObjectContrib(object):
         dcf.writeto(self.ext_names['CFF'])
 
     def regroup(self, objID_dir):
-        """Move the files to a new location"""
-        # go over all contributors
+        """Move the files to a new location."""
+
         for one_contrib in self.ext_names.iteritems():
 
             # extract the key
@@ -1530,36 +1482,28 @@ class DrizzleObjectContrib(object):
             self.ext_names[key] = new_name
 
     def get_wht_info(self):
-        """Evaluate the weight image"""
+        """Evaluate the weight image."""
+
         # if the wht-image does NOT exist,
         # store and return None's
         if not os.path.isfile(self.ext_names['WHT']):
             self.npix = None
             self.nwht = None
-            return None, None
+        else:
+            wht_data = fits.getdata(self.ext_names['WHT'])
 
-        # open the image and get to the data
-        wht_img = fits.open(self.ext_names['WHT'], mode='readonly')
-        wht_data = wht_img[0].data
+            # get the number of pixels and the number
+            # of good pixels
+            npix = wht_data.shape[0] * wht_data.shape[1]
+            nwht = int(wht_data.mean() * float(npix))
 
-        # get the number of pixels and the number
-        # of good pixels
-        npix = wht_data.shape[0] * wht_data.shape[1]
-        nwht = int(wht_data.mean() * float(npix))
-
-        # store the number of pixels
-        # and the number of pixels with weight
-        self.npix = npix
-        self.nwht = nwht
-
-        # close the image
-        wht_img.close()
-
-        # return values
-        return npix, nwht
+            # store the number of pixels
+            # and the number of pixels with weight
+            self.npix = npix
+            self.nwht = nwht
 
 
-class DrizzleCoefficients(object):
+class DrizzleCoefficients:
     """Class for a contributing image to a drizzle object"""
     def __init__(self, image):
         # save the image name
@@ -1575,16 +1519,25 @@ class DrizzleCoefficients(object):
         self.header = self._make_header(self.image)
 
     def _get_coefficients(self, image):
-        """Extracts the drizzle coefficients"""
-        # create a coefficients list
+        """Extracts the drizzle coefficients.
+
+        Parameters
+        ----------
+        image: str
+            Name of the image
+
+        Returns
+        -------
+        xcoeffs: list
+            drizzle x-coefficients from the header
+        ycoeffs: list
+            drizzle y-coefficients from the header
+        """
+
         xcoeffs = []
         ycoeffs = []
 
-        # open the image
-        inima = fits.open(image)
-
-        # extract the header
-        im_head = inima[0].header
+        im_head = fits.getheader(image)
 
         # search at most 10 coefficients
         for index in range(10):
@@ -1601,14 +1554,12 @@ class DrizzleCoefficients(object):
             xcoeffs.append(str(im_head[drz0_keyword]))
             ycoeffs.append(str(im_head[drz1_keyword]))
 
-        # close the image
-        inima.close()
-
         # return the coefficients
         return xcoeffs, ycoeffs
 
     def _get_order(self, coeff_list):
-        """Determine the order of the polynomial"""
+        """Determine the order of the polynomial."""
+
         # dictionary with the fixed names for the orders
         fixed_orders = {1: 'constant', 2: 'linear', 3: 'quadratic', 4: 'cubic'}
 
@@ -1642,11 +1593,11 @@ class DrizzleCoefficients(object):
         header.append('from keywords in image: {0:s}'
                       .formatos.path.basename(image))
 
-        # return the header
         return header
 
     def writeto(self, file_name):
-        """Write coefficients to a file"""
+        """Write coefficients to a file."""
+
         # delete any previous file
         if os.path.isfile(file_name):
             os.unlink(file_name)

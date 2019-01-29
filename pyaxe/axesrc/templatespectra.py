@@ -9,7 +9,7 @@ from ..axeerror import aXeSIMError
 from ..axeutils import getDATA, getSIMDATA, getOUTSIM
 
 
-class TemplateSpectrumList(object):
+class TemplateSpectrumList:
     """Class for the template spectra"""
 
     def __init__(self, inlist, incat, tpass_flux):
@@ -314,7 +314,7 @@ class TemplateSpectrumList(object):
             spec.check()
 
 
-class TemplateSpectrum(object):
+class TemplateSpectrum:
     """General class to shift spectra in flux-redshift range
     """
     def __init__(self, filename, tpass,  mag_info, z=0.0):

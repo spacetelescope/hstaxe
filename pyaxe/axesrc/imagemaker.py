@@ -1,10 +1,9 @@
-from astropy.io import fits as pyfits
+from astropy.io import fits
+from pyaxe import axeerror
 from . import configfile
-from . import axeerror
-from . import axeutils
 
 
-class DummyImages(object):
+class DummyImages:
     """
     Small class to create dummy images for the simulations
 
@@ -197,11 +196,11 @@ class DummyImages(object):
             os.unlink(imgname)
 
         # open a HDU-list
-        mex_hdu = pyfits.HDUList()
+        mex_hdu = fits.HDUList()
 
         # create a primary HDU,
         # append it to the list
-        hdrpr = pyfits.PrimaryHDU()
+        hdrpr = fits.PrimaryHDU()
         mex_hdu.append(hdrpr)
 
         # go the the header and put
@@ -234,7 +233,7 @@ class DummyImages(object):
                     verbose='YES', Stdout=1)
 
         # open the dummy image, go to the header
-        img = pyfits.open(imgname, 'update')
+        img = fits.open(imgname, 'update')
         hdr = img[1].header
 
         # update the header

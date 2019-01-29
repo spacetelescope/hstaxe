@@ -5,7 +5,7 @@ from astropy.io import fits
 from pyaxe import config
 from .axeerror import aXeSIMError
 from . import axeutils
-from . import axetasks
+from pyaxe import config as config_utl
 
 
 
@@ -108,10 +108,10 @@ class DispImator(object):
         root_name = self.grismname[:pos]
 
         # delete the GOL, the OAF and the PET
-        result_cat = axeutils.getOUTPUT(root_name + '_2.cat')
+        result_cat = config_util.getOUTPUT(root_name + '_2.cat')
         if os.path.isfile(result_cat):
             os.unlink(result_cat)
-        result_oaf = axeutils.getOUTPUT(root_name + '_2.OAF')
+        result_oaf = config_util.getOUTPUT(root_name + '_2.OAF')
         if os.path.isfile(result_oaf):
             os.unlink(result_oaf)
 
@@ -198,10 +198,10 @@ class DirImator(object):
         root_name = self.dirname[:pos]
 
         # delete the GOL, the OAF and the PET
-        result_cat = axeutils.getOUTPUT(root_name + '_2.cat')
+        result_cat = config_util.getOUTPUT(root_name + '_2.cat')
         if os.path.isfile(result_cat):
             os.unlink(result_cat)
-        result_oaf = axeutils.getOUTPUT(root_name + '_2.OAF')
+        result_oaf = config_util.getOUTPUT(root_name + '_2.OAF')
         if os.path.isfile(result_oaf):
             os.unlink(result_oaf)
 
@@ -258,21 +258,21 @@ class DummyExtractor(object):
     def _check_files(self):
         """Checks the existence of the input files"""
         # check the direct image
-        if not os.path.isfile(axeutils.getDATA(self.direct_image)):
+        if not os.path.isfile(config_util.getDATA(self.direct_image)):
             err_msg = ("\nThe direct image is not available: {0:s}"
-                       .format(axeutils.getDATA(self.direct_image)))
+                       .format(config_util.getDATA(self.direct_image)))
             raise aXeSIMError(err_msg)
 
         # check the configuration file
-        if not os.path.isfile(axeutils.getCONF(self.configfile)):
+        if not os.path.isfile(config_util.getCONF(self.configfile)):
             err_msg = ("\nThe configuration file is not available: {0:s}"
-                       .format(axeutils.getCONF(self.configfile)))
+                       .format(config_util.getCONF(self.configfile)))
             raise aXeSIMError(err_msg)
 
         # check the simulated grism image
-        if not os.path.isfile(axeutils.getOUTSIM(self.simul_grisim)):
+        if not os.path.isfile(config_util.getOUTSIM(self.simul_grisim)):
             err_msg = ("\nThe grism image is not available: {0:s}"
-                       .format(axeutils.getOUTSIM(self.simul_grisim)))
+                       .format(config_util.getOUTSIM(self.simul_grisim)))
             raise aXeSIMError(err_msg)
 
         # check the IOL
@@ -285,9 +285,9 @@ class DummyExtractor(object):
             float(self.bck_flux)
         except ValueError:
             # check the background image
-            if not os.path.isfile(axeutils.getCONF(self.bck_flux)):
+            if not os.path.isfile(config_util.getCONF(self.bck_flux)):
                 err_msg = ("\nThe background imagage is not available: {0:s}"
-                           .format(axeutils.getCONF(self.bck_flux)))
+                           .format(config_util.getCONF(self.bck_flux)))
                 raise aXeSIMError(err_msg)
 
     def _decorate_PET(self):
@@ -300,7 +300,7 @@ class DummyExtractor(object):
         root_name = self.dispersed_image.split('.fits')[0]
 
         # compose the name of the PET
-        result_pet = axeutils.getOUTPUT(root_name + '_2.PET.fits')
+        result_pet = config_util.getOUTPUT(root_name + '_2.PET.fits')
 
         # open the PET
         pet_fits = fits.open(result_pet, mode='update')
@@ -324,19 +324,19 @@ class DummyExtractor(object):
         sys.stdout.flush()
 
         # get a random filenames
-        tmpfile1 = axeutils.get_random_filename('t', '.fits')
+        tmpfile1 = config_util.get_random_filename('t', '.fits')
 
         # copy the grism image to AXE_IMAGE_PATH
-        shutil.copy(axeutils.getOUTSIM(self.simul_grisim),
-                    axeutils.getDATA(tmpfile1))
+        shutil.copy(config_util.getOUTSIM(self.simul_grisim),
+                    config_util.getDATA(tmpfile1))
 
         # subtract the background from
         # the grism image
         # expression = "(a - b)"
         # iraf.imexpr(expr=expression, output=tmpfile2,
-        #    a=axeutils.getDATA(tmpfile1)+'[SCI]', b=self.bck_flux, Stdout=1)
+        #    a=config_util.getDATA(tmpfile1)+'[SCI]', b=self.bck_flux, Stdout=1)
 
-        in_image = fits.open(axeutils.getDATA(tmpfile1))
+        in_image = fits.open(config_util.getDATA(tmpfile1))
         in_image['sci'].data -= self.bck_flux
         in_image.close()
 
@@ -354,27 +354,27 @@ class DummyExtractor(object):
         result_root = self.simul_grisim.split('.fits')[0]
 
         # move and rename the SPC-file
-        out_spc = axeutils.getOUTPUT(root_name + '_2.SPC.fits')
-        result_spc = axeutils.getOUTSIM(result_root + '_2.SPC.fits')
+        out_spc = config_util.getOUTPUT(root_name + '_2.SPC.fits')
+        result_spc = config_util.getOUTSIM(result_root + '_2.SPC.fits')
         shutil.move(out_spc, result_spc)
 
         # move and rename the STP-file
-        out_stp = axeutils.getOUTPUT(root_name + '_2.STP.fits')
-        result_stp = axeutils.getOUTSIM(result_root + '_2.STP.fits')
+        out_stp = config_util.getOUTPUT(root_name + '_2.STP.fits')
+        result_stp = config_util.getOUTSIM(result_root + '_2.STP.fits')
         shutil.move(out_stp, result_stp)
 
         # delete the background subtracted
         # grism image
-        os.unlink(axeutils.getDATA(self.dispersed_image))
+        os.unlink(config_util.getDATA(self.dispersed_image))
 
         # delete the GOL, the OAF and the PET
-        result_cat = axeutils.getOUTPUT(root_name + '_2.cat')
+        result_cat = config_util.getOUTPUT(root_name + '_2.cat')
         if os.path.isfile(result_cat):
             os.unlink(result_cat)
-        result_oaf = axeutils.getOUTPUT(root_name + '_2.OAF')
+        result_oaf = config_util.getOUTPUT(root_name + '_2.OAF')
         if os.path.isfile(result_oaf):
             os.unlink(result_oaf)
-        result_pet = axeutils.getOUTPUT(root_name + '_2.PET.fits')
+        result_pet = config_util.getOUTPUT(root_name + '_2.PET.fits')
         if os.path.isfile(result_pet):
             os.unlink(result_pet)
 

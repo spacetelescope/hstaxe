@@ -9,7 +9,7 @@ from . import configfile
 from . import axeiol
 
 
-class Sex2GolPy(object):
+class Sex2GolPy:
     """ Class for the SEX2GOL task """
     def __init__(self, grisim, config,
                  in_sex=None,

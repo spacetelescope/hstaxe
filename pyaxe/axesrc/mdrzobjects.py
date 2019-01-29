@@ -1,6 +1,6 @@
 import sys
 import math
-from .. import axeutils
+from pyaxe import config as config_util
 from . import drizzleobjects
 
 
@@ -35,14 +35,14 @@ class MulDrzObjList(drizzleobjects.DrizzleObjectList):
         if drztmp_dir is not None:
             self.drztmp_dir = drztmp_dir
         else:
-            self.drztmp_dir = axeutils.getDRZTMP()
+            self.drztmp_dir = config_util.getDRZTMP()
 
         # save the drizzle directory;
         # use the default if not explicitly given
         if drizzle_dir is not None:
             self.drizzle_dir = drizzle_dir
         else:
-            self.drizzle_dir = axeutils.getDRIZZLE()
+            self.drizzle_dir = config_util.getDRIZZLE()
 
         # get the identifier for drizzle objects
         self.regexp = self._get_regexp(back=False)
@@ -215,11 +215,11 @@ class MultDrzObj(drizzleobjects.DrizzleObject):
         return contrib_list
 
     def _migrate_crr(self, wht_image, crr_image):
-        from astropy.io import fits as pyfits
+        from astropy.io import fits
 
         # open the two images
-        wht_img = pyfits.open(wht_image, 'update')
-        crr_img = pyfits.open(crr_image, 'readonly')
+        wht_img = fits.open(wht_image, 'update')
+        crr_img = fits.open(crr_image, 'readonly')
 
         # migrsate the crr's
         wht_img[0].data = wht_img[0].data * crr_img[0].data

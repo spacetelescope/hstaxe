@@ -5,7 +5,7 @@ from pyaxe import config as config_util
 from pyaxe.axeerror import aXeError
 
 
-class ConfigList(object):
+class ConfigList:
     """Configuration File Object"""
     def __init__(self, keylist, header=None):
         """
@@ -659,7 +659,7 @@ class ConfigFile(ConfigList):
         # simulation configuration file
         return os.path.basename(new_name)
 
-class ConfigBeam(object):
+class ConfigBeam:
     """Configuration Beam object"""
     def __init__(self, ident=None, keylist=None):
         """
@@ -967,7 +967,7 @@ class ConfigBeam(object):
         return n_sens
 
 
-class TwoDimPolyN(object):
+class TwoDimPolyN:
     """Object for a polynomial with 2D variance"""
     def __str__(self):
         """The method transforms the 2D polynomial object into its str
@@ -1328,7 +1328,7 @@ class ConfigDisp(TwoDimPolyN):
         return rstring
 
 
-class DefConfHeader(object):
+class DefConfHeader:
     """Default header for a configuration file"""
     def __init__(self):
         self.header = []
@@ -1392,7 +1392,7 @@ class ConfHeader(DefConfHeader):
             fopen.close
 
 
-class ConfKey(object):
+class ConfKey:
     """Class for a keyword in a configuration file
 
     This keyword class is a light, but yet versatile

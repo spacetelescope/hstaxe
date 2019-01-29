@@ -5,7 +5,7 @@ from .. import axe_asciidata
 from ..axeerror import aXeError
 
 
-class Interpolator(object):
+class Interpolator:
     """General class to get interpolated values"""
     def __init__(self, input_file=None, indep=None, depen=None):
         """The method initializes an interpolator objects from various input.

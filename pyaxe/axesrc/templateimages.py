@@ -7,7 +7,7 @@ from pyaxe.axeerror import aXeSIMError
 from pyaxe.config import getDATA, getOUTSIM, getSIMDATA
 
 
-class ArtImaList(object):
+class ArtImaList:
     """Class for the image list"""
     def __init__(self, inlist):
         """Initializer for the class
@@ -117,7 +117,7 @@ class ArtImaList(object):
         print('')
 
 
-class ArtImage(object):
+class ArtImage:
     """Class for one image template"""
     def __init__(self, filename):
         """Initializer for the ArtImage class

@@ -1,33 +1,64 @@
-from ..axeerror import aXeError
-import pydrizzle
 import os
-from astropy.io import fits as pyfits
-
-# Import numpy functionality
 import numpy as np
 
-# Import general tools
+from astropy.io import fits
 from stsci.imagestats import ImageStats
 from stsci.image.numcombine import numCombine
+from drizzlepac.drizCR import quickDeriv
+from drizzlepac import minmed
+from drizzlepac import adrizzle
 
-import multidrizzle
-from multidrizzle.minmed import minmed
-import multidrizzle.quickDeriv
+from pyaxe.axeerror import aXeError
 
 
-class Drizzle(object):
+class Drizzle:
     """Class to wrap drizzle command"""
     def __init__(self):
 
         print("No init in class")
 
-    def run(self, data, in_mask, outdata, outweig, coeffs,
-            wt_scl, drizzle_params, img_nx, img_ny):
+    def run(self, data='',
+                  outdata='',
+                  in_mask,
+                  outweig,
+                  coeffs,
+                  wt_scl='',
+                  drizzle_params,
+                  img_nx,
+                  img_ny):
         """
-        Do the drizzling
+        drizzle using drizzlepac.astrodrizzle.
 
-        Currently, the basic command is the iraf-version of drizzle,
-        but the pydrizzle version may at some point be used instead.
+        Parameters
+        ----------
+        data: str
+            The name of the input image file or association table which is to be "drizzled"
+
+        in_mask:
+
+        outdata: str
+            The name for the output data image desired by the user
+
+        outweig:
+
+        coeffs:
+
+        wt_scl: str
+            Weighting factor for input image. If wt_scl=exptime then wt_scl
+            will be set equal to the exposure time found in the image header.
+            This is the standard operation and is recommended. It is also
+            possible to give wt_scl=expsq for weighting by the square of
+            exposure time. The latter is optimal for read-noise dominated
+            images.
+
+
+        drizzle_params:
+
+        img_nx:
+
+        img_ny:
+
+
         """
 
         # Check for file names that are too long for the drizzle task
@@ -40,23 +71,29 @@ class Drizzle(object):
                        "for drizzle task".format(outdata))
             raise aXeError(err_msg)
 
-        ret = pydrizzle.drizzle(data=data, outdata=outdata, outweig=outweig,
-                                in_mask=in_mask, wt_scl=wt_scl, coeffs=coeffs,
-                                outnx=img_nx, outny=img_ny,
-                                in_un=drizzle_params['IN_UN'],
-                                out_un=drizzle_params['OUT_UN'],
-                                pixfrac=drizzle_params['PFRAC'],
-                                scale=drizzle_params['PSCALE'],
-                                kernel=drizzle_params['KERNEL'], Stdout=1)
+        ret = adrizzle.drizzle(data, outdata,
+                               outweig=outweig,
+                               in_mask=in_mask,
+                               wt_scl=wt_scl,
+                               coeffs=coeffs,
+                               outnx=img_nx,
+                               outny=img_ny,
+                               in_un=drizzle_params['IN_UN'],
+                               out_un=drizzle_params['OUT_UN'],
+                               pixfrac=drizzle_params['PFRAC'],
+                               scale=drizzle_params['PSCALE'],
+                               kernel=drizzle_params['KERNEL'], Stdout=1)
 
         for i in range(len(ret)):
             print(ret[i])
 
 
-class MedianCombine(object):
+class MedianCombine:
     """Class to median-combine individual drizzles"""
-    def __init__(self, contributors,
-                 drizzle_params, mult_drizzle_par,
+    def __init__(self,
+                 contributors,
+                 drizzle_params,
+                 mult_drizzle_par,
                  ext_names):
         """Initialize the class"""
 
@@ -139,25 +176,25 @@ class MedianCombine(object):
 
         for one_image in self.input_data['sci_imgs']:
             if os.access(one_image, os.F_OK):
-                in_fits = pyfits.open(one_image, 'readonly')
+                in_fits = fits.open(one_image, 'readonly')
                 sci_data.append(in_fits[0].data)
                 in_fits.close()
 
         wht_data = []
         for one_image in self.input_data['wht_imgs']:
             if os.access(one_image, os.F_OK):
-                in_fits = pyfits.open(one_image, 'readonly')
+                in_fits = fits.open(one_image, 'readonly')
                 wht_data.append(in_fits[0].data)
                 in_fits.close()
             else:
-                print("{0:s} not found/created by multidrizzle"
+                print("{0:s} not found/created by drizzle"
                       "...skipping it.".format(one_image))
 
         if len(sci_data) != len(wht_data):
             print("The number of single_sci images created by "
-                  "multidrizzle does not match the number of single_wht"
+                  "drizzle does not match the number of single_wht"
                   " files created!")
-            raise aXeError("Multidrizzle error")
+            raise aXeError("drizzle error")
 
         weight_mask_list = []
 
@@ -215,8 +252,8 @@ class MedianCombine(object):
                                 )
 
         # print result.combArrObj
-        hdu = pyfits.PrimaryHDU(result.combArrObj)
-        hdulist = pyfits.HDUList([hdu])
+        hdu = fits.PrimaryHDU(result.combArrObj)
+        hdulist = fits.HDUList([hdu])
         hdulist[0].header['EXPTIME'] = (self.input_data['exp_tot'],
                                         'total exposure time')
         hdulist.writeto(self.median_image)
@@ -233,7 +270,7 @@ class MedianCombine(object):
         del weight_mask_list
 
 
-class Blot(object):
+class Blot:
     """
     Class to wrap the blot command
     """
@@ -261,7 +298,7 @@ class Blot(object):
                        expout='input')
 
 
-class Deriv(object):
+class Deriv:
     """
     Class for the deriv-command
     """
@@ -360,16 +397,16 @@ class Deriv(object):
 
         print("Running quickDeriv on ", self.in_name)
         # OPEN THE INPUT IMAGE IN READ ONLY MODE
-        img = pyfits.open(self.in_name, mode='readonly', memmap=0)
+        img = fits.open(self.in_name, mode='readonly', memmap=0)
 
         # calling qderiv with the assumption that the
         # input file is a simple FITS file.
-        absderiv = multidrizzle.quickDeriv.qderiv(img["PRIMARY"].data)
+        absderiv = quickDeriv.qderiv(img["PRIMARY"].data)
         # absderiv = self._qderiv(img["PRIMARY"].data)
 
         # WRITE THE OUTPUT IMAGE TO A FITS FILE
-        outfile = pyfits.open(self.out_name, 'append')
-        outhdu = pyfits.PrimaryHDU(data=absderiv)
+        outfile = fits.open(self.out_name, 'append')
+        outhdu = fits.PrimaryHDU(data=absderiv)
         outfile.append(outhdu)
 
         # CLOSE THE IMAGE FILES
@@ -379,11 +416,9 @@ class Deriv(object):
         del img
 
 
-class CRIdent(object):
+class CRIdent:
     def __init__(self, drizzle_params, mult_drizzle_par):
-        """
-        Initializes the class
-        """
+        """Initializes the class. """
         self.driz_cr_scale = (float(mult_drizzle_par['driz_cr_scale'].split()[0]),
                               float(mult_drizzle_par['driz_cr_scale'].split()[1]))
         self.driz_cr_snr = (float(mult_drizzle_par['driz_cr_snr'].split()[0]),
@@ -395,7 +430,7 @@ class CRIdent(object):
         self.rdnoise = drizzle_params['RDNOISE']
 
     def _identify_crr(self, in_img, blot_img, blotder_img, exptime, sky_val):
-        """Identify CRR's and other deviant pixels
+        """Identify cosmic rays and other deviant pixels.
 
         The code was taken from muldidrizzle.DrizCR. Small adjustments and
         re-factoring was done.
@@ -477,7 +512,7 @@ class CRIdent(object):
 
         # make tail convolution kernel and convolve it with original __crMask
         cr_ctegrow_kernel = numpy.zeros((2*self.driz_cr_ctegrow+1,
-                                         2*self.driz_cr_ctegrow+1)) #  kernel for tail masking of CR pixel
+                                         2*self.driz_cr_ctegrow+1))  # kernel for tail masking of CR pixel
         cr_ctegrow_kernel_conv = __crMask.copy()  # for output convolution
 
         # which pixels are masked by tail kernel depends on sign of
@@ -494,11 +529,11 @@ class CRIdent(object):
         convolve.convolve2d(__crMask, cr_ctegrow_kernel, output = cr_ctegrow_kernel_conv)
 
         # select high pixels from both convolution outputs; then 'and' them to create new __crMask
-        where_cr_grow_kernel_conv    = numpy.where( cr_grow_kernel_conv < self.driz_cr_grow*self.driz_cr_grow,0,1 )        # radial
-        where_cr_ctegrow_kernel_conv = numpy.where( cr_ctegrow_kernel_conv < self.driz_cr_ctegrow, 0, 1 )     # length
-        __crMask = numpy.logical_and( where_cr_ctegrow_kernel_conv, where_cr_grow_kernel_conv) # combine masks
+        where_cr_grow_kernel_conv = numpy.where(cr_grow_kernel_conv < self.driz_cr_grow*self.driz_cr_grow,0,1 )        # radial
+        where_cr_ctegrow_kernel_conv = numpy.where(cr_ctegrow_kernel_conv < self.driz_cr_ctegrow, 0, 1 )     # length
+        __crMask = numpy.logical_and(where_cr_ctegrow_kernel_conv, where_cr_grow_kernel_conv) # combine masks
 
-        __crMask = __crMask.astype(numpy.uint8) # cast back to Bool
+        __crMask = __crMask.astype(numpy.uint8)  # cast back to Bool
 
         del __crMask_orig_bool
         del cr_grow_kernel
@@ -529,7 +564,7 @@ class CRIdent(object):
             os.unlink(crName)
 
         # Create the output file
-        fitsobj = pyfits.HDUList()
+        fitsobj = fits.HDUList()
 
         if (header is not None):
             del(header['NAXIS1'])
@@ -543,12 +578,12 @@ class CRIdent(object):
             if 'NEXTEND' in header:
                 header['NEXTEND'] = 0
 
-            hdu = pyfits.PrimaryHDU(data=_cr_file, header=header)
+            hdu = fits.PrimaryHDU(data=_cr_file, header=header)
             del hdu.header['PCOUNT']
             del hdu.header['GCOUNT']
 
         else:
-            hdu = pyfits.PrimaryHDU(data=_cr_file)
+            hdu = fits.PrimaryHDU(data=_cr_file)
 
         fitsobj.append(hdu)
         fitsobj.writeto(crName)
@@ -567,13 +602,13 @@ class CRIdent(object):
         from astropy.io import fits as pyfits
 
         # open the input image
-        inImage = pyfits.open(in_image, 'readonly')
+        inImage = fits.open(in_image, 'readonly')
 
         # open the blot image
-        blotImage = pyfits.open(blot_image, 'readonly')
+        blotImage = fits.open(blot_image, 'readonly')
 
         # open the blot image
-        blotDerImage = pyfits.open(blotder_image, 'readonly')
+        blotDerImage = fits.open(blotder_image, 'readonly')
 
         # identify the CR's
         crr_data = self._identify_crr(inImage[0].data,
