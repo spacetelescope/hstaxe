@@ -17,12 +17,12 @@ class Drizzle:
 
         print("No init in class")
 
-    def run(self, data='',
-                  outdata='',
+    def run(self, data,
+                  outdata,
                   in_mask,
                   outweig,
                   coeffs,
-                  wt_scl='',
+                  wt_scl,
                   drizzle_params,
                   img_nx,
                   img_ny):

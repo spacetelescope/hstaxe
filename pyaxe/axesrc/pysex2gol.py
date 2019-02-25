@@ -235,7 +235,7 @@ class Sex2GolPy:
 
             # store the GOL
             self.gol.write(getOUTPUT(self.out_sex),
-                             format='ascii.commented_header')
+                             format='ascii.commented_header', overwrite=True)
 
         else:
             # if there are no objects, just copy the empty table

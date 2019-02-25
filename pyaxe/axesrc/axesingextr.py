@@ -1,7 +1,7 @@
 from pyaxe import config as config_util
 from . import axetasks
 from . import configfile
-from . import nlincoeffs
+# from . import nlincoeffs
 
 
 class aXeSpcExtr:
@@ -185,18 +185,18 @@ class aXeSpcExtr:
         del conf
 
         # Does this harm data that was astrodrizzled?
-        if (('drzfwhm' in self.params) and
-            (self.params['drzfwhm']) or
-            (('cont_model' in self.params) and
-            (config_util.is_quant_contam(self.params['cont_model'])))):
+        # if (('drzfwhm' in self.params) and
+        #     (self.params['drzfwhm']) or
+        #     (('cont_model' in self.params) and
+        #     (config_util.is_quant_contam(self.params['cont_model'])))):
 
             # generate the non-linear distortions from the IDCTAB;
             # store them in the fits-file header
-            nlins = nlincoeffs.NonLinCoeffs(config_util.getDATA(self.grisim),
-                                            ext_info)
-            nlins.make()
-            nlins.store_coeffs()
-            del nlins
+            # nlins = nlincoeffs.NonLinCoeffs(config_util.getDATA(self.grisim),
+            #                                 ext_info)
+            # nlins.make()
+            # nlins.store_coeffs()
+            # del nlins
 
         # make the object PET's
         self._make_objPET()

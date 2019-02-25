@@ -73,7 +73,11 @@ class aXePrepArator:
                        config="",
                        dmag=0,
                        **params):
-        self.grisim = config_util.getDATA(grisim)
+        if grisim:
+            shutil.copy(config_util.getDATA(grisim), config_util.getOUTPUT(grisim))
+            self.grisim = config_util.getOUTPUT(grisim)
+        else:
+            raise ValueError("No grisim image specified for axeprep")
         self.objcat = config_util.getDATA(objcat)
         self.dirim = config_util.getDATA(dirim)
         self.config = config
@@ -223,7 +227,7 @@ class aXePrepArator:
         grism_header['AXEPRBCK'] = ('Done',          'flag that background subtraction was done')
 
         # save the image
-        grism_file.writeto(config_util.getOUTPUT(self.grisim))
+        grism_file.writeto(self.grisim)
         grism_file.close()
         return 0
 
@@ -265,6 +269,7 @@ class aXePrepArator:
             raise aXeError(err_msg)
 
         # Subtract the scaled background image from the grism image
+        # copy the image to the output directory first
         sci_file = fits.open(self.grisim, 'update')
         bck_file = fits.open(config_util.getOUTPUT(axe_names['NBCK']),'readonly')
         sci_file['SCI', ext_info['ext_version']].data -= bck_file[1].data
@@ -318,9 +323,7 @@ class aXePrepArator:
         except KeyError:
             print("Previous subtraction not recorded, proceeding with background subtraction.")
 
-        # copy the image to output so that it can be modified
-        #shutil.copy(config_util.getDATA(self.grisim), config_util.getOUTPUT(self.grisim))
-        scalebck = axelowlev.aXe_SCALEBCK(os.path.split(self.grisim)[-1],
+        scalebck = axelowlev.aXe_SCALEBCK(self.grisim,
                                           os.path.split(axe_names['MSK'])[-1],
                                           os.path.split(self.config)[-1],
                                           os.path.split(self.master_bck)[-1])
@@ -351,7 +354,7 @@ class aXePrepArator:
             return False
 
         # Subtract the scaled background image from the grism image
-        grism_file = fits.open(config_util.getOUTPUT(self.grisim), mode='update')
+        grism_file = fits.open(self.grisim, mode='update')
         grism_file[ext_info['ext_version']].data -= bck_data
         grism_header = grism_file[ext_info['fits_ext']].header
 
@@ -501,7 +504,7 @@ class aXePrepArator:
     def _apply_gain_correction(self, ext_info):
         """Apply the gain correction"""
         # open the fits image
-        fits_img = fits.open(config_util.getOUTPUT(self.grisim), 'readonly')
+        fits_img = fits.open(self.grisim, 'readonly')
 
         # get the gain
         # for NICMOS:
@@ -516,13 +519,13 @@ class aXePrepArator:
         fits_img.close()
 
         # multiply both the sci and the error array by the gain
-        file_a = fits.open(config_util.getOUTPUT(self.grisim), 'update')
+        file_a = fits.open(self.grisim, 'update')
         file_a["SCI"].data *= gain
         file_a["ERR"].data *= gain
         file_a.close()
 
         # open the fits image
-        fits_img = fits.open(config_util.getOUTPUT(self.grisim), 'update')
+        fits_img = fits.open(self.grisim, 'update')
 
         # write the flag into the science extension
         fits_img[ext_info['fits_ext']].header['AXEGAINC'] = ('Done', 'flag that gain correction was done')

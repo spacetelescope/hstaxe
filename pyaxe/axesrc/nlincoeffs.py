@@ -1,7 +1,7 @@
 import os
 from astropy.io import fits
-# from drizzlepac import astrodrizzle
-import pydrizzle
+from drizzlepac import astrodrizzle
+#import pydrizzle
 from pyaxe.axeerror import aXeError
 from pyaxe import config as config_util
 

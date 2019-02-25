@@ -2,7 +2,7 @@ import os
 from astropy.io import fits
 
 from pyaxe.axeerror import aXeError
-from pyaxe import axeutils
+from pyaxe import config as config_utils
 
 from . import axeinputs
 from . import configfile

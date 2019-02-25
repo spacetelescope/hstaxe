@@ -1,10 +1,11 @@
 import os
 import numpy as np
 from astropy.io import fits
-from .. import axeutils
+from pyaxe import config as config_utils
+from pyaxe.axeerror import aXeError
 from . import configfile
-from ..axeerror import aXeError
-from .. import axe_asciidata
+
+# from pyaxe import axe_asciidata
 
 
 class MEFExtractor:
@@ -27,9 +28,8 @@ class MEFExtractor:
             self.bck_dol = bck_dol
 
         # generate a list with all MEF files;
-        # write the list to a file
         obj_list = MEFList(self.obj_dol.get_mef_files())
-        obj_list.writeto(self.ext_names['OLIS'])
+        obj_list.writeto(self.ext_names['OLIS'], overwrite=True)
         del obj_list
 
         if self.bck_dol is not None:
@@ -76,28 +76,28 @@ class MEFExtractor:
         ext_names['BLIS'] = drizzle_params['ROOT'] + '_2.BCK.lis'
 
         ext_names['OAF'] = drizzle_params['ROOT'] + '_2.OAF'
-        ext_names['DRZ_OAF'] = axeutils.getDRIZZLE(ext_names['OAF'])
+        ext_names['DRZ_OAF'] = config_utils.getDRIZZLE(ext_names['OAF'])
 
         ext_names['BAF'] = drizzle_params['ROOT'] + '_2.BAF'
-        ext_names['DRZ_BAF'] = axeutils.getDRIZZLE(ext_names['BAF'])
+        ext_names['DRZ_BAF'] = config_utils.getDRIZZLE(ext_names['BAF'])
 
         ext_names['FITS'] = drizzle_params['ROOT'] + '.fits'
-        ext_names['DRZ_FITS'] = axeutils.getDRIZZLE(ext_names['FITS'])
+        ext_names['DRZ_FITS'] = config_utils.getDRIZZLE(ext_names['FITS'])
 
         ext_names['OPET'] = drizzle_params['ROOT'] + '_2.PET.fits'
-        ext_names['DRZ_OPET'] = axeutils.getDRIZZLE(ext_names['OPET'])
+        ext_names['DRZ_OPET'] = config_utils.getDRIZZLE(ext_names['OPET'])
 
         ext_names['BPET'] = drizzle_params['ROOT'] + '_2.BCK.PET.fits'
-        ext_names['DRZ_BPET'] = axeutils.getDRIZZLE(ext_names['BPET'])
+        ext_names['DRZ_BPET'] = config_utils.getDRIZZLE(ext_names['BPET'])
 
         ext_names['SPC'] = drizzle_params['ROOT'] + '_2.SPC.fits'
-        ext_names['DRZ_SPC'] = axeutils.getDRIZZLE(ext_names['SPC'])
+        ext_names['DRZ_SPC'] = config_utils.getDRIZZLE(ext_names['SPC'])
 
         ext_names['STP'] = drizzle_params['ROOT'] + '_2.STP.fits'
-        ext_names['DRZ_STP'] = axeutils.getDRIZZLE(ext_names['STP'])
+        ext_names['DRZ_STP'] = config_utils.getDRIZZLE(ext_names['STP'])
 
         ext_names['CONF'] = drizzle_params['ROOT'] + '.conf'
-        ext_names['CON_CONF'] = axeutils.getCONF(ext_names['CONF'])
+        ext_names['CON_CONF'] = config_utils.getCONF(ext_names['CONF'])
 
         # return the dictionary
         return ext_names
@@ -120,43 +120,43 @@ class MEFExtractor:
         opt_names['BLIS'] = drizzle_params['ROOT'] + '_2.BCK.lis'
 
         opt_names['OAF'] = drizzle_params['ROOT'] + '_2.OAF'
-        opt_names['DRZ_OAF'] = axeutils.getDRIZZLE(opt_names['OAF'])
+        opt_names['DRZ_OAF'] = config_utils.getDRIZZLE(opt_names['OAF'])
 
         opt_names['BAF'] = drizzle_params['ROOT'] + '_2.BAF'
-        opt_names['DRZ_BAF'] = axeutils.getDRIZZLE(opt_names['BAF'])
+        opt_names['DRZ_BAF'] = config_utils.getDRIZZLE(opt_names['BAF'])
 
         opt_names['FITS'] = drizzle_params['ROOT'] + '.fits'
-        opt_names['DRZ_FITS'] = axeutils.getDRIZZLE(opt_names['FITS'])
+        opt_names['DRZ_FITS'] = config_utils.getDRIZZLE(opt_names['FITS'])
 
         opt_names['OPET'] = drizzle_params['ROOT'] + '_2_opt.PET.fits'
-        opt_names['DRZ_OPET'] = axeutils.getDRIZZLE(opt_names['OPET'])
+        opt_names['DRZ_OPET'] = config_utils.getDRIZZLE(opt_names['OPET'])
 
         opt_names['BPET'] = drizzle_params['ROOT'] + '_2_opt.BCK.PET.fits'
-        opt_names['DRZ_BPET'] = axeutils.getDRIZZLE(opt_names['BPET'])
+        opt_names['DRZ_BPET'] = config_utils.getDRIZZLE(opt_names['BPET'])
 
         opt_names['SPC'] = drizzle_params['ROOT'] + '_2_opt.SPC.fits'
-        opt_names['DRZ_SPC']  = axeutils.getDRIZZLE(opt_names['SPC'])
+        opt_names['DRZ_SPC']  = config_utils.getDRIZZLE(opt_names['SPC'])
 
         opt_names['STP'] = drizzle_params['ROOT'] + '_2_opt.STP.fits'
-        opt_names['DRZ_STP']  = axeutils.getDRIZZLE(opt_names['STP'])
+        opt_names['DRZ_STP']  = config_utils.getDRIZZLE(opt_names['STP'])
 
         opt_names['CONF'] = drizzle_params['ROOT'] + '.conf'
-        opt_names['CON_CONF'] = axeutils.getCONF(opt_names['CONF'])
+        opt_names['CON_CONF'] = config_utils.getCONF(opt_names['CONF'])
 
         # return the dictionary
         return opt_names
 
     def _copy_optext_images(self):
         # open the object and background drizzle lists
-        obj_list = axe_asciidata.open(self.opt_names['OLIS'])
-        bck_list = axe_asciidata.open(self.opt_names['BLIS'])
+        obj_list = Table.read(self.opt_names['OLIS'], format='ascii.no_header')
+        bck_list = Table.read(self.opt_names['BLIS'], format='ascii.no_header')
 
         # go over one list
         for index in range(obj_list.nrows):
 
             # take and compose the filenames
-            obj_img = axeutils.getDRIZZLE(obj_list[0][index].strip())
-            bck_img = axeutils.getDRIZZLE(bck_list[0][index].strip())
+            obj_img = config_utils.getDRIZZLE(obj_list[0][index].strip())
+            bck_img = config_utils.getDRIZZLE(bck_list[0][index].strip())
 
             # open the fits file
             obj_fits = fits.open(obj_img, 'update')
@@ -307,15 +307,12 @@ class MEFExtractor:
                             out_stp=self.opt_names['STP'])
 
 
-class MEFList(axe_asciidata.asciidata.AsciiData):
+class MEFList:
     """Class for the list of drizzled MEF files"""
     def __init__(self, mef_files):
         """Initializes the class"""
-        # create an empty list
-        super(MEFList, self).__init__(ncols=1, nrows=len(mef_files))
-
         # go over all MEF files
-        for index in range(len(mef_files)):
+        for mef in mef_files:
             # insert the file name
             self[0][index] = mef_files[index]
 
@@ -327,7 +324,7 @@ class DrizzleConf(configfile.ConfigList):
         # get the name of the input configuration file;
         # load the configuration file
         config_file = drizzle_params['CONF']
-        config = configfile.ConfigFile(axeutils.getCONF(config_file))
+        config = configfile.ConfigFile(config_utils.getCONF(config_file))
 
         # get the header
         header = self._get_header()
