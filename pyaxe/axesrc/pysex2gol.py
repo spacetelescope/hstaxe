@@ -165,6 +165,7 @@ class Sex2GolPy:
 
         # check for an empty table
         if len(self.iol.catalog) < 1:
+            print("Empty catalog found\n")
             return None
 
         # create a new GOL that's a copy of the input list
@@ -234,8 +235,18 @@ class Sex2GolPy:
             self._transfer_coos()
 
             # store the GOL
-            self.gol.write(getOUTPUT(self.out_sex),
-                             format='ascii.commented_header', overwrite=True)
+            # This needs to be stored in the same way as SEXTRACTOR
+            outfile = getOUTPUT(self.out_sex)
+            if os.access(outfile, os.F_OK):
+                os.remove(outfile)
+            print("Saving {} objects to {}".format(len(self.gol),outfile))
+            of = open(outfile, 'w')
+            for num, name in zip(range(len(self.gol.colnames)), self.gol.colnames):
+                of.write("# {0:d} {1:s}\t\t{2:s}\t\t[{3:s}]\n".format(num+1, name,
+                                                     self.gol[name].description,
+                                                     str(self.gol[name].unit)))
+            self.gol.write(of, format='ascii.no_header', overwrite=False)
+            of.close()
 
         else:
             # if there are no objects, just copy the empty table

@@ -149,7 +149,7 @@ class DirImator(object):
         self.model_images = model_images
         self.tel_area = tel_area
 
-    def run(self, silent=True):
+    def run(self, silent=False):
         """Generates a simulated direct image
 
         The method executes the series of aXe tasks necessary to generate

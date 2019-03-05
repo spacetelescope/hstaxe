@@ -27,7 +27,7 @@ class aXePrepArator:
         The input direct image
     config: string
         The name of the aXe configuration file
-    dmag: float
+    dmag: float or None
         a number to add to the MMAG_EXTRACT and MMAG_MARK values given in the
         configuration file.
 
@@ -71,7 +71,7 @@ class aXePrepArator:
                        objcat="",
                        dirim="",
                        config="",
-                       dmag=0,
+                       dmag=None,
                        **params):
         if grisim:
             shutil.copy(config_util.getDATA(grisim), config_util.getOUTPUT(grisim))
@@ -87,9 +87,6 @@ class aXePrepArator:
         # store the master background
         if 'master_bck' in params:
             self.master_bck = config_util.getCONF(params['master_bck'])
-            print("Using master background: {}".format(self.master_bck))
-
-        print("Using configfile: {}".format(self.config))
 
     def _is_nicmos_data(self):
         """Check whether the data comes from NICMOS"""
@@ -323,7 +320,7 @@ class aXePrepArator:
         except KeyError:
             print("Previous subtraction not recorded, proceeding with background subtraction.")
 
-        scalebck = axelowlev.aXe_SCALEBCK(self.grisim,
+        scalebck = axelowlev.aXe_SCALEBCK(os.path.split(self.grisim)[-1],
                                           os.path.split(axe_names['MSK'])[-1],
                                           os.path.split(self.config)[-1],
                                           os.path.split(self.master_bck)[-1])

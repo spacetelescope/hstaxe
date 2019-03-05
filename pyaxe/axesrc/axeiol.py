@@ -11,7 +11,7 @@ class InputObjectList(object):
         # Read and validate the catalog
         # this expects an ascii file with atleast one header line
         # a full sextrctor catalog is acceptable
-        self.catalog = Table.read(filename, format='ascii')
+        self.catalog = Table.read(filename, format='ascii.sextractor')
 
         # check for the mandatory columns
         # self.mand_cols, self.wav_cols = self._find_columns()

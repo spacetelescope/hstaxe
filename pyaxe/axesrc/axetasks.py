@@ -47,8 +47,8 @@ def iolprep(drizzle_image='',
     -----
     The names and drizzle parameters of the input images are retrieved from
     the header of the Astrodrizzle combined image. The projection of the object
-    positions into the coordinate system of the input images is done with the
-    STSDAS task wtranback.
+    positions into the coordinate system of the input images is done by going
+    through the WCS information. 
 
     There is a parameter to influence the sensitive area to include objects
     in the IOL's. This allows objects beyond the physical boundaries of the
@@ -154,7 +154,6 @@ def axeprep(inlist='',
 
     # go over all the input
     for row in axe_inputs:
-        print(row)
         # make a prepare-object; run the prepare
         aXePrep = axepreptor.aXePrepArator(row['grisim'],
                                            row['objcat'],
@@ -509,7 +508,8 @@ def petcont(grism='',
                                     lambda_psf=lambda_psf,
                                     cont_map=cont_map,
                                     in_af=in_af,
-                                    no_pet=no_pet)
+                                    no_pet=no_pet,
+                                    silent=silent)
 
     petcont.runall(silent)
 

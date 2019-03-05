@@ -189,8 +189,6 @@ class ProjectionList:
 
         # use HSTWCS for the astrodrizzle image
         # read in the data_name file
-        # awtran gives back this format:
-        # all_out.append("%10.3f %10.3f %10.3f %10.3f" % (xin,yin,xout,yout))
 
         hstimage = HSTWCS(drizzle_image, ext=1)
         datanamefile = open(data_name, 'r')
@@ -254,8 +252,21 @@ class ProjectionList:
             else:
                 grism_cat.remove_row(r_index)
 
-        # save the new IOL
-        grism_cat.write(self.iol_name, format='ascii', overwrite=True)
+        # save the new IOL, this is done especially for the C
+        # code which is expecting Source Extractor style catalog
+        # files. Decided to keep the output here consistent with
+        # the C code so that it can continue to be used separately
+        # numbers start at 1 not zero. The output formatting allows
+        # the astropy.sextractor formatter to read the catalog file.
+        if os.access(self.iol_name, os.F_OK):
+            os.remove(self.iol_name)
+        of = open(self.iol_name, 'w')
+        for num, name in zip(range(len(grism_cat.colnames)), grism_cat.colnames):
+            of.write("# {0:d} {1:s}\t\t{2:s}\t\t[{3:s}]\n".format(num+1, name,
+                                                     grism_cat[name].description,
+                                                     str(grism_cat[name].unit)))
+        grism_cat.write(of, format='ascii.no_header', overwrite=False)
+        of.close()
 
         print()
         print(" >>>> Catalog: {0:s} written with {1:d} entries.>>>> "

@@ -59,8 +59,7 @@ class TaskWrapper(object):
         silent: bool
             indicates silent/noisy runs
         """
-        # check whether the command
-        # was run silent
+        # if silent, save error info to file
         if silent:
             # dump the files with
             # stdout and stderr onto the screen
@@ -142,7 +141,6 @@ class TaskWrapper(object):
         """
         # run the executable
         retcode = self.run(silent=silent)
-
         # check whether the run was good
         if retcode == GOOD_RETURN_VALUE:
             # do the cleaning
@@ -445,7 +443,35 @@ class aXe_GOL2AF(TaskWrapper):
         configs: str
             aXe configuration file term
         params: dict
-            all other possible parameters
+            all other possible parameters, see following
+
+        mfwhm: int
+            the extraction width multiplicative factor
+
+        back:bool
+            generate a BAF instead of an OAF file
+
+        orient:bool
+            switch on/off tilted extraction
+
+        slitless_geom: bool
+             switch on/off automatic orientation for the tilted extraction 
+
+        exclude:bool
+            switch on the removal of  faint objects in the result
+
+        lambda_mark: float
+            the wavelength at which to apply the cutoff magnitudes MMAG_EXTRACT and MMAG_MARK
+
+        dmag: float or None
+            number to add to the MMAG_EXTRACT and MMAG_MARK values given in the configuration file
+
+        out_af: str
+            overwrites the default output OAF or BAF filename
+
+        in_gol: str
+            overwrites the default input catalog name
+
         """
         # initialize via superclass
         super().__init__('aXe_GOL2AF', 'gol2af')
@@ -493,14 +519,14 @@ class aXe_GOL2AF(TaskWrapper):
 
         # append the flag 'slitless_geom'
         if (('slitless_geom' in params) and (params['slitless_geom'])):
-            # put the exclude_faint-flag to the list
+            # put the slitless_Geom-flag to the list
             self.command_list.append('-slitless_geom=1')
         else:
             self.command_list.append('-slitless_geom=0')
 
         # append the flag 'orient'
         if (('orient' in params) and (params['orient'])):
-            # put the exclude_faint-flag to the list
+            # put the orient-flag to the list
             self.command_list.append('-orient=1')
         else:
             self.command_list.append('-orient=0')
@@ -514,6 +540,8 @@ class aXe_GOL2AF(TaskWrapper):
         if (('back' in params) and (params['back'])):
             # put the bck-flag to the list
             self.command_list.append('-bck')
+        print("Command list: {}".format(self.command_list))
+
 
 
 class aXe_INTPIXCORR(TaskWrapper):
