@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+import sys
+if (sys.version_info < (3, 3)):
+    sys.stderr.write("ERROR: pyaxe requires Python 3.3 or later\n")
+    sys.exit(1)
 
 import os
-import sys
 
 from configparser import ConfigParser
 from distutils.command.clean import clean
@@ -49,7 +52,7 @@ except ImportError:
             pass
 
         def run(self):
-            print('!\n! Sphinx is not installed!\n!', file=sys.stderr)
+            sys.stderr.write('Sphinx is not installed!')
             exit(1)
 
 
@@ -169,7 +172,7 @@ class BuildExtWithConfigure(install):
                             "--with-gsl="+CURRENT_ENV,
                             "--libdir="+CURRENT_ENV,
                             "--prefix="+CURRENT_ENV],
-                            cwd=AXELIB_DIR)
+                           cwd=AXELIB_DIR)
                 check_call(["make", "clean"], cwd=AXELIB_DIR)
                 check_call(["make", "install"], cwd=AXELIB_DIR)
             except CalledProcessError as e:
@@ -232,8 +235,7 @@ setup(
                       'wcstools',
                       'cfitsio',
                       'gsl',
-                      'stwcs',
-                      'pydrizzle'],
+                      'stwcs'],
     packages=find_packages(),
     tests_require=[
         'backports.tempfile',

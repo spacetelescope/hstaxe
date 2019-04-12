@@ -1,7 +1,6 @@
 import os
 from astropy.io import fits
-from drizzlepac import astrodrizzle
-#import pydrizzle
+
 from pyaxe.axeerror import aXeError
 from pyaxe import config as config_util
 
@@ -116,7 +115,7 @@ quartic
 """
 
 DEFAULT_COEFFS_DATA = """# Dummy polynomial distortion coefficients
-# file, created bz aXe
+# file, created by aXe
 cubic
 0.0  1.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0  0.0
 
@@ -130,6 +129,8 @@ class NonLinCoeffs:
         # store the input internally
         self.image = image
         self.ext_info = ext_info
+        self.xcoeffs = []
+        self.ycoeffs = []
 
     def _get_coeff_filename(self):
         """Get the missing information about the file name"""
@@ -160,66 +161,66 @@ class NonLinCoeffs:
         # return the file name
         return coeff_filename, detector
 
-        def _get_default_coeffs(self, instr_setup, detector):
-            """Defines and returns the default coefficients
+    def _get_default_coeffs(self, instr_setup, detector):
+        """Defines and returns the default coefficients
 
-            Parameters
-            ----------
-            instr_setup: dict
-            dictionary of keywords describing the observation
-            detector: str
-                The detector number
+        Parameters
+        ----------
+        instr_setup: dict
+        dictionary of keywords describing the observation
+        detector: str
+            The detector number
 
-            """
-            # the default, which gives the identity matrix
-            default_coeffs = DEFAULT_COEFFS_DATA
+        """
+        # the default, which gives the identity matrix
+        default_coeffs = DEFAULT_COEFFS_DATA
 
-            # the ACS branch
-            if (instr_setup['instrument'] is 'ACS'):
-                if (instr_setup['detector'] is 'WFC'):
-                    # select the detector
-                    if (str(detector) is '1'):
-                        default_coeffs = ACS_DEFAULT_COEFFS_1
-                    elif (str(detector) is '2'):
-                        default_coeffs = ACS_DEFAULT_COEFFS_2
-                    else:
-                        raise ValueError("Detector not found for coeffs")
-
-                #  the ACS/HRC plus G800L branch
-                elif (instr_setup['detector'] is 'HRC'):
-                    if (instr_setup['disperser'] is 'G800L'):
-                        default_coeffs = ACS_DEFAULT_COEFFS_G800L
-                    elif (instr_setup['disperser'] is 'PR200L'):
-                        default_coeffs = ACS_DEFAULT_COEFFS_PR200L
-                    else:
-                        raise ValueError("Disperser not found for coeffs")
-
-                # the ACS/SBC plus PR110L  branch
-                elif (instr_setup['detector'] is 'SBC'):
-                    if (instr_setup['disperser'] is 'PR110L'):
-                        default_coeffs = ACS_DEFAULT_COEFFS_PR110L
-                    elif (instr_setup['disperser'] is 'PR130L'):
-                        default_coeffs = ACS_DEFAULT_COEFFS_PR130L
-                    else:
-                        raise ValueError("Disperser not found for coeffs")
-
-            # the NICMOS plus G141 branch
-            elif (instr_setup['instrument'] is 'NICMOS'):
-                if (instr_setup['disperser'] is 'G141'):
-                    default_coeffs = NICMOS_DEFAULT_COEFFS
+        # the ACS branch
+        if (instr_setup['instrument'] is 'ACS'):
+            if (instr_setup['detector'] is 'WFC'):
+                # select the detector
+                if (str(detector) is '1'):
+                    default_coeffs = ACS_DEFAULT_COEFFS_1
+                elif (str(detector) is '2'):
+                    default_coeffs = ACS_DEFAULT_COEFFS_2
                 else:
-                    raise ValueError("No coeffs available for NICMOS {0:s}"
-                                     .format(instr_setup['disperser']))
+                    raise ValueError("Detector not found for coeffs")
 
-            # the WFC3 IR branch
-            elif (instr_setup['instrument'] is 'WFC3'):
-                if (instr_setup['detector'] is 'IR'):
-                    default_coeffs = WFC3_DEFAULT_COEFFS_IR
-                elif (instr_setup['detector'] is 'UVIS'):
-                    default_coeffs = WFC3_DEFAULT_COEFFS_UVIS
+            #  the ACS/HRC plus G800L branch
+            elif (instr_setup['detector'] is 'HRC'):
+                if (instr_setup['disperser'] is 'G800L'):
+                    default_coeffs = ACS_DEFAULT_COEFFS_G800L
+                elif (instr_setup['disperser'] is 'PR200L'):
+                    default_coeffs = ACS_DEFAULT_COEFFS_PR200L
                 else:
-                    raise ValueError("No coeffs available for WFC3 {0:s}"
-                                     .format(instr_setup['detector']))
+                    raise ValueError("Disperser not found for coeffs")
+
+            # the ACS/SBC plus PR110L  branch
+            elif (instr_setup['detector'] is 'SBC'):
+                if (instr_setup['disperser'] is 'PR110L'):
+                    default_coeffs = ACS_DEFAULT_COEFFS_PR110L
+                elif (instr_setup['disperser'] is 'PR130L'):
+                    default_coeffs = ACS_DEFAULT_COEFFS_PR130L
+                else:
+                    raise ValueError("Disperser not found for coeffs")
+
+        # the NICMOS plus G141 branch
+        elif (instr_setup['instrument'] is 'NICMOS'):
+            if (instr_setup['disperser'] is 'G141'):
+                default_coeffs = NICMOS_DEFAULT_COEFFS
+            else:
+                raise ValueError("No coeffs available for NICMOS {0:s}"
+                                 .format(instr_setup['disperser']))
+
+        # the WFC3 IR branch
+        elif (instr_setup['instrument'] is 'WFC3'):
+            if (instr_setup['detector'] is 'IR'):
+                default_coeffs = WFC3_DEFAULT_COEFFS_IR
+            elif (instr_setup['detector'] is 'UVIS'):
+                default_coeffs = WFC3_DEFAULT_COEFFS_UVIS
+            else:
+                raise ValueError("No coeffs available for WFC3 {0:s}"
+                                 .format(instr_setup['detector']))
 
         return default_coeffs
 
@@ -303,74 +304,30 @@ class NonLinCoeffs:
         return coeff_filename
 
     def _get_coeffs_numbers(self, coeffs):
-        """Extract the coefficients from the file content"""
-        # initialize the arrays
-        xcoeffs = []
-        ycoeffs = []
+        """Extract the coefficients from the file content.
 
-        # parse through the content
-        first = 0
-        for line in coeffs:
+        Notes
+        -----
+        This assumes that there are only 2 rows with floating point values
+        and the first row contains the x-coefficients, the second row
+        contains the y-coefficients.
 
-            # neglect lines starting with a comment
-            if line[0] is '#':
-                continue
-
-            # switch from x- to y-array
-            # when encountering a blank line
-            elif len(line.strip()) == 0:
-                first = 1
-
-            # neglect also lines starting with a string
-            elif config_util.isstringlike(line.strip().split()[0]) == 1:
-                continue
-
-            # here are the data lines
-            else:
-
-                # convert the data lines to a list
-                scoeffs = line.strip().split()
-
-                # parse through the list
-                for number in scoeffs:
-
-                    # append the item to x
-                    if first == 0:
-                        xcoeffs.append(float(number))
-
-                    # or append it to y
-                    else:
-                        ycoeffs.append(float(number))
-
-        # return the lists
-        return xcoeffs, ycoeffs
-
-    # def mopup_pydrizzle(self, coeff_filename):
-    #     """Delete al files created by pydrizzle"""
-    #     # compose the file names
-    #     msk1name = self.image.replace('.fits', '_final_mask1.fits')
-    #     msk2name = self.image.replace('.fits', '_final_mask2.fits')
-    #     sing1name = self.image.replace('.fits', '_single_mask1.fits')
-    #     sing2name = self.image.replace('.fits', '_single_mask2.fits')
-
-    #     # check if the files exist;
-    #     # delete them if yes
-    #     if os.path.isfile(msk1name):
-    #         os.unlink(msk1name)
-    #     if os.path.isfile(msk2name):
-    #         os.unlink(msk2name)
-    #     if os.path.isfile(sing1name):
-    #         os.unlink(sing1name)
-    #     if os.path.isfile(sing2name):
-    #         os.unlink(sing2name)
-
-    #     # also delete the coefficients file
-    #     if os.path.isfile(coeff_filename):
-    #         os.unlink(coeff_filename)
+        """
+        first = True
+        for row in coeffs:
+            try:
+                float(row[0])
+                if first:
+                    self.xcoeffs = list(map(float, row.split()))
+                    first = False
+                else:
+                    self.ycoeffs = list(map(float, row.split()))
+            except ValueError:
+                pass
 
     def make(self):
         """Generate the non-linear coefficients"""
-
+        print("\nGenerating non-linear coefficients")
         # get the name of the coefficients file
         coeff_filename, detector = self._get_coeff_filename()
 
@@ -382,17 +339,10 @@ class NonLinCoeffs:
         os.chdir(os.path.dirname(self.image))
 
         # reduce the coefficients file name
-        coeff_filename = os.path.basename(coeff_filename)
+        # coeff_filename = os.path.basename(coeff_filename)
 
-        try:
-            # create a distortion coefficient file
-            pydrizzle.PyDrizzle(os.path.basename(self.image),
-                                          bits_single=None,
-                                          bits_final=None,
-                                          updatewcs=False)
-        except:
-            # if this fails, create a default coefficients file
-            coeff_filename = self._create_dummy_coeffs(detector)
+        # create dummy coeffs file
+        coeff_filename = self._create_dummy_coeffs(detector)
 
         # check whether the file exists
         if os.path.isfile(coeff_filename):
@@ -413,14 +363,11 @@ class NonLinCoeffs:
         os.chdir(homedir)
 
         # convert the string into a float array
-        self.xcoeffs, self.ycoeffs = self._get_coeffs_numbers(coeffs)
-
-        # delete unnecessary files
-        self.mopup_pydrizzle(coeff_filename)
+        self._get_coeffs_numbers(coeffs)
 
     def store_coeffs(self):
         """Get keyword information used to determine coeffs"""
-
+        print("\nStoring non-linear coefficients")
         # open the fits and go to the first header
         flt_imag = fits.open(self.image, mode='update', memmap=0)
         flt_head = flt_imag[0].header
@@ -438,7 +385,6 @@ class NonLinCoeffs:
             detector = flt_head['CAMERA']
         else:
             detector = None
-
         # translate instrument and detector to
         # a linear pixel scale;
         # store this pixel scale
@@ -461,23 +407,32 @@ class NonLinCoeffs:
         else:
             flt_head['DRZSCALE'] = (1.0, 'Default scale for drizzling')
 
+        print("DRZSCALE set to: {}".format(flt_head['DRZSCALE']))
+
         # store the number of coefficients
         flt_head['DRZCNUM'] = (len(self.xcoeffs),
-                               'Number of coefficients per coordinate')
-
+                               'Number of coefficients per xy coordinate')
         # store the x-coefficients
-        for index in range(len(self.xcoeffs)):
+        if (len(self.xcoeffs) == 0):
+            raise ValueError("No x-coefficients recorded")
+        else:
+            print(self.xcoeffs)
+        for idx, val in enumerate(self.xcoeffs):
             keyname = 'DRZ{0:1d}X{1:02d}'.format(int(self.ext_info['axe_ext']),
-                                                 index+1)
-            keycomm = 'Drizzle coefficient {0:02d} in X'.format(index+1)
-            flt_head[keyname] = (self.xcoeffs[index], keycomm)
+                                                 idx+1)
+            keycomm = 'Drizzle coefficient {0:02d} in X'.format(idx+1)
+            flt_head[keyname] = (val, keycomm)
 
         # store the y-coefficients
-        for index in range(len(self.ycoeffs)):
+        if (len(self.ycoeffs) == 0):
+            raise ValueError("No y-coefficients recorded")
+        else:
+            print(self.ycoeffs)
+        for idx, val in enumerate(self.ycoeffs):
             keyname = 'DRZ{0:1d}Y{1:02d}'.format(int(self.ext_info['axe_ext']),
-                                                 index+1)
-            keycomm = 'Drizzle coefficient {0:02d} in Y' % (index+1)
-            flt_head[keyname] = (self.ycoeffs[index], keycomm)
+                                                 idx+1)
+            keycomm = 'Drizzle coefficient {0:02d} in Y'.format(idx+1)
+            flt_head[keyname] = (val, keycomm)
 
         # close the fits
         flt_imag.close()

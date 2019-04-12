@@ -11,7 +11,7 @@ GOOD_RETURN_VALUE = 0
 
 
 class TaskWrapper(object):
-    """General class to execute C-tasks"""
+    """General class to execute the C-tasks"""
     def __init__(self, taskname="", tshort=""):
         """
         Parameters
@@ -84,8 +84,8 @@ class TaskWrapper(object):
     def run(self, silent=False):
         """Run the wrapped task
 
-        The method executes the associated C-executable. The return code given
-        by the C-executable is returned. In silent mode stdout and stderr
+        The method executes the associated C-executable. The return code from
+        the C-executable is returned. In silent mode stdout and stderr
         are writtren to a file, in non-silent mode to the screen.
 
         Parameters
@@ -98,7 +98,6 @@ class TaskWrapper(object):
         retcode: int
             the return code of the C-executable
         """
-        # is output desired
         if silent:
             # open stdout/stderr
             sout = open(self.stdout, 'w+')
@@ -868,6 +867,20 @@ class aXe_PETFF(TaskWrapper):
     """Wrapper around the aXe_PETFF task"""
     def __init__(self, grism, config, **params):
         """
+        Apply a wavelength dependent flat-fielding to the COUNT and
+        ERROR parts of a Pixel Extraction Table (PET)
+        The wavelength of a pixel is used in conjunction with a flat-fielding
+        data cube containing the coefficents of a polynomial which can be used
+        to compute at each pixel (x,y):
+
+            FF(x,y,lambda) = a_0(x,y) + a_1(x,y)*lambda + .. +a_i * lambda^i
+
+        The coefficients a_0(x,y) are stored in the first data extention of the
+        flat-field cube, a_1(x,y) in the second, etc... The name of the
+        flat-field cube is read from the aXe configuration file.
+
+        Notes
+        -----
         This method is a simple initializer for the class. All
         variables a transferred to a list, if necessary with the
         appropriate leading parameter name
@@ -1134,6 +1147,7 @@ class aXe_FILET(TaskWrapper):
         """
         # initialize via superclass
         super().__init__('aXe_FILET', 'filet')
+        print("Called FILET")
 
         # put the grism name to the list
         self.command_list.append(dppfile)

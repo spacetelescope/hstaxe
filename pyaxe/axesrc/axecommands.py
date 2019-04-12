@@ -8,6 +8,9 @@ from . import axeutils
 from pyaxe import config as config_utl
 
 
+"""
+The following deal with axe simulations
+"""
 
 class DispImator(object):
     """Class to create a dispersed image"""

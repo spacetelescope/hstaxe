@@ -1,7 +1,8 @@
 from pyaxe import config as config_util
+
 from . import axetasks
 from . import configfile
-# from . import nlincoeffs
+from . import nlincoeffs
 
 
 class aXeSpcExtr:
@@ -102,7 +103,8 @@ class aXeSpcExtr:
                          config=self.config,
                          cont_model=self.params['cont_model'],
                          model_scale=self.params['model_scale'],
-                         spec_models=None, object_models=None,
+                         spec_models=None,
+                         object_models=None,
                          inter_type=self.params['inter_type'],
                          lambda_psf=self.params['lambda_psf'],
                          cont_map=True,
@@ -185,31 +187,34 @@ class aXeSpcExtr:
         del conf
 
         # Does this harm data that was astrodrizzled?
-        # if (('drzfwhm' in self.params) and
-        #     (self.params['drzfwhm']) or
-        #     (('cont_model' in self.params) and
-        #     (config_util.is_quant_contam(self.params['cont_model'])))):
+        if (('drzfwhm' in self.params) and
+            (self.params['drzfwhm']) or
+            (('cont_model' in self.params) and
+            (config_util.is_quant_contam(self.params['cont_model'])))):
 
             # generate the non-linear distortions from the IDCTAB;
-            # store them in the fits-file header
-            # nlins = nlincoeffs.NonLinCoeffs(config_util.getDATA(self.grisim),
-            #                                 ext_info)
-            # nlins.make()
-            # nlins.store_coeffs()
-            # del nlins
+            # and store them in the fits-file header
+            print("Generating and storing nonlinear distortions in {0}".format(config_util.getDATA(self.grisim)))
+            nlins = nlincoeffs.NonLinCoeffs(config_util.getDATA(self.grisim), ext_info)
+            nlins.make()
+            nlins.store_coeffs()
+            del nlins
 
         # make the object PET's
         self._make_objPET()
 
         # make a background PET if necessary
         if 'back' in self.params and self.params['back']:
+            print("\nMaking backpet\n")
             self._make_bckPET()
 
         # extract the spectra
         if 'spectr' in self.params and self.params['spectr']:
+            print("\nMaking spectra\n")
             self._make_spectra()
 
         # make the proper non-quantitative contamination
         if ('drzfwhm' in self.params and self.params['drzfwhm']) and \
            ('cont_model' in self.params and not config_util.is_quant_contam(self.params['cont_model'])):
+            print("\nmaking non quant contam\n")
             self._make_drzgeocont(ext_info)

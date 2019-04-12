@@ -14,7 +14,7 @@ from . import axetasks
 class aXePrepArator:
     """This task prepares the science files for further processing within aXe.
 
-    axeprep provides important keywords and is mandatory if axedrizzle is to be
+    `axeprep` provides important keywords and is mandatory if axedrizzle is to be
     used later on.
 
     Inputs

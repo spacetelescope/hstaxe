@@ -214,6 +214,7 @@ def axecore(inlist='',
     for row in axe_inputs:
 
         # make an extraction object
+        print("image is located: {0}".format(row['grisim']))
         aXeNator = axesingextr.aXeSpcExtr(row['grisim'],
                                           row['objcat'],
                                           row['dirim'],
@@ -231,7 +232,8 @@ def axecore(inlist='',
                                           model_scale=model_scale,
                                           inter_type=inter_type,
                                           lambda_psf=lambda_psf,
-                                          np=np, interp=interp,
+                                          np=np,
+                                          interp=interp,
                                           niter_med=niter_med,
                                           niter_fit=niter_fit,
                                           kappa=kappa,
