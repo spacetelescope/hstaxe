@@ -1,34 +1,80 @@
 import os
+from copy import deepcopy
 from stsci.tools import wcsutil
 
 from pyaxe.axeerror import aXeError
-from pyaxe.config import (getCONF, getDATA, getOUTPUT,
-                          getOUTSIM, getDRZTMP, get_ext_info)
+from pyaxe.config import (getCONF, getDATA,
+                          getOUTPUT, get_ext_info)
 
 from . import configfile
 from . import axeiol
 
 
 class Sex2GolPy:
-    """ Class for the SEX2GOL task """
+    """This task generates a Grism Object List file using an Input Object List."""
+
     def __init__(self, grisim, config,
                  in_sex=None,
                  dirname=None,
                  out_sex=None,
                  spec_hdu=None,
                  dir_hdu=None):
+        """
+        Parameters
+        ----------
+        grisim : str
+            input grism/prism image
+        config : str
+            axe configuration filename
+        in_sex : str
+            name of the object file
+        dirname : str
+            direct image name
+        out_sex : str
+            overwrites the default output object catalog name
+        spec_hdu : int
+            grism/prism image extension to be used
+        dir_hdu :  int
+            direct image extension to be used
+
+        Returns
+        -------
+        Creates output catalog files in source extractor format
+
+        Notes
+        -----
+        There are three different kinds of Input Object List that
+        can be fed into aXe:
+        * an Input Object List (in SExtractor format) of objects on a
+          direct image covering (roughly) the same field as the grism image
+        * an Input Object List in SExtractor format, which gives the objects
+          on the grism image in world coordinates (RA, Dec and theta_sky)
+
+        The image coordinates of the objects on the grism image will be
+        recomputed using the WCS information of the grism image and the
+        direct image. This approach therefore relies on the accuracy of
+        the WCS information given in those images.
+
+        """
 
         # store some parameters
         self.grisim = grisim
         self.config = config
-        self.in_sex = in_sex
+        self.in_sex = None
+        self.out_sex = None
         self.dirname = dirname
+        self.iol = None
+        self.gol = None
 
         # determine the grism image extensions
         self.grism_extinfo = self._get_grism_ext_info(grisim, config, spec_hdu)
 
         # determine the grism image extensions
-        self.dirname, self.dirname_extinfo = self._get_dirname_information(dirname, config, grisim, self.grism_extinfo, dir_hdu)
+        self.dirname, self.dirname_extinfo = self._get_dirname_information(dirname,
+                                                                           config,
+                                                                           grisim,
+                                                                           self.grism_extinfo,
+                                                                           dir_hdu)
 
         # get information on the input and output lists
         self.in_sex, self.out_sex = self._resolve_list_names(self.dirname,
@@ -61,18 +107,32 @@ class Sex2GolPy:
     def _cleanup(self):
         """Clean up files created for stdout
 
-        This is a usual cleaning procedure in case nothing bad happened.
+        This is a cleaning procedure in case nothing bad happened.
         """
         # delete stdout/stderr
         if os.path.isfile(self.stdout):
             os.unlink(self.stdout)
 
-    def _get_grism_ext_info(self, grisim, config, spec_hdu=None):
-        """Determine the extension information on the grism image"""
-        # check for an explicit extension
+    def _get_grism_ext_info(self, grisim='', config='', spec_hdu=None):
+        """Determine the extension information on the grism image.
+
+        Parameters
+        ----------
+        grisim : str
+            The name of the grism images
+        config : str
+            The name of the configuration file
+        spec_hdu : int, None
+            The extention number of the spectra data
+
+        Returns
+        -------
+        ext_info : dict
+            A dictionary that contains the header extension
+            and the data extension
+        """
+
         if spec_hdu is None:
-            # load the configuration file;
-            # determine the extension information
             conf = configfile.ConfigFile(getCONF(config))
             ext_info = get_ext_info(getDATA(grisim), conf)
 
@@ -84,13 +144,15 @@ class Sex2GolPy:
         return ext_info
 
     def _get_dirname_information(self,
-                                 dirname="",
+                                 dirname=None,
                                  config="",
                                  grisim="",
                                  grism_extinfo=None,
                                  dir_hdu=None):
         """Determine the direct image information.
 
+        Parameters
+        ----------
         dirname : str
             Diretory name
         config : str
@@ -102,9 +164,14 @@ class Sex2GolPy:
         dir_hdu :  fits.HDU
             FITS header data unit
 
+        Returns
+        -------
+        A tuple of the direct image name and a dictionary of
+        extension information
+
         """
         # check whether ANY direct image information exists
-        if (not (dirname) and (dir_hdu is None)):
+        if ((dirname is None) and (dir_hdu is None)):
             # set the grism image as direct image
             dirname = grisim
             dirname_extinfo = grism_extinfo
@@ -129,14 +196,37 @@ class Sex2GolPy:
         # return the name and the extension info
         return dirname, dirname_extinfo
 
-    def _resolve_list_names(self,
-                            dirname,
-                            dirname_extinfo,
-                            grisim,
-                            grism_extinfo,
-                            in_sex,
-                            out_sex):
-        """Determine the lists for input and output"""
+    def _resolve_list_names(self, dirname='',
+                            dirname_extinfo=None,
+                            grisim='',
+                            grism_extinfo=None,
+                            in_sex=None,
+                            out_sex=None):
+        """Determine the lists for input and output.
+
+        Parameters
+        ----------
+        dirname : str
+            The direct image name
+        dirname_extinfo : dict
+            A dictionary that contains the direct
+            header and data information
+        grisim : str
+            The name of the grisim image
+        grism_extinfo : dict
+            A dictionary that contains the grism
+            header and data information
+        in_sex : str
+            The name of the source extractor catalog
+            that goes with the direct image
+        out_sex : str
+            The name of the output grism object list
+            that is created using the input catalog
+
+        Returns
+        -------
+        A tuple of the names of the input and output catalog names
+        """
         # compose the default name
         if in_sex is None:
             # compose the filename from the direct image name
@@ -169,7 +259,7 @@ class Sex2GolPy:
             return None
 
         # create a new GOL that's a copy of the input list
-        self.gol = self.iol.catalog.copy()  # just make a copy
+        self.gol = deepcopy(self.iol.catalog) # just make a copy
 
     def _transfer_coos(self):
         """Transfer coordinates from the IOL to the GOL"""
@@ -181,47 +271,57 @@ class Sex2GolPy:
         dir_wcs = wcsutil.WCSObject(dir_term)
         gri_wcs = wcsutil.WCSObject(gri_term)
 
-        # go over each row
+        # go over each row in the catalog
         for row in self.gol:
 
             # make a position tuple
-            xy_direct= (row['X_IMAGE'], row['Y_IMAGE'])
+            try:
+                xy_direct = (row['X_IMAGE'], row['Y_IMAGE'])
+            except KeyError:
+                self._treat_NULL_table
+                raise aXeError("No coordinate columns in catalog, empty?")
 
-            # convert to RADEC
+            # convert to RADEC using the direct image
             radec_pos = dir_wcs.xy2rd(xy_direct)
 
-            # convert to XY on grism
+            # convert to XY on grism image
             xy_grism = gri_wcs.rd2xy(radec_pos)
 
             # store projected vals in the GOL
             row['X_IMAGE'] = float(xy_grism[0])
             row['Y_IMAGE'] = float(xy_grism[1])
 
-    def _treat_NULL_table(self, out_name):
-        """Transfer an empty table
+    # def _treat_NULL_table(self, out_name):
+    #     """Transfer an empty table.
 
-        The header of the empty table is written to the
-        GOL file. However then no check is done whether
-        the column is complete.
-        """
-        # open the "GOL"
-        out_file = open(out_name, 'w+')
+    #     Parameters
+    #     ----------
+    #     out_name : str
+    #         The name of the output file
 
-        # go over the "IOL"
-        for a_line in self.in_sex:
-            # transfer everyhing
-            out_file.write(a_line)
 
-        # close the file
-        out_file.close()
+    #     The header of the empty table is written to the
+    #     GOL file.
+    #     """
+    #     catalog = Table.read(self.in_sex, format='ascii.sextractor')
+    #     new_catalog = deepcopy(catalog)
+    #     if os.access(out_name, os.F_OK):
+    #         os.remove(out_name)
+    #     of = open(out_name, 'w')
+    #     for num, name in zip(range(len(new_catalog.colnames)), new_catalog.colnames):
+    #         of.write("# {0:d} {1:s}\t\t{2:s}\t\t[{3:s}]\n".format(num+1,
+    #                                                               name,
+    #                                                               new_catalog[name].description,
+    #                                                               str(new_catalog[name].unit))
+    #                                                              )
+    #     new_catalog.write(of, format='ascii.no_header', overwrite=False)
+    #     of.close()
 
     def run(self, silent=False):
         """Make the SEX2GOL transformations"""
-        # give feedback
         if not silent:
-            print("py_SEX2GOL:  Start processing ...",)
+            print("py_SEX2GOL:  Start processing ...\n",)
         else:
-            # open stdout/stderr
             sout = open(self.stdout, 'w+')
             sout.write(str(self)+"\n")
             sout.write("py_SEX2GOL:  Start processing ...")
@@ -258,7 +358,7 @@ class Sex2GolPy:
                 print("\npy_SEX2GOL:  Warning! Empty table copied to GOL")
             else:
                 # open stdout/stderr
-                sout.write("py_SEX2GOL:  Warning! Empty table copied to GOL")
+                sout.write("py_http://www.stsci.edu/hst/wfc3/ins_performance/persistence/:  Warning! Empty table copied to GOL")
 
         # give feedback
         if not silent:

@@ -63,8 +63,8 @@ def iolprep(drizzle_image='',
 
     """
     iol_maker = iolmaking.IOLMaker(drizzle_image,
-                                    input_cat,
-                                    dimension_in)
+                                   input_cat,
+                                   dimension_in)
     iol_maker.run()
 
 
@@ -78,7 +78,7 @@ def fcubeprep(grism_image='',
 
     # run the main command
     fcmaker = fcubeobjs.FluxCubeMaker(grism_image, segm_image, filter_info,
-                                       AB_zero, dim_info, interpol)
+                                      AB_zero, dim_info, interpol)
     fcmaker.run()
 
 
@@ -197,7 +197,7 @@ def axecore(inlist='',
             adj_sens=True,
             weights=False,
             sampling='drzizzle'):
-    """Convenience unction for the aXe task AXECORE"""
+    """Convenience function for the aXe task AXECORE"""
     # only temporarily here ????
     axe_setup()
 
@@ -273,6 +273,7 @@ def axecrr(inlist='',
            adj_sens=True,
            opt_extr=True,
            driz_separate=False):
+
     """Function for aXedrizzle with CR-rejection"""
     # make the general setup
     axe_setup(tmpdir=True)

@@ -103,8 +103,7 @@ class MyClean(Command):
     def run(self):
         print("** cleaning python and C binaries for aXe **")
         current_env = sys.prefix + "/bin/"
-        axe_bins = ["aXe_SEX2GOL",
-                    "aXe_GOL2AF",
+        axe_bins = ["aXe_GOL2AF",
                     "aXe_AF2PET",
                     "aXe_BE",
                     "aXe_PET2SPC",

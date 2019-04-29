@@ -2,32 +2,41 @@
 
 """
 import os
+import pytest
 from pyaxe import axetasks
 
-axelist = """ib6o23rsq_flt.fits ib6o23rtq_flt_1.cat ib6o23rtq_flt.fits
+
+@pytest.fixture(scope='module')
+def global_data():
+    yield {"config": "G141.F140W.V4.31.conf",
+           "background_image": "WFC3.IR.G141.sky.V1.0.fits"}
+
+
+@pytest.fixture
+def axe_inputs(global_data, scope='module'):
+    axe_lis_filename = "aXe.lis"
+    axelist = """ib6o23rsq_flt.fits ib6o23rtq_flt_1.cat ib6o23rtq_flt.fits
 ib6o23ruq_flt.fits ib6o23rwq_flt_1.cat ib6o23rwq_flt.fits
 ib6o23ryq_flt.fits ib6o23rzq_flt_1.cat ib6o23rzq_flt.fits
 ib6o23s0q_flt.fits ib6o23s2q_flt_1.cat ib6o23s2q_flt.fits
 
 """
 
+    with open(axe_lis_filename, 'w') as fd:
+            fd.write(axelist)
+            fd.close()
+    yield axetasks.axeinputs.aXeInput(axe_lis_filename,
+                                      global_data['config'],
+                                      global_data['background_image'])
+    print("\nTearing down axe_inputs")
+    os.remove(axe_lis_filename)
 
-def test_sex2gol():
-    """test the sex2gol task"""
 
-    filename = "aXe.lis"
-    configs = "G141.F140W.V4.31.conf"
-    backims = "WFC3.IR.G141.sky.V1.0.fits"
-
-    with open(filename, 'w') as fd:
-        fd.write(axelist)
-        fd.close()
-
-    axe_inputs = axetasks.axeinputs.aXeInput(filename, configs, backims)
-
+def test_sex2gol(axe_inputs, global_data):
+    """test the sex2gol creates basic catalog files"""
     for row in axe_inputs:
         axetasks.sex2gol(grism='DATA/'+row['grisim'],
-                         config=configs,
+                         config=global_data['config'],
                          in_sex='DATA/'+row['objcat'],
                          use_direct=True,
                          direct='DATA/'+row['dirim'],
@@ -37,6 +46,15 @@ def test_sex2gol():
                          silent=False)
         assert os.path.isfile('OUTPUT/' + row['grisim'].split('.fits')[0] + '_2.cat')
 
-    os.remove(filename)
 
+def test_radec_translation(axe_inputs):
+    """check whether an object location from the input
+       catalog translates correctly."""
+    from astropy.table import Table
 
+    for row in axe_inputs:
+        filename = 'OUTPUT/' + row['grisim'].split('.fits')[0] + '_2.cat'
+        if os.path.isfile(filename):
+            catalog = Table.read(filename, format='ascii.sextractor')
+        else:
+            raise IOError("File not found: {0:s}".format(filename))

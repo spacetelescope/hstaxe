@@ -2,10 +2,9 @@ import sys
 import shutil
 from astropy.io import fits
 
-from pyaxe import config
+from pyaxe import config as config_util
+
 from .axeerror import aXeSIMError
-from . import axeutils
-from pyaxe import config as config_utl
 
 
 """

@@ -1,6 +1,8 @@
 import os
 import math
 from astropy.io import fits
+from astropy.table import Table
+from astropy.io.registry import IORegistryError
 
 from . import axeinputs
 from . import configfile
@@ -165,21 +167,19 @@ class InputChecker:
 
         # go over all inputs
         for one_input in self.axe_inputs:
-            print(one_input)
-
-            # go on if the list has been checked
             if one_input['objcat'] in IOL_list:
                 continue
 
             # check the prism image
             if not os.path.isfile(config_util.getDATA(one_input['objcat'])):
-                # error and out
-                err_msg = '%s: The direct image: "%s" does not exist!' % (self.taskname, config_util.getDATA(one_input['objcat']))
-                raise aXeError(err_msg)
-
+                raise aXeError("{0:s}: The direct image: '{1:s}' does not "
+                               "exist!".format(self.taskname, config_util.getDATA(one_input['objcat'])))
             # load the IOL to check its format
-            iol = axeiol.InputObjectList(config_util.getDATA(one_input['objcat']))
-
+            try:
+                print("reading {}".format(config_util.getDATA(one_input['objcat'])))
+                Table.read(config_util.getDATA(one_input['objcat']), format='ascii.sextractor')
+            except IORegistryError:
+                raise aXeError("{0:s} is not in a known format".format(one_input['objcat']))
             # put the IOL to the list
             IOL_list.append(one_input['objcat'])
 

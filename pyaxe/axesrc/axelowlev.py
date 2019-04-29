@@ -1046,7 +1046,7 @@ class aXe_STAMPS(TaskWrapper):
     """Wrapper around the aXe_STAMPS task"""
     def __init__(self, grism, config, **params):
         """
-        Initializer for the class
+        Create stamp images.
 
         This method is a simple initializer for the class. All
         variables a transferred to a list, if necessary with the
@@ -1096,6 +1096,7 @@ class aXe_STAMPS(TaskWrapper):
         if (params['drzpath']):
             # put the according flag to the list
             self.command_list.append('-drz')
+        print(self.command_list)
 
 
 class aXe_TRACEFIT(TaskWrapper):

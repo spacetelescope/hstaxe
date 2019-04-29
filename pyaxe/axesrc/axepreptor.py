@@ -189,7 +189,7 @@ class aXePrepArator:
         ratio_data[grism_dq_data > 0.5] = flag
 
         # Flag pixels in the ratio image based on the grism image MSK file
-        msk_file = fits.open(config_util.getOUTPUT(msk_image_sc.split("[")[0]), 'readonly')
+        msk_file = fits.open(config_util.getOUTPUT(msk_image_sc.split("[")[0]),  'readonly')
         msk_data = msk_file['SCI'].data
         msk_file.close()
 

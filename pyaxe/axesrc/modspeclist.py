@@ -3,11 +3,10 @@ import sys
 import math
 from astropy.io import fits
 from stwcs.wcsutil import HSTWCS
-from .. import axe_asciidata
-from ..axeerror import aXeSIMError
+from pyaxe.axeerror import aXeSIMError
+from pyaxe.axesrc.axeiol import InputObjectList
 
-
-class MagColList(axe_asciidata.AsciiData):
+class MagColList(InputObjectList):
     """Subclass of the AsciiData class for lists with magnitude columns
 
     This class loads ASCII tables and identifies the magnitude colunmns,
@@ -17,6 +16,8 @@ class MagColList(axe_asciidata.AsciiData):
 
     Moreover there are mechanisms to search for column names and store
     the column index in a dictionary.
+
+    TODO: FINISH UPDATING THIS CLASS FOR AXEIOL BASE
     """
     def __init__(self, filename, mag_wavelength=None):
         """Initializer for the class
@@ -28,7 +29,7 @@ class MagColList(axe_asciidata.AsciiData):
         mag_wavelength: float
             special wavelength
         """
-        super(MagColList, self).__init__(filename=filename)
+        super(InputObjectList, self).__init__(filename=filename)
 
         # initialize the dictionary
         # with indices of required columns

@@ -1,6 +1,7 @@
 import re
 from astropy.table import Table
-from ..axeerror import aXeError
+
+from pyaxe.axeerror import aXeError
 
 
 class InputObjectList(object):
@@ -59,33 +60,6 @@ class InputObjectList(object):
                        .format(self.filename, len(wav_cols)))
             raise aXeError(err_msg)
 
-    # def find_magcol(self, mag_cols, mag_wave):
-    #     """
-    #     Input:
-    #         mag_cols - the list with infos on magnitude columns
-    #         mag_wave - the target wavelength
-    #
-    #     Description:
-    #         The method analyses all magnitude columns and finds the one
-    #         which is closest to a wavelength given in the input.
-    #     """
-    #     # define a incredibly large difference
-    #     min_dist = 1.0e+30
-    #
-    #     # define a non-result
-    #     min_ind  = -1
-    #
-    #     # go over al magnitude columns
-    #     for index in range(len(mag_cols)):
-    #         # check wehether a new minimum distance is achieved
-    #         if math.fabs(mag_cols[index][1]-mag_wave) < min_dist:
-    #             # transport the minimum and the index
-    #             min_ind  = index
-    #             min_dist = math.fabs(mag_cols[index][1]-mag_wave)
-    #
-    #     # return the index
-    #     return min_ind
-
     def search_mcols(self):
         """
 
@@ -123,23 +97,24 @@ class InputObjectList(object):
         The method tries to extract the wavelength
         encoded into a column name. The encoding
         format is "MAG_<C><WAVE>*" with <C> a
-        single character, <WAVE> an integer number
-        and anything (*) afterwards.
+        single character, <WAVE> an integer number.
 
         Input
         -----
-            colname - the column name
+        colname: str
+            the column name
 
         Returns
         -------
-            wave - the wavelength encoded in the
-                    column name, or None
+        wave: int
+            the wavelength encoded in the
+            column name, or None
 
         """
         # check for the start string
         check = re.compile("^MAG_([A-Z,a-z]{1})([0-9]*)")
-        found = check.split(colname)
-        if len(found) > 2:
+        found = check.search(colname)
+        if found is not None:
             return int(found[2])
         else:
             return None

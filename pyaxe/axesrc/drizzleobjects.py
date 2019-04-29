@@ -1,7 +1,7 @@
 import os
 import re
 import math
-import numpy
+import numpy as np
 import shutil
 
 from astropy.io import fits
@@ -51,8 +51,12 @@ class DrizzleParams(dict):
         """
 
         # list with all valid kernels
-        kernels = ['square', 'point', 'turbo', 'gaussian', 'tophat',
-                   'lanczos2', 'lanczos3']
+        kernels = ['square',
+                   'point',
+                   'turbo',
+                   'gaussian',
+                   'tophat',
+                   'lanczos3']
 
         # create an empty dictionary
         drizzle_params = {}
@@ -297,7 +301,7 @@ class DrizzleObjectList:
                 os.rmdir(abs_path)
 
     def make_OAF_file(self, infwhm, outfwhm, af_file):
-        """Generate the OAF file fore the drizzled images"""
+        """Generate the OAF file for the drizzled images"""
         # delete previous versions of the OAF
         if os.path.isfile(af_file):
             os.unlink(af_file)
@@ -617,14 +621,14 @@ class DrizzleObject:
                 slitwidt.append(one_contrib.info['SLITWIDT'])
 
         # convert to numpy arrays
-        length_arr = numpy.array(length)
-        owidth_arr = numpy.array(owidth)
-        xoffs_arr = numpy.array(xoffs)
-        drzwidth_arr = numpy.array(drzwidth)
+        length_arr = np.array(length)
+        owidth_arr = np.array(owidth)
+        xoffs_arr = np.array(xoffs)
+        drzwidth_arr = np.array(drzwidth)
 
         # if possible, compute the mean slitwidth
         if len(slitwidt) > 0:
-            slitwidt_mean = numpy.array(slitwidt).mean()
+            slitwidt_mean = np.array(slitwidt).mean()
         # set to None
         else:
             slitwidt_mean = None
@@ -669,7 +673,7 @@ class DrizzleObject:
         fits_data = fits_img[0].data
 
         # compute some statistics
-        img_ave = fits_data.mean()
+        img_ave = np.mean(fits_data)
 
         # close the image
         fits_img.close()
@@ -701,7 +705,7 @@ class DrizzleObject:
         """Correct the contamination image (for geometric contamination)"""
         # Replace contamination values with nearest integer
         file_a = fits.open(self.ext_names['CON'], 'update')
-        file_a[0].data = numpy.rint(file_a[0].data)
+        file_a[0].data = np.rint(file_a[0].data)
         file_a.close()
 
     def _fill_header(self, header):

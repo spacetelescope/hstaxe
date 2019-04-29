@@ -65,7 +65,7 @@ class aXeInput(object):
         # do a check on the first object catalog to make sure it's a format
         # that we can read
         try:
-            __ = Table.read(config_utils.getDATA(self._inimlist[0]['objcat']), format='ascii')
+            __ = Table.read(config_utils.getDATA(self._inimlist[0]['objcat']), format='ascii.sextractor')
         except IORegistryError:
             raise aXeError("Catalog format not recognized , checked for: {0:s}"
                            .format(self._inimlist[name][0]))
