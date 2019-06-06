@@ -79,6 +79,7 @@ class aXePrepArator:
         else:
             raise ValueError("No grisim image specified for axeprep")
         self.objcat = config_util.getDATA(objcat)
+        print("\n**Using object catalog: {0}\n".format(self.objcat))
         self.dirim = config_util.getDATA(dirim)
         self.config = config
         self.dmag = dmag

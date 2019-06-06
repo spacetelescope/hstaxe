@@ -54,7 +54,5 @@ def test_radec_translation(axe_inputs):
 
     for row in axe_inputs:
         filename = 'OUTPUT/' + row['grisim'].split('.fits')[0] + '_2.cat'
-        if os.path.isfile(filename):
-            catalog = Table.read(filename, format='ascii.sextractor')
-        else:
-            raise IOError("File not found: {0:s}".format(filename))
+        assert os.path.isfile(filename)
+        catalog = Table.read(filename, format='ascii.sextractor')

@@ -5,7 +5,18 @@ from pyaxe import axetasks
 
 
 def test_stamps():
-    """test the aXe_stamps task"""
+    """test the aXe_stamps task
+
+    Notes
+    -----
+    SPC files contained 1D spectra, opt.SPC files contained optimally extracted spectra using gaussian profiles
+    STP files contain 2D stamps.
+    CONT files contain the gaussian based contamination estimate
+
+    This test should produce STP FITS files where each stamp is contained in its own extension.
+    All output files should be in the directory pointed to by the AXE_OUTPUT_PATH environment
+    variable.
+    """
 
     # These are the files in the OUTPUT dir
     outfiles = ['ib6o23rsq_flt.fits',

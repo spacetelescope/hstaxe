@@ -45,6 +45,7 @@ class Sex2GolPy:
         -----
         There are three different kinds of Input Object List that
         can be fed into aXe:
+
         * an Input Object List (in SExtractor format) of objects on a
           direct image covering (roughly) the same field as the grism image
         * an Input Object List in SExtractor format, which gives the objects
@@ -277,8 +278,8 @@ class Sex2GolPy:
             # make a position tuple
             try:
                 xy_direct = (row['X_IMAGE'], row['Y_IMAGE'])
-            except KeyError:
-                self._treat_NULL_table
+            except KeyError:          
+                # self._treat_NULL_table
                 raise aXeError("No coordinate columns in catalog, empty?")
 
             # convert to RADEC using the direct image
@@ -351,14 +352,14 @@ class Sex2GolPy:
         else:
             # if there are no objects, just copy the empty table
             # header to the GOL
-            self._treat_NULL_table(getOUTPUT(self.out_sex))
+            #self._treat_NULL_table(getOUTPUT(self.out_sex))
 
             # give feedback
             if not silent:
                 print("\npy_SEX2GOL:  Warning! Empty table copied to GOL")
             else:
                 # open stdout/stderr
-                sout.write("py_http://www.stsci.edu/hst/wfc3/ins_performance/persistence/:  Warning! Empty table copied to GOL")
+                sout.write("pysex2gol:  Warning! Empty table copied to GOL")
 
         # give feedback
         if not silent:

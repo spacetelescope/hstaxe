@@ -60,8 +60,6 @@ os.chdir(cwd)
 os.system("cp cookbook_data/aXe.lis .")
 #!cat aXe.lis
 
-os.chdir(cwd)
-
 axetasks.axeprep(inlist="aXe.lis",
                      configs="G141.F140W.V4.31.conf",
                      backgr=True,

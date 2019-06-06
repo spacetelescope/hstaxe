@@ -140,9 +140,6 @@ def axeprep(inlist='',
     of the grism images! It is highly recommended to work only
     on copies of the original files in order to be able to repeat
     the reduction with different parameters.
-
-
-
     """
 
     # do all the input checks

@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import sys
-if (sys.version_info < (3, 3)):
-    sys.stderr.write("ERROR: pyaxe requires Python 3.3 or later\n")
-    sys.exit(1)
-
 import os
 
 from configparser import ConfigParser
@@ -13,6 +9,10 @@ from setuptools import find_packages, Command, setup
 from setuptools.command.test import test as TestCommand
 from setuptools.command.install import install
 from subprocess import check_call, CalledProcessError
+
+if (sys.version_info < (3, 3)):
+    sys.stderr.write("ERROR: pyaxe requires Python 3.3 or later\n")
+    sys.exit(1)
 
 AXELIB_DIR = "cextern/aXe_c_code/"
 CONF_H_NAME = os.path.join(AXELIB_DIR, "config.h")
@@ -72,7 +72,7 @@ class PyTest(TestCommand):
             import pytest
         except ImportError:
             print('Unable to run tests...')
-            print('To continue, please install "pytest":')
+            print('To continue, please install "pytest" using:')
             print('    pip install pytest')
             exit(1)
 
