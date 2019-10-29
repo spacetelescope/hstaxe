@@ -43,7 +43,7 @@ class aXeSpcExtr:
                          smooth_fwhm=self.params['smooth_fwhm'],
                          old_bck=False,
                          mask=False,
-                         in_af=None,
+                         in_af="",
                          out_bck=None)
 
         # run AF2PET
@@ -108,7 +108,7 @@ class aXeSpcExtr:
                          inter_type=self.params['inter_type'],
                          lambda_psf=self.params['lambda_psf'],
                          cont_map=True,
-                         in_af=None)
+                         in_af="")
 
         # run PETFF
         axetasks.petff(grism=self.grisim,
@@ -133,7 +133,7 @@ class aXeSpcExtr:
                          weights=self.params['weights'],
                          do_flux=True,
                          drzpath=False,
-                         in_af=None,
+                         in_af="",
                          opet=None,
                          bpet=None,
                          out_spc=None)
@@ -143,7 +143,7 @@ class aXeSpcExtr:
                         config=self.config,
                         sampling=self.params['sampling'],
                         drzpath=False,
-                        in_af=None,
+                        in_af="",
                         in_pet=None,
                         out_stp=None)
 

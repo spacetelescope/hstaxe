@@ -3,8 +3,8 @@
 from pyaxe.axesrc import axelowlev
 
 
-def test_axeprep():
-    """test the axeprep task"""
+def test_scalebck():
+    """test the back ground scaling task"""
 
     outfiles = ['ib6o23rsq_flt.fits',
                 'ib6o23ruq_flt.fits',

@@ -443,7 +443,7 @@ def gol2af(grism='',
            exclude=False,
            lambda_mark=None,
            dmag=None,
-           out_af=None,
+           out_af="",
            in_gol=None,
            silent=False):
     """Function for the aXe task GOL2AF"""
@@ -467,7 +467,7 @@ def gol2af(grism='',
 def af2pet(grism='',
            config='',
            back=False,
-           in_af=None,
+           in_af="",
            out_pet=None,
            silent=False):
     """Function for the aXe task AF2PET"""
@@ -484,14 +484,14 @@ def af2pet(grism='',
 
 def petcont(grism='',
             config='',
-            cont_model=None,
+            cont_model="",
             model_scale=None,
-            spec_models=None,
-            object_models=None,
-            inter_type=None,
+            spec_models="",
+            object_models="",
+            inter_type='linear',
             lambda_psf=None,
             cont_map=True,
-            in_af=None,
+            in_af="",
             no_pet=False,
             silent=False):
     """Function for the aXe task PETCONT"""
@@ -538,7 +538,7 @@ def backest(grism='',
             smooth_fwhm=None,
             old_bck=False,
             mask=False,
-            in_af=None,
+            in_af="",
             out_bck=None):
     """Function for the aXe task BACKEST"""
     # check for required environment variables
@@ -567,7 +567,7 @@ def pet2spc(grism='',
             weights=False,
             do_flux=True,
             drzpath=False,
-            in_af=None,
+            in_af="",
             opet=None,
             bpet=None,
             out_spc=None,
@@ -593,7 +593,7 @@ def stamps(grism='',
            config='',
            sampling='rectified',
            drzpath=False,
-           in_af=None,
+           in_af="",
            in_pet=None,
            out_stp=None,
            silent=False):
@@ -616,7 +616,7 @@ def drz2pet(inlist='',
             config='',
             opt_extr=False,
             back=False,
-            in_af=None,
+            in_af="",
             out_pet=None):
     """Function for the aXe task DRZ2PET"""
     # check for required environment variables

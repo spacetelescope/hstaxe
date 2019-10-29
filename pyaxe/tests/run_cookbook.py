@@ -1,3 +1,7 @@
+"""
+Run the commands from nor's axe cookbook example
+but setup for pyaxe
+"""
 import os
 from drizzlepac import astrodrizzle
 from pyaxe import axetasks
@@ -14,7 +18,7 @@ os.system("cp cookbook_data/G141/G141.lis G141/")
 os.chdir(cwd)
 os.chdir("G141")
 #!cat G141.lis
-astrodrizzle.AstroDrizzle("@G141.lis",output="G141",build=True)
+astrodrizzle.AstroDrizzle("@G141.lis", output="G141", build=True)
 os.chdir(cwd)
 
 # if os.path.isdir("F140W"):

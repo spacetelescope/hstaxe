@@ -7,7 +7,7 @@ from pyaxe.axeerror import aXeSIMError
 from pyaxe.axesrc.axeiol import InputObjectList
 
 class MagColList(InputObjectList):
-    """Subclass of the AsciiData class for lists with magnitude columns
+    """Subclass for lists with magnitude columns
 
     This class loads ASCII tables and identifies the magnitude colunmns,
     columns which have AB magnitudes as their content.
@@ -245,7 +245,7 @@ class MagColList(InputObjectList):
 
 
 class ModelSpectrumList(MagColList):
-    """Subclass of the AsciiData class for model spectra list"""
+    """Subclass for model spectra list"""
     def __init__(self, filename, mag_wavelength=None):
         """Initializes the class
 
@@ -314,7 +314,7 @@ class ModelSpectrumList(MagColList):
 
 
 class ModelObjectTable(MagColList):
-    """Subclass of the AsciiData class for model object table"""
+    """Subclass for model object table"""
     def __init__(self, filename, model_spectra=None, model_images=None):
         """
         Initializes the class

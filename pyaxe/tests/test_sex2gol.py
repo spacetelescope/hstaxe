@@ -47,12 +47,3 @@ def test_sex2gol(axe_inputs, global_data):
         assert os.path.isfile('OUTPUT/' + row['grisim'].split('.fits')[0] + '_2.cat')
 
 
-def test_radec_translation(axe_inputs):
-    """check whether an object location from the input
-       catalog translates correctly."""
-    from astropy.table import Table
-
-    for row in axe_inputs:
-        filename = 'OUTPUT/' + row['grisim'].split('.fits')[0] + '_2.cat'
-        assert os.path.isfile(filename)
-        catalog = Table.read(filename, format='ascii.sextractor')

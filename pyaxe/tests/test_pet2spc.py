@@ -4,8 +4,9 @@
 from pyaxe import axetasks
 
 
-def test_axecore():
-    """test the axecore task"""
+def test_pet2spc():
+    """test the pet2spc task which bins the contents of
+    the Pixle Extraction Table into a 1D spectrum"""
 
     # These are the files in the OUTPUT dir
     outfiles = ['ib6o23rsq_flt.fits']
@@ -20,9 +21,9 @@ def test_axecore():
                          adj_sens=True,
                          weights=False,
                          do_flux=True,
-                         drzpath=False,
-                         in_af=None,
-                         opet=None,
-                         bpet=None,
-                         out_spc=None,
+                         drzpath="",
+                         in_af="",
+                         opet="",
+                         bpet=False,
+                         out_spc="",
                          silent=False)

@@ -222,7 +222,7 @@ class aXe_AF2PET(TaskWrapper):
             self.command_list.append('-bck')
 
         # check for the in-AF name
-        if (('in_af' in params) and (params['in_af'] is not None)):
+        if (('in_af' in params) and (params['in_af'])):
             # put the name to the list
             self.command_list.append('-in_AF={0:s}'.format(params['in_af']))
 
@@ -369,7 +369,7 @@ class aXe_BE(TaskWrapper):
                                      .format(str(params['smooth_fwhm'])))
 
         # append the parameter 'af_file'
-        if (params['in_af'] is not None):
+        if (params['in_af']):
             self.command_list.append('-in_AF={0:s}'.format(params['in_af']))
 
         # append the parameter 'out_bck'
@@ -467,7 +467,7 @@ class aXe_DRZ2PET(TaskWrapper):
                                      .format(params['out_pet']))
 
         # append the parameter 'in_af'
-        if (('in_af' in params) and (params['in_af'] is not None)):
+        if (('in_af' in params) and (params['in_af'])):
             # put the name to the list
             self.command_list.append('-in_AF={0:s}'.format(params['in_af']))
 
@@ -793,7 +793,7 @@ class aXe_GOL2AF(TaskWrapper):
                                      .format(params['out_pet']))
 
         # append the parameter 'in_af'
-        if (('out_af' in params) and (params['out_af'] is not None)):
+        if (('out_af' in params) and (params['out_af'])):
             # put the name to the list
             self.command_list.append('-out_AF={0:s}'.format(params['out_af']))
 
@@ -983,7 +983,12 @@ class aXe_PET2SPC(TaskWrapper):
                  adj_sens=True,
                  weights=False,
                  do_flux=True,
-                 **params):
+                 drzpath="",
+                 in_af="",
+                 opet="",
+                 bpet="",
+                 use_bpet=False,
+                 out_spc=""):
         """Bin contents of a Pixel Extraction Table into 1D spectra.
 
         Parameters
@@ -1014,6 +1019,8 @@ class aXe_PET2SPC(TaskWrapper):
         bpet : str
             Name to use for the input background pixel extraction table file
             instead of the default.
+        use_bpet : bool
+            Put the ip_corr-flag to the list
         out_spc : str
             Name to use for the output file with the spectra instead of the
             default).
@@ -1074,48 +1081,48 @@ class aXe_PET2SPC(TaskWrapper):
         self.command_list.append(config)
 
         # check for the 'in_AF' name
-        if (('in_af' in params) and (params['in_af'] is not None)):
+        if in_af:
             # put the name to the list
-            self.command_list.append('-in_AF={0:s}'.format(params['in_af']))
+            self.command_list.append('-in_AF={0:s}'.format(in_af))
 
         # check for the 'OPET' name
-        if (params['opet'] is not None):
+        if opet:
             # put the name to the list
-            self.command_list.append('-OPET={0:s}'.format(params['opet']))
+            self.command_list.append('-OPET={0:s}'.format(opet))
 
         # check for the 'BPET' name
-        if (params['bpet'] is not None):
+        if bpet:
             # put the name to the list
-            self.command_list.append('-BPET={0:s}'.format(params['bpet']))
+            self.command_list.append('-BPET={0:s}'.format(bpet))
 
         # check for the 'out_SPC' name
-        if (params['out_spc'] is not None):
+        if out_spc:
             # put the name to the list
             self.command_list.append('-out_SPC={0:s}'
-                                     .format(params['out_spc']))
+                                     .format(out_spc))
 
         # append the flag 'drzpath'
-        if (params['drzpath']):
+        if drzpath:
             # put the ip_corr-flag to the list
             self.command_list.append('-drz')
 
         # append the flag 'noBPET'
-        if (not params['use_bpet']):
+        if not use_bpet:
             # put the ip_corr-flag to the list
             self.command_list.append('-noBPET')
 
         # append the flag 'opt_weights'
-        if (params['weights']):
+        if weights:
             # put the ip_corr-flag to the list
             self.command_list.append('-opt_weights')
 
         # append the flag 'noflux'
-        if (not params['do_flux']):
+        if not do_flux:
             # put the ip_corr-flag to the list
             self.command_list.append('-noflux')
 
         # append the flag 'smooth_conv'
-        if (('adj_sens' in params) and (params['adj_sens'])):
+        if adj_sens:
             # put the ip_corr-flag to the list
             self.command_list.append('-smooth_conv')
 
@@ -1124,13 +1131,15 @@ class aXe_PETCONT(TaskWrapper):
     """Wrapper around the aXe_PETCONT task"""
     def __init__(self, grism, config,
                  cont_model="gauss",
-                 model_scale=3.0,
+                 model_scale=None,
                  spec_models="",
                  object_models="",
-                 interp_type="linear",
-                 lambda_psf=0.,
+                 inter_type="linear",
+                 lambda_psf=None,
                  cont_map=False,
-                 in_af="",):
+                 no_pet=False,
+                 silent=False,
+                 in_af=""):
         """Check whether pixels in a PET are members of more than one beam
 
         This method is a simple initializer for the class. All
@@ -1202,69 +1211,69 @@ class aXe_PETCONT(TaskWrapper):
         self.command_list.append(config)
 
         # check for the 'in_AF' name
-        if (('in_af' in params) and (params['in_af'] is not None)):
+        if in_af:
             # put the name to the list
-            self.command_list.append('-in_AF={0:s}'.format(params['in_af']))
+            self.command_list.append('-in_AF={0:s}'.format(in_af))
 
         # check for the 'specmodels' name
-        if (params['spec_models'] is not None):
+        if spec_models:
             # put the name to the list
             self.command_list.append('-model_spectra={0:s}'
-                                     .format(params['spec_models']))
+                                     .format(spec_models))
 
         # check for the 'objectmodels' name
-        if (params['object_models'] is not None):
+        if object_models:
             # put the name to the list
             self.command_list.append('-model_images={0:s}'
-                                     .format(params['object_models']))
+                                     .format(object_models))
 
         # append the flag 'cont_model'
-        if (params['cont_model'] is 'gauss'):
+        if (cont_model == 'gauss'):
             # put the gauss-flag to the list
             self.command_list.append('-cont_model=1')
-        elif (params['cont_model'] is 'direct'):
+        elif (cont_model == 'direct'):
             # put the according number to the list
             self.command_list.append('-cont_model=2')
-        elif (params['cont_model'] is 'fluxcube'):
+        elif (cont_model == 'fluxcube'):
             # put the according number to the list
             self.command_list.append('-cont_model=3')
-        elif (params['cont_model'] is 'geometric'):
+        elif (cont_model == 'geometric'):
             # put the according number to the list
             self.command_list.append('-cont_model=4')
 
         # append the flag 'inter_type'
-        if (params['inter_type'] is 'linear'):
+        if (inter_type == 'linear'):
             # put the according number to the list
             self.command_list.append('-inter_type=1')
-        elif (params['inter_type'] is 'polynomial'):
+        elif (inter_type == 'polynomial'):
             # put the according number to the list
             self.command_list.append('-inter_type=2')
-        elif (params['inter_type'] is 'spline'):
+        elif (inter_type == 'spline'):
             # put the according number to the list
             self.command_list.append('-inter_type=3')
 
         # append the parameter 'model_scale'
-        if (params['model_scale'] is not None):
+        if (model_scale is not None):
             # put the flag to the list
             self.command_list.append('-model_scale={0:s}'
                                      .format(str(params['model_scale'])))
 
         # append the parameter 'lambda_psf'
-        if (params['lambda_psf'] is not None):
+        if (lambda_psf is not None):
             # put the number to the list
             self.command_list.append('-lambda_psf={0:s}'
-                                     .format(str(params['lambda_psf'])))
+                                     .format(str(lambda_psf)))
         else:
             self.command_list.append('-lambda_psf=800.0')
 
         # append the flag 'cont_map'
-        if (params['cont_map']):
+        if cont_map:
             # put the cont_map-flag to the list
             self.command_list.append('-cont_map')
 
         # append the flag 'no_pet' to indicate
         # that no PET exists
-        if (params['no_pet']):
+        if no_pet:
             # append the no-PET flagg
             self.command_list.append('-noPET')
 
@@ -1340,12 +1349,12 @@ class aXe_PETFF(TaskWrapper):
         self.command_list.append(config)
 
         # check for the 'FFNAME' name
-        if (params['ffname'] is not None):
+        if ffname:
             # put the name to the list
             self.command_list.append('-FFNAME={0:s}'.format(params['ffname']))
 
         # append the flag 'bck'
-        if (params['back']):
+        if back:
             # put the according flag to the list
             self.command_list.append('-bck')
 
@@ -1485,7 +1494,7 @@ class aXe_STAMPS(TaskWrapper):
                          config='G141.F140W.V4.31.conf',
                          sampling='drizzle',
                          drzpath=False,
-                         in_af=None,
+                         in_af='',
                          in_pet=None,
                          out_stp=None,
                          silent=False)
@@ -1501,7 +1510,7 @@ class aXe_STAMPS(TaskWrapper):
         self.command_list.append(config)
 
         # append the parameter 'in_af'
-        if (params['in_af'] is not None):
+        if (params['in_af']):
             # put the name to the list
             self.command_list.append('-in_AF={0:s}'.format(params['in_af']))
 
@@ -1558,7 +1567,7 @@ class aXe_TRACEFIT(TaskWrapper):
         self.command_list.append(config)
 
         # append the parameter 'in_af'
-        if (('in_af' in params) and (params['in_af'] is not None)):
+        if (('in_af' in params) and (params['in_af'])):
             # put the name to the list
             self.command_list.append('-in_AF={0:s}'.format(params['in_af']))
 

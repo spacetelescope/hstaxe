@@ -9,9 +9,7 @@ class InputObjectList(object):
     def __init__(self, filename):
         self.filename = filename
 
-        # Read and validate the catalog
-        # this expects an ascii file with atleast one header line
-        # a full sextrctor catalog is acceptable
+        # Read and validate the sextrator catalog
         self.catalog = Table.read(filename, format='ascii.sextractor')
 
         # check for the mandatory columns
@@ -29,15 +27,14 @@ class InputObjectList(object):
         # opt_colnames = ["MODSPEC", "MODIMAGE"]
 
         # go over all mandatory columns
-        cat_columns = self.catalog.colnames
         for colname in mand_colnames:
-            if colname not in cat_columns:
+            if colname not in self.catalog.colnames:
                 err_msg = ("Input Object List: {0:s} does not contain column "
                            "{1:s}".format(self.filename, colname))
                 raise aXeError(err_msg)
 
         # check for the MAG_AUTO-column
-        mauto_col = "MAG_AUTO" in cat_columns
+        mauto_col = "MAG_AUTO" in self.catalog.colnames
 
         # get the columns with an encoded wavelength
         wav_cols = self.search_mcols()

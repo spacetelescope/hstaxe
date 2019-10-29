@@ -47,12 +47,10 @@ class aXePrepArator:
     background subtraction:  Provided that an Input Object List is given for
         the grism image, axeprep uses the tasks sex2gol, gol2af and backest
         to mark the beam areas on the grism image as well as on the master
-        background image. Using the IRAF task imstat with 3 cycles of
-        clipping pixels with values greater than 3 sigma, the median pixel
-        values are derived for the unmarked pixels on both the grism image
-        and on the master background image. The master background, scaled to
-        the level of the grism image, is finally subtracted from the grism
-        image.
+        background image. The median pixel values are derived for the unmarked
+        pixels on both the grism image and on the master background image. 
+        The master background, scaled to the level of the grism image, is
+        finally subtracted from the grism image.
 
     exposure time normalization:
         The input file is normalized by the exposure time to transform the
@@ -159,7 +157,7 @@ class aXePrepArator:
                          smooth_fwhm=None,
                          old_bck=False,
                          mask=True,
-                         in_af=None,
+                         in_af="",
                          out_bck=None)
 
     def _subtract_sky(self, ext_info, flag=-1.0e10):
