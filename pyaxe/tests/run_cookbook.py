@@ -3,15 +3,16 @@ Run the commands from nor's axe cookbook example
 but setup for pyaxe
 """
 import os
+import shutil
 from drizzlepac import astrodrizzle
 from pyaxe import axetasks
 
 cwd = os.getcwd()
 print("We are in %s" % (cwd))
 os.chdir(cwd)
-# if os.path.isdir("G141"):
-#     shutil.rmtree("G141")
-#os.mkdir("G141")
+if os.path.isdir("G141"):
+    shutil.rmtree("G141")
+os.mkdir("G141")
 
 os.system("cp cookbook_data/G141/*flt.fits G141/")
 os.system("cp cookbook_data/G141/G141.lis G141/")
@@ -21,10 +22,10 @@ os.chdir("G141")
 astrodrizzle.AstroDrizzle("@G141.lis", output="G141", build=True)
 os.chdir(cwd)
 
-# if os.path.isdir("F140W"):
-#     shutil.rmtree("F140W")
+if os.path.isdir("F140W"):
+    shutil.rmtree("F140W")
 
-#os.mkdir("F140W")
+os.mkdir("F140W")
 
 os.system("cp cookbook_data/F140W/*flt.fits F140W/")
 os.system("cp cookbook_data/F140W/F140W.lis F140W/")
@@ -43,9 +44,9 @@ os.system("cp ../cookbook_data/cookbook.cat .")
 
 os.chdir(cwd)
 
-# if os.path.isdir("CONF"):
-#     shutil.rmtree("CONF")
-#os.mkdir("CONF")
+if os.path.isdir("CONF"):
+    shutil.rmtree("CONF")
+os.mkdir("CONF")
 
 os.system("cp cookbook_data/CONF/* CONF/")
 

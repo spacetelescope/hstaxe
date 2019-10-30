@@ -1,9 +1,0 @@
-grism,s,a,"",,,"Name of grism image"
-config,s,a,"",,,"Configuration filename for instrument"
-in_sex,s,a,"",,,"Input object catalog name (non-default)"
-use_direct,b,h,yes,,,"Use direct image?"
-direct,s,h,"",,,"Name of direct image"
-dir_hdu,i,h,,,,"Extension from direct image to get CD matrix"
-spec_hdu,i,h,,,,"Extension from grism image to get CD matrix"
-out_sex,s,h,"",,,"Output object catalog name (non-default)"
-mode,s,h,"al",,,

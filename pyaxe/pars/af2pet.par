@@ -1,6 +1,0 @@
-grism,s,a,"",,,"Name of grism image"
-config,s,a,"",,,"Configuration filename for instrument"
-back,b,h,no,,,"Generate a background PET?"
-in_af,s,h,"",,,"User-specified filename for input AF"
-out_pet,s,h,"",,,"User-specified filename for output PET"
-mode,s,h,"al",,,

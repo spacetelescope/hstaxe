@@ -1,5 +1,0 @@
-grism,s,a,"",,,"Name of grism image" 
-config,s,a,"",,,"Configuration filename for instrument" 
-back,b,h,no,,,"Apply FF to background Pixel Extraction Table (BPET)?"
-ffname,s,h,"",,,"Flat field cube file to use instead of default"
-mode,s,h,"al",,,

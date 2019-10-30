@@ -1,6 +1,0 @@
-grism,s,a,"",,,"Name of grism image" 
-config,s,a,"",,,"Configuration filename for instrument" 
-beam_ref,s,a,"",,,"The beam reference to compute the wavelength" 
-xval,i,a,,,,"x-coordinate of the pixel"
-yval,i,a,,,,"y-coordinate of the pixel"
-mode,s,h,"al",,,

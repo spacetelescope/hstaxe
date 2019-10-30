@@ -1,7 +1,0 @@
-inlist,s,a,"",,,"Name of the image list" 
-config,s,a,"",,,"Configuration filename for instrument"
-opt_extr,b,h,no,,,"Using optimal extraction?"
-back,b,h,no,,,"Generate a background PET using a BAF file?"
-in_af,s,h,"",,,"Input AF/BAF filename (non standard)" 
-out_pet,s,h,"",,,"Output PET/BPET filename (non standard)" 
-mode,s,h,"al",,,

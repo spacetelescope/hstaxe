@@ -1,5 +1,0 @@
-inlist,s,a,"",,,"Name of image list" 
-configs,s,a,"",,,"Configuration filenames for the CCD's" 
-opt_extr,b,h,no,,,"Use optimal extraction in aXedrizzle?"
-back,b,h,no,,,"Generate ALSO a background DPP file using a PET?"
-mode,s,h,"al",,,

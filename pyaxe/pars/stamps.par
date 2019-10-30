@@ -1,8 +1,0 @@
-grism,s,a,"",,,"Name of grism image" 
-config,s,a,"",,,"Configuration filename for instrument" 
-sampling,s,h,drizzle,"drizzle|rectified|trace",,"Which sampling type?"
-drzpath,b,h,no,,,"Use AXE_DRIZZLE_PATH for IN/Output?"
-in_af,s,h,"",,,"Input AF filename (non standard)"
-in_pet,s,h,"",,,"Input PET filename (non standard)"
-out_stp,s,h,"",,,"Output STP filename (non standard)"
-mode,s,h,"al",,,

@@ -1,5 +1,0 @@
-inlist,s,a,"",,,"List of template spectra in ascii format" 
-incat,s,a,"",,,"Catalogue with flux and redshift values" 
-tpass_flux,s,a,"",,,"Total passband for flux scaling" 
-model_spectra,s,h,"",,,"Name of output multi-extension fits table" 
-mode,s,h,"al",,,

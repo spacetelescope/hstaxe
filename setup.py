@@ -1,32 +1,55 @@
 #!/usr/bin/env python
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+#
+# install cfitsio, gsl, wcstools, astropy, drizzlepac
+#
+#
 import sys
 import os
 
-from configparser import ConfigParser
+
 from distutils.command.clean import clean
 from setuptools import find_packages, Command, setup
 from setuptools.command.test import test as TestCommand
 from setuptools.command.install import install
 from subprocess import check_call, CalledProcessError
 
-if (sys.version_info < (3, 3)):
-    sys.stderr.write("ERROR: pyaxe requires Python 3.3 or later\n")
+if (sys.version_info < (3, 5)):
+    sys.stderr.write("ERROR: pyaxe requires Python 3.5 or later\n")
     sys.exit(1)
 
-AXELIB_DIR = "cextern/aXe_c_code/"
+
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
+
+conf = ConfigParser()
+conf.read(['setup.cfg'])
+
+metadata = dict(conf.items('metadata'))
+
+
+AXELIB_DIR = "cextern/"
 CONF_H_NAME = os.path.join(AXELIB_DIR, "config.h")
 
 
 # hack building the sphinx docs with C source
 try:
-    import sphinx
+    from sphinx.cmd.build import build_main
     from sphinx.setup_command import BuildDoc
 
     class BuildSphinx(BuildDoc):
         """Build Sphinx documentation after compiling C source files"""
 
         description = 'Build Sphinx documentation with C extensions'
+        user_options = BuildDoc.user_options[:]
+        user_options.append(
+            ('keep-going', 'k',
+             'Parses the sphinx output and sets the return code to 1 if there '
+             'are any warnings. Note that this will cause the sphinx log to '
+             'only update when it completes, rather than continuously as is '
+             'normally the case.'))
 
         def initialize_options(self):
             BuildDoc.initialize_options(self)
@@ -38,8 +61,9 @@ try:
             build_cmd = self.reinitialize_command('build_ext')
             build_cmd.inplace = 1
             self.run_command('build_ext')
-            sphinx.build_main(['setup.py', '-b', 'html',
-                               './docs', './docs/_build/html'])
+            retcode = build_main(['-W', '--keep-going', '-b', 'html', './docs', './docs/_build/html'])
+            if retcode != 0:
+                sys.exit(retcode)
 
 except ImportError:
     class BuildSphinx(Command):
@@ -180,39 +204,7 @@ class BuildExtWithConfigure(install):
 
         install.run(self)
 
-# Get some values from the setup.cfg
-conf = ConfigParser()
-conf.read(['setup.cfg'])
-metadata = dict(conf.items('metadata'))
-PACKAGENAME = metadata.get('package_name', 'pyaxe')
-CLASSIFIER = metadata.get('classifier', 'Programming Language :: Python :: 3')
-DESCRIPTION = metadata.get('description', 'aXe - spectral extraction for HST')
-LONG_DESCRIPTION = metadata.get('long_description',
-                                'aXe spectral extraction for HST minus the IRAF')
-AUTHOR = metadata.get('author', 'STScI')
-AUTHOR_EMAIL = metadata.get('author_email', 'https://hsthelp.stsci.edu')
-LICENSE = metadata.get('license', '3-Clause BSD')
-URL = metadata.get('url', 'http://axe-info.stsci.edu')
 
-
-if os.path.exists('relic'):
-    sys.path.insert(1, 'relic')
-    import relic.release
-else:
-    try:
-        import relic.release
-    except ImportError:
-        try:
-            check_call(['git', 'clone',
-                        'https://github.com/spacetelescope/relic.git'])
-            sys.path.insert(1, 'relic')
-            import relic.release
-        except CalledProcessError as e:
-            print(e)
-            exit(1)
-
-version = relic.release.get_info()
-relic.release.write_template(version, PACKAGENAME)
 
 
 # Note that requires and provides should not be included in the call to
@@ -220,15 +212,19 @@ relic.release.write_template(version, PACKAGENAME)
 # https://groups.google.com/forum/#!topic/astropy-dev/urYO8ckB2uM
 
 setup(
-    name=PACKAGENAME,
-    version=version.pep386,
-    description=DESCRIPTION,
-    long_description=LONG_DESCRIPTION,
-    author=AUTHOR,
-    author_email=AUTHOR_EMAIL,
-    url=URL,
-    license=LICENSE,
-    classifiers=CLASSIFIER,
+    name=metadata.get('package_name', 'imexam'),
+    provides=[metadata.get('package_name', 'imexam')],
+    description=metadata.get('description'),
+    long_description=metadata.get('long_description'),
+    author=metadata.get('author'),
+    author_email=metadata.get('author_email'),
+    url=metadata.get('url'),
+    license=metadata.get('license'),
+    classifiers=metadata.get('classifier'),
+    zip_safe=False,
+    use_scm_version=True,
+    use_2to3=False,
+    setup_requires=['setuptools_scm'],
     install_requires=['numpy',
                       'astropy',
                       'wcstools',
@@ -249,4 +245,5 @@ setup(
         'install': BuildExtWithConfigure,
         'clean': MyClean,
     },
+    package_dir={'': '.'},
 )

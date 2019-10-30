@@ -1,5 +1,0 @@
-mdrizzle_image,s,a,"",,,"drizzled image"
-input_cat,s,a,"",,,"Input catalogue" 
-dimension_info,s,h,"0,0,0,0",,,"Additional pixels on the left,right,bottom,top" 
-useMdriz,b,h,no,,,"Use multidrizzle header info for coord transform (False for Astrodrizzle"
-mode,s,h,"al",,,

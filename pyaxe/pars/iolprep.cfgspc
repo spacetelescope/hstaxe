@@ -1,5 +1,0 @@
-_task_name_ = string_kw(default="iolprep")
-
-drizzle_image = string_kw(default="", comment="Astrodrizzledimage")
-input_cat     = string_kw(default="", comment="Master Catalogue")
-dim_info      = string_kw(default="0,0,0,0", comment="dimension information")

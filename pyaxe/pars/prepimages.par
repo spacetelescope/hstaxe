@@ -1,3 +1,0 @@
-inlist,s,a,"",,,"List of template images in fits format" 
-model_images,s,h,"",,,"Name of multi-extension output fits image" 
-mode,s,h,"al",,,

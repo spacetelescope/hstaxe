@@ -1,6 +1,5 @@
 """A Place to store global variables and constants required to
-configure axe modules. Use the teal interface to ConfigObj to return a
-config object cfgobj=teal.teal('axe',loadonly=True)
+configure axe modules.
 
 """
 import os

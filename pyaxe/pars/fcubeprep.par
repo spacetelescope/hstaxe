@@ -1,8 +1,0 @@
-grism_image,s,a,"",,,"drizzled grism image"
-segm_image,s,a,"",,,"Segmentation image" 
-filter_info,s,a,"",,,"Filter image,lambda,zeropoint or listfile" 
-AB_zero,b,h,yes,,,"Zeropoints in the AB magnitude system?" 
-dimension_info,s,h,"0,0,0,0",,,"Additional columns on the left,right,bottom,top" 
-interpol,s,h,poly5,"nearest|linear|poly3|poly5",,"Interpolation method for fiter images?"
-useMdriz,b,h,no,,,"Use multidrizzle header ? False for Astrodrizzle"
-mode,s,h,"al",,,
