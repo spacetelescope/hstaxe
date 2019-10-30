@@ -146,6 +146,7 @@ class MyClean(Command):
                     "aXe_NICBACK",
                     "aXe_TEST",
                     "aXe_DIRIMAGE",
+                    "aXe_SEX2GOL"
                     "aXe_SCALEBCK"]
 
         try:
