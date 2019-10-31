@@ -63,5 +63,5 @@ def test_axecore(axe_inputs, global_data):
                                         smooth_fwhm=None,
                                         spectr=True,
                                         adj_sens=True,
-                                        sampling='drzizzle')
+                                        sampling='drizzle')
         runner.run()
