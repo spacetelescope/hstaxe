@@ -26,7 +26,7 @@ def test_gol2af():
                         config='G141.F140W.V4.31.conf',
                         mfwhm=3.,
                         back=False,
-                        orient=False,
+                        orient=True,
                         slitless_geom=True,
                         exclude=False,
                         lambda_mark=4000,

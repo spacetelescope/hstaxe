@@ -123,12 +123,11 @@ class ProjectionList:
 
         hard_angle : bool
             This will always set the extraction angle to 90degrees.
-            This is what is expected to be used by most parties
 
         hard_angle_value : float
             If a specified angle for extraction is preferred then
             this is the value to use and will replace THETA_IMAGE
-            and THETA_WORLD in the output catalog. It's currently specified in
+            in the output catalog. It's currently specified in
             degrees, and is converted appropriately for whatever
             units are used in the catalog itself.
 
@@ -142,10 +141,6 @@ class ProjectionList:
         displayed position and angles calculated from the catalog entry. That
         functionality has been moved to memory since awtran is no longer in use.
         The catalog is read directly.
-
-        Nor Pirzkal has recommended setting the angle for extraction to 90 all the time
-        as that is what most users will/are using and the calculation as axe originally
-        was doing it was never quite right to begin with.
         """
 
         if not drizzle_image:
@@ -202,16 +197,16 @@ class ProjectionList:
 
         output_catalog = deepcopy(catalog)
         for row in range(len(catalog)-1, -1, -1):
-            x = dither_image_x[row]
-            y = dither_image_y[row]
+            x = trans_x[row]
+            y = trans_y[row]
             # check whether the object position is
             # in the range to be stored
             if (( self.dim_info[0] <= x <= self.dim_info[1])  and
                 ( self.dim_info[2] <= y <= self.dim_info[3]) ):
 
                 # compute the new object angle
-                dx = x - trans_x[row]
-                dy = y - trans_y[row]
+                dx = xcat[row] - x
+                dy = ycat[row] - y
                 angle = math.atan2(dy, dx)  # compute local angle change
 
                 # return to degrees for catalog if necessary
