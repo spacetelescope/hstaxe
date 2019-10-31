@@ -193,7 +193,7 @@ def axecore(inlist='',
             spectr=True,
             adj_sens=True,
             weights=False,
-            sampling='drzizzle'):
+            sampling='drizzle'):
     """Convenience function for the aXe task AXECORE"""
     # only temporarily here ????
     axe_setup()

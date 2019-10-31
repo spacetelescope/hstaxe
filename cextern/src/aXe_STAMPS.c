@@ -256,8 +256,8 @@ main (int argc, char *argv[])
 	      drzstmp = drizzled_stamp_img (PET,oblist[objindex]->beams[beamID].width,
 					    oblist[objindex]->beams[beamID].orient,  dim);
 
-	      // does this make sense
-	      interpolate_over_NaN (drzstmp->counts);
+	      // does this make sense -> no, STP files are only for validation
+	      // interpolate_over_NaN (drzstmp->counts);
 
 	      // give the extension name and store the counts
 	      sprintf (label, "BEAM_%d%c",oblist[objindex]->ID, BEAM (oblist[objindex]->beams[beamID].ID));
