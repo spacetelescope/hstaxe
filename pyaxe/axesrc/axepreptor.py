@@ -72,8 +72,7 @@ class aXePrepArator:
                        dmag=None,
                        **params):
         if grisim:
-            shutil.copy(config_util.getDATA(grisim), config_util.getOUTPUT(grisim))
-            self.grisim = config_util.getOUTPUT(grisim)
+            self.grisim = config_util.getDATA(grisim)
         else:
             raise ValueError("No grisim image specified for axeprep")
         self.objcat = config_util.getDATA(objcat)
