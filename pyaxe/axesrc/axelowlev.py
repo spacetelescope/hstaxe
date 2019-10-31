@@ -703,7 +703,7 @@ class aXe_GOL2AF(TaskWrapper):
 
         The task defines how exactly the spectra will be extracted by the
         tasks pet2spc or axedrizzle in later stages of the aXe reduction. With
-        'orient="yes"' the cross-dispersion direction follows the anlge
+        'orient="yes"' the cross-dispersion direction follows the angle
         "THETA_IMAGE" specified for each image in the Input Object List. The
         parameter 'slitless_geom="yes"' automatically adjusts the
         cross-dispersion angle such that the extracted signal becomes maximal.

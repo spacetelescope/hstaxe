@@ -100,7 +100,7 @@ class ProjectionList:
         in_img.close()
         del in_head
 
-    def make_grismcat(self, drizzle_image="", catalog=None, hard_angle=True, hard_angle_value=90.):
+    def make_grismcat(self, drizzle_image="", catalog=None, hard_angle=False, hard_angle_value=90.):
 
         """Make the grism catalog.
 
@@ -163,7 +163,6 @@ class ProjectionList:
         # this must go through the wcs of the mosaic image
         # and then through the wcs for the individual image
         print("Converting coordinates using wcs from grism image {0}\n".format(self.filename))
-
         trad = catalog['THETA_IMAGE']
         xcat = catalog['X_IMAGE']
         ycat = catalog['Y_IMAGE']
@@ -190,7 +189,7 @@ class ProjectionList:
 
         # translate the catalog (x, y) to (ra, dec)
         mosaic_image_wcs = HSTWCS(drizzle_image, ext=1)
-        mosaic_image_ra, mosaic_image_dec = mosaic_image_wcs.all_pix2world(shifted_x,
+        mosaic_image_ra, mosaic_image_dec = mosaic_image_wcs.wcs_pix2world(shifted_x,
                                                                            shifted_y,
                                                                            1)
         # compute  the location in the dithered image using the shifted coords
@@ -198,7 +197,7 @@ class ProjectionList:
         dither_image_x, dither_image_y = dither_image_wcs.all_world2pix(mosaic_image_ra,
                                                                         mosaic_image_dec,
                                                                         1)
-        trans_ra, trans_dec = mosaic_image_wcs.all_pix2world(xcat, ycat, 1)
+        trans_ra, trans_dec = mosaic_image_wcs.wcs_pix2world(xcat, ycat, 1)
         trans_x, trans_y = dither_image_wcs.all_world2pix(trans_ra, trans_dec, 1)
 
         output_catalog = deepcopy(catalog)
@@ -211,8 +210,8 @@ class ProjectionList:
                 ( self.dim_info[2] <= y <= self.dim_info[3]) ):
 
                 # compute the new object angle
-                dx = x - xcat[row]
-                dy = y - ycat[row]
+                dx = x - trans_x[row]
+                dy = y - trans_y[row]
                 angle = math.atan2(dy, dx)  # compute local angle change
 
                 # return to degrees for catalog if necessary

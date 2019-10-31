@@ -27,7 +27,7 @@ def global_data():
            "output_directory": "F140W/",
            "output_roots": ["ib6o23rtq", "ib6o23rwq", "ib6o23rzq", "ib6o23s2q"],
            "output_suffix": ["_flt.fits", "_flt_1.cat"],
-           "reference_suffix": "_reference.",
+           "reference_suffix": ".reference",
            }
 
 
@@ -59,7 +59,7 @@ def test_catalog_values(global_data):
         catalog = rootname + global_data["output_suffix"][1]
         print("Current catalog: {}".format(catalog))
         current_catalog = Table.read(catalog, format='ascii.sextractor')
-        reference = rootname + global_data["output_suffix"][1].split(".cat")[0] + global_data["reference_suffix"] + "cat"
+        reference = rootname + global_data["output_suffix"][1]+ global_data["reference_suffix"]
         print("reference catalog: {}".format(reference))
         assert os.path.isfile(reference)
         reference_catalog = Table.read(reference, format='ascii.sextractor')
@@ -72,8 +72,7 @@ def test_catalog_values(global_data):
             compare = current_catalog[np.where(current_catalog["NUMBER"] == number)]
             if len(compare) == 0:
                 print(f"\nMissing object! {number}\nreference has: {ref}\n")
-            if (compare["THETA_IMAGE"] != 90.): # hard coded theta should be 90.
-                print(compare["THETA_IMAGE"], "\t", compare["NUMBER"])
+            assert_allclose(ref["THETA_IMAGE"], compare["THETA_IMAGE"], atol=1., rtol=1.)
             assert_allclose(ref["X_IMAGE"], compare["X_IMAGE"], atol=1e-3, rtol=1e-3)
             assert_allclose(ref["Y_IMAGE"], compare["Y_IMAGE"], atol=1e-3, rtol=1e-3)
             assert (ref["A_IMAGE"] == compare["A_IMAGE"])
