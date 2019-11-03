@@ -1,13 +1,17 @@
 import os
+import logging
 from astropy.io import fits
 
 from pyaxe.axeerror import aXeError
-from pyaxe import config as config_utils
+import pyaxe.config as config_util
 
-from . import axeinputs
 from . import configfile
 from . import axelowlev
+from . import axeinputs
 
+
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class DPPdumps(object):
     """Class to intitially handle all DPP files"""
@@ -26,18 +30,18 @@ class DPPdumps(object):
         DPP_list = []
 
         # generate the input list for aXe
-        axe_inputs = axeinputs.aXeInputList(inima, confterm)
+        axe_inputs = axeinputs.aXeInput(inima, confterm)
 
         # go over the list of all inputs
         for an_input in axe_inputs:
             # load the configuration file
-            conf = configfile.ConfigFile(axeutils.getCONF(an_input['CONFIG']))
+            conf = configfile.ConfigFile(config_util.getCONF(an_input['config']))
 
             # get the image extensions
-            ext_info = axeutils.get_ext_info(axeutils.getDATA(an_input['GRISIM']), conf)
+            ext_info = config_util.get_ext_info(config_util.getDATA(an_input['grisim']), conf)
 
             # get the name of all axe files
-            axe_names = axeutils.get_axe_names(an_input['GRISIM'], ext_info)
+            axe_names = config_util.get_axe_names(an_input['grisim'], ext_info)
 
             # if requested,
             # append the background DPP file
@@ -52,10 +56,10 @@ class DPPdumps(object):
 
     def _check_files(self, dpp_list):
         """check for the existence of all DPP's"""
-        # go over all DPP files
+
         for one_dpp in dpp_list:
             # make the full path name
-            full_path = axeutils.getOUTPUT(one_dpp)
+            full_path = config_util.getOUTPUT(one_dpp)
 
             # check for existence
             if not os.path.isfile(full_path):
@@ -70,7 +74,7 @@ class DPPdumps(object):
         contam_model = None
 
         # open the fits and get the header
-        fits_img = fits.open(axeutils.getOUTPUT(self.dpp_list[0]), 'readonly')
+        fits_img = fits.open(config_util.getOUTPUT(self.dpp_list[0]), 'readonly')
         fits_head = fits_img[0].header
 
         # transfer value, if possible
@@ -96,15 +100,15 @@ class DPPdumps(object):
         contam_model = self._get_contam_model()
 
         # check whether the model is quantitative or not
-        isquantcont = axeutils.is_quant_contam(contam_model)
+        isquantcont = config_util.is_quant_contam(contam_model)
 
         # return the flag
         return (contam_model, isquantcont)
 
     def filet_dpp(self, opt_extr=False):
         """Dump all DPP files"""
-        # get the drizzle tmp directory
-        drztmp = axeutils.getDRZTMP()
+ 
+        drztmp = config_util.getDRZTMP()
 
         # go over all DPP files
         for one_dpp in self.dpp_list:

@@ -1,11 +1,17 @@
 import sys
 import shutil
+import logging
+
 from astropy.io import fits
 
 from pyaxe import config as config_util
 
+from . import axetasks
 from .axeerror import aXeSIMError
 
+
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 """
 The following deal with axe simulations
@@ -70,7 +76,7 @@ class DispImator(object):
         """
 
         # run SEX2GOL
-        print('Running task "sex2gol" ...', end=' ')
+        _log.info('Running task "sex2gol" ...', end=' ')
         sys.stdout.flush()
         axetasks.sex2gol(grism=self.grismname,
                          config=self.configfile,
@@ -78,19 +84,19 @@ class DispImator(object):
                          use_direct=True,
                          direct=self.dirname,
                          silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
         # run GOL2AF
-        print('Running task "gol2af"  ...')
+        _log.info('Running task "gol2af"  ...')
         axetasks.gol2af(grism=self.grismname,
                         config=self.configfile,
                         orient=1,
                         slitless_geom=1,
                         silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
         # run PETCONT
-        print('Running task "petcont" ...', end=' ')
+        _log.info('Running task "petcont" ...', end=' ')
         sys.stdout.flush()
         axetasks.petcont(grism=self.grismname,
                          config=self.configfile,
@@ -100,7 +106,7 @@ class DispImator(object):
                          lambda_psf=self.lambda_psf,
                          no_pet=True,
                          silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
     def mopup(self):
         """Deleting GOL and OAF files"""
@@ -163,25 +169,25 @@ class DirImator(object):
             for silent mode
         """
         # run SEX2GOL
-        print('Running task "sex2gol"  ...', end=' ')
+        _log.info('Running task "sex2gol"  ...', end=' ')
         sys.stdout.flush()
         axetasks.sex2gol(grism=self.dirname,
                          config=self.configfile,
                          in_sex=self.iolname,
                          use_direct=False,
                          silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
         # run GOL2AF
-        print('Running task "gol2af"   ...')
+        _log.info('Running task "gol2af"   ...')
         sys.stdout.flush()
         axetasks.gol2af(grism=self.dirname,
                         config=self.configfile,
                         silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
         # run DIRIMAGE
-        print('Running task "dirimage" ...')
+        _log.info('Running task "dirimage" ...')
         sys.stdout.flush()
         axetasks.axedirim(dirname=self.dirname,
                           config=self.configfile,
@@ -190,7 +196,7 @@ class DirImator(object):
                           model_images=self.model_images,
                           tel_area=self.tel_area,
                           silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
     def mopup(self):
         """Deleting GOL and OAF files"""
@@ -322,7 +328,7 @@ class DummyExtractor(object):
         to AXE_IMAGE_PATH and subtracting the background on this copy.
         """
         # give brief feedback
-        print('Dummy extraction on the dispersed image:')
+        _log.info('Dummy extraction on the dispersed image:')
         sys.stdout.flush()
 
         # get a random filenames
@@ -393,7 +399,7 @@ class DummyExtractor(object):
             boolean for silent mode
         """
         # run SEX2GOL
-        print('Running task "sex2gol" ...', end=' ')
+        _log.info('Running task "sex2gol" ...', end=' ')
         sys.stdout.flush()
         axetasks.sex2gol(grism=self.dispersed_image,
                          config=self.configfile,
@@ -401,10 +407,10 @@ class DummyExtractor(object):
                          use_direct=True,
                          direct=self.direct_image,
                          silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
         # run GOL2AF
-        print('Running task "gol2af"  ...', end=' ')
+        _log.info('Running task "gol2af"  ...', end=' ')
         sys.stdout.flush()
         axetasks.gol2af(grism=self.dispersed_image,
                         config=self.configfile,
@@ -413,15 +419,15 @@ class DummyExtractor(object):
                         slitless_geom=self.slitless_geom,
                         lambda_mark=self.lambda_mark,
                         ilent=silent)
-        print(' Done')
+        _log.info(' Done')
 
         # run AF2PET
-        print('Running task "af2pet"  ...', end=' ')
+        _log.info('Running task "af2pet"  ...', end=' ')
         sys.stdout.flush()
         axetasks.af2pet(grism=self.dispersed_image,
                         config=self.configfile,
                         silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
         # -----------------------------------------------
         # set the contamination keyword
@@ -436,19 +442,19 @@ class DummyExtractor(object):
         # -----------------------------------------------
 
         # run PET2SPC
-        print('Running task "pet2spc" ...', end=' ')
+        _log.info('Running task "pet2spc" ...', end=' ')
         sys.stdout.flush()
         axetasks.pet2spc(grism=self.dispersed_image,
                          config=self.configfile,
                          adj_sens=self.adj_sens,
                          silent=silent)
-        print(' Done')
+        _log.info(' Done')
 
         # run STAMPS
-        print('Running task "stamps"  ...', end=' ')
+        _log.info('Running task "stamps"  ...', end=' ')
         sys.stdout.flush()
         axetasks.stamps(grism=self.dispersed_image,
                         config=self.configfile,
                         sampling='rectified',
                         silent=silent)
-        print(' Done')
+        _log.info(' Done')

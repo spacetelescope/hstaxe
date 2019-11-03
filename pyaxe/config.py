@@ -4,21 +4,33 @@ configure axe modules.
 """
 import os
 import shutil
+
 from astropy.io import fits
 from pyaxe.axeerror import aXeError
+from pyaxe.utils import set_logging
+
+_log = set_logging(filename='axe_output.log')  # defaults to INFO
 
 # defaults
 __user_paths = {"AXE_IMAGE_PATH": 'DATA',
                 "AXE_OUTPUT_PATH": 'OUTPUT',
                 "AXE_CONFIG_PATH": 'CONF',
-                "AXE_DRIZZLE_PATH": 'DRIZZLE'}
+                "AXE_DRIZZLE_PATH": 'DRIZZLE',
+                "AXE_SIMDATA_PATH": 'SIMDATA',
+                "AXE_OUTSIM_PATH": 'OUTSIM',
+                }
 
 __AXE_DRZTMP_SUB = 'tmp'
 __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
                                 __AXE_DRZTMP_SUB)
+__user_paths['AXE_DRZTMP_LOC'] = __AXE_DRZTMP_LOC
+
 
 # notification of python only axe
-print("Welcome to pyaxe! This version is independent of IRAF and PyRAF.")
+welcome_string="* Welcome to pyaxe! This version is independent of IRAF and PyRAF. *"
+print(f"\n{len(welcome_string)*'*'}")
+print(welcome_string)
+print(f"{len(welcome_string)*'*'}\n")
 
 
 def set_defaults():
@@ -45,9 +57,6 @@ def set_defaults():
                     raise OSError("Problem creating {0:s} -> {1:s}"
                                   .format(name, __user_paths[name]))
             os.environ[name] = __user_paths[name]
-
-    __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
-                                    __AXE_DRZTMP_SUB)
 
 
 def check_axe_dirs():
@@ -198,10 +207,19 @@ def getDRZTMP(name=None):
     else:
         return os.path.join(__AXE_DRZTMP_LOC, name)
 
-
 def get_ext_info(image, conf):
-    """Determines the extension information on an image."""
+    """Determines the extension information on an image.
 
+    Parameters
+    ----------
+    conf: configfile.ConfigFile
+
+    Returns
+    -------
+    ext_info: int
+        Extension information
+
+    """
     # initialize a dictionary
     ext_info = {}
 
@@ -215,7 +233,7 @@ def get_ext_info(image, conf):
     with fits.open(image, 'readonly') as fits_image:
 
         # check the keyword for string-like
-        if isstringlike(conf.get_gvalue('SCIENCE_EXT')):
+        if isinstance(conf.get_gvalue('SCIENCE_EXT'), str):
             # set the extension name
             ext_info['ext_name'] = conf.get_gvalue('SCIENCE_EXT')
 

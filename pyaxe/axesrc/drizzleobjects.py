@@ -1,8 +1,11 @@
 import os
 import re
+import sys
 import math
 import numpy as np
 import shutil
+import logging
+from copy import deepcopy
 
 from astropy.io import fits
 from drizzlepac import astrodrizzle
@@ -12,6 +15,8 @@ from pyaxe.axeerror import aXeError
 
 from . import configfile
 
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class DrizzleParams(dict):
     """Class to store the drizzle parameters"""
@@ -35,6 +40,7 @@ class DrizzleParams(dict):
         dict.__init__(self, drizzle_params)
 
         self['CONF'] = conflist[0]
+        print(drizzle_params)
 
     def _set_default(self, drizzle_dict, config, keyword, default_val):
         """Provide defaults if a keyword is not given"""
@@ -98,8 +104,7 @@ class DrizzleParams(dict):
 
         # check for valid drizzle kernel
         if drizzle_params['KERNEL'] not in kernels:
-            err_msg = ("The term {0:s} is not a valid drizzle kernel!"
-                       .format(drizzle_params['KERNEL']))
+            err_msg = (f"The term {drizzle_params['KERNEL']} is not a valid drizzle kernel!")
             raise aXeError(err_msg)
 
         # return the dictionary
@@ -192,8 +197,7 @@ class DrizzleObjectList:
         # check whether the directory exists
         if not os.path.isdir(drztmp_dir):
             # complain and out if not
-            err_msg = ("The specified path: {0:s} doens't exist or isn't a "
-                       "directory!".format(drztmp_dir))
+            err_msg = (f"The specified path: {drztmp_dir} doens't exist or isn't a directory!")
             raise aXeError(err_msg)
 
         # list all content in the tmp-directory
@@ -387,27 +391,22 @@ class DrizzleObjectList:
         # delete object with ZERO members
         del_indices.sort(reverse=True)
         for one_index in del_indices:
-            print("Deleting empty object: {0:s}!"
-                  .format(str(self.drizzle_objects[one_index].objID)))
+            _log.info(f"Deleting empty object: {str(self.drizzle_objects[one_index].objID)}!")
             del self.drizzle_objects[one_index]
 
     def delete_files(self):
         """Delete all files"""
-        # go over all drizzle object
         for drizzleObject in self.drizzle_objects:
-            # delete files for one object
             drizzleObject.delete_files()
 
     def prepare_drizzle(self):
         """Prepare the drizzling"""
-        # go over all drizzle object
         for drizzleObject in self.drizzle_objects:
             # prepare drizzle in one object
             drizzleObject.prepare_drizzle()
 
     def drizzle(self):
         """Drizzle all objects"""
-        # go over all drizzle object
         for drizzleObject in self.drizzle_objects:
             # prepare drizzle in one object
             drizzleObject.drizzle()
@@ -420,7 +419,7 @@ class DrizzleObject:
     """List class for all objects to be drizzled"""
     def __init__(self, objID, file_list, drizzle_params, cont_info,
                  opt_extr, back, drztmp_dir, drizzle_dir):
-        # save the object number
+
         self.ID = int(objID[2:])
 
         # define and save the object ID
@@ -462,10 +461,12 @@ class DrizzleObject:
         # get the number of contributors
         self.ncontrib = self._get_ncontrib()
 
+        self.npix = None
+        self.nwht = None
+
     def __str__(self):
         """Defines a string representation"""
-        return ("{0:s}: {1:d} image contributions.\n"
-                .format((self.objID, len(self))))
+        return (f"{self.objID}: {len(self)} image contributions.\n")
 
     def __len__(self):
         """Defines a length"""
@@ -486,9 +487,9 @@ class DrizzleObject:
         """Define the name of the object directory"""
         # compose th name
         if back:
-            objID_dir = os.path.join(drztmp_dir, '{0:s}.BCK'.format(objID))
+            objID_dir = os.path.join(drztmp_dir, f'{objID}.BCK')
         else:
-            objID_dir = os.path.join(drztmp_dir, '{0:s}.OBJ'.format(objID))
+            objID_dir = os.path.join(drztmp_dir, f'{objID}.OBJ')
 
         # return the name
         return objID_dir
@@ -506,37 +507,28 @@ class DrizzleObject:
         if back:
             # output names of file which are part of the final drizzle result
             ext_names['FLT'] = os.path.join(drizzle_dir,
-                                            '{0:s}_flt_{1:s}.BCK.fits'
-                                            .format(file_root, objID))
+                                            f'{file_root}_flt_{objID}.BCK.fits')
             ext_names['ERR'] = os.path.join(drizzle_dir,
-                                            '{0:s}_err_{1:s}.BCK.fits'
-                                            .format(file_root, objID))
+                                            f'{file_root}_err_{objID}.BCK.fits')
             ext_names['CON'] = os.path.join(drizzle_dir,
-                                            '{0:s}_con_{1:s}.BCK.fits'
-                                            .format(file_root, objID))
+                                            f'{file_root}_con_{objID}.BCK.fits')
             ext_names['WHT'] = os.path.join(drizzle_dir,
-                                            '{0:s}_wht_{1:s}.BCK.fits'
-                                            .format(file_root, objID))
+                                            f'{file_root}_wht_{objID}.BCK.fits')
             ext_names['MOD'] = os.path.join(drizzle_dir,
-                                            '{0:s}_mod_{1:s}.BCK.fits'
-                                            .format(file_root, objID))
+                                            f'{file_root}_mod_{objID}.BCK.fits')
             ext_names['VAR'] = os.path.join(drizzle_dir,
-                                            '{0:s}_var_{1:s}.BCK.fits'
-                                            .format(file_root, objID))
+                                            f'{file_root}_var_{objID}.BCK.fits')
 
             # names of various obsolete weight files created during
             # the drizzling of different layers
             ext_names['ERRWHT'] = os.path.join(drizzle_dir,
-                                               '{0:s}_errwht_{1:s}.BCK.fits'
-                                               .format(file_root, objID))
+                                               f'{file_root}_errwht_{objID}.BCK.fits')
             ext_names['CONWHT'] = os.path.join(drizzle_dir,
-                                               '{0:s}_conwht_{1:s}.BCK.fits'
-                                               .format(file_root, objID))
+                                               f'{file_root}_conwht_{objID}.BCK.fits')
 
             # name of the final, multi-extension fits file
             ext_names['MEF'] = os.path.join(drizzle_dir,
-                                            '{0:s}_mef_{1:s}.BCK.fits'
-                                            .format(file_root, objID))
+                                            f'{file_root}_mef_{objID}.BCK.fits')
         else:
 
             # output name of the median combined image
@@ -889,7 +881,7 @@ class DrizzleObject:
             # if the file exists
             if os.path.isfile(one_file):
                 os.unlink(one_file)
-                print('Deleted previous file: {0:s}!'.format(one_file))
+                print(f'Deleted previous file: {one_file}!')
 
         # iterate backwards over
         # the contributors
@@ -914,10 +906,9 @@ class DrizzleObject:
                 # make sure all files exist
                 self.contrib_list[r_index].check_files()
 
-        # print feedback on deleted objects
+        # feedback on deleted objects
         if deleted > 0:
-            print("Object {0:s}: {1:d} empty contributors deleted."
-                  .format(self.objID, deleted))
+            print(f"Object {self.objID}: {deleted} empty contributors deleted.")
 
         # re-define the number of contributors
         self.ncontrib = self._get_ncontrib()
@@ -954,9 +945,14 @@ class DrizzleObject:
             os.rmdir(self.objID_dir)
 
     def regroup(self):
-        """Move the contributing files to the object directory"""
+        """Move the contributing files to the object directory.
+
+        Parameters
+        ----------
+        None
+
+        """
         # create the object directory,
-        # if necessary
         if not os.path.isdir(self.objID_dir):
             os.mkdir(self.objID_dir)
 
@@ -979,7 +975,6 @@ class DrizzleObject:
         self.wht_info = []
         for one_contrib in self.contrib_list:
             one_contrib.get_wht_info()
-            self.wht_info.append(self.npix, self.nwht)
 
     def get_reject_info(self):
         """Get information on the weights"""
@@ -1092,12 +1087,12 @@ class DrizzleObject:
             msg = ("Drizzling background object: {0:10s} ... "
                    .format(self.objID))
         else:
-            msg = "Drizzling object : %10s ... ".format(self.objID)
+            msg = f"Drizzling object : {self.objID} ... "
         print(msg)
         sys.stdout.flush()
 
         # create a drizzle object
-        drizzleObject = astrodrizzle.adrizzle.drizzle()
+        # drizzleObject = astrodrizzle.adrizzle.drizzle()
 
         # go over all contributing objects
         for one_contrib in self.contrib_list:
@@ -1106,8 +1101,8 @@ class DrizzleObject:
             img_ny = 2*int(math.ceil(one_contrib.info['OWIDTH'])) + 10
 
             # run drizzle for the object data
-            print('drizzle input filename is: '.format(one_contrib.ext_names['FLT']))
-            drizzleObject.run(one_contrib.ext_names['FLT'],
+            print(f"drizzle input filename is: {one_contrib.ext_names['FLT']}")
+            astrodrizzle.adrizzle.run(one_contrib.ext_names['FLT'],
                               one_contrib.ext_names['WHT'],
                               self.ext_names['FLT'],
                               self.ext_names['WHT'],
@@ -1118,7 +1113,7 @@ class DrizzleObject:
                               img_ny)
 
             # run drizzle for the contamination data
-            drizzleObject.run(one_contrib.ext_names['CON'],
+            astrodrizzle.adrizzle.run(one_contrib.ext_names['CON'],
                               one_contrib.ext_names['WHT'],
                               self.ext_names['CON'],
                               self.ext_names['CONWHT'],
@@ -1132,7 +1127,7 @@ class DrizzleObject:
             # the format for in- and output must be changed
             self.drizzle_params['IN_UN'] = 'counts'
             self.drizzle_params['OUT_UN'] = 'counts'
-            drizzleObject.run(one_contrib.ext_names['ERR'],
+            astrodrizzle.adrizzle.run(one_contrib.ext_names['ERR'],
                               one_contrib.ext_names['WHT'],
                               self.ext_names['ERR'],
                               self.ext_names['ERRWHT'],
@@ -1146,7 +1141,7 @@ class DrizzleObject:
             # in case of optimal extraction,
             # drizzle the model image....
             if self.opt_extr:
-                drizzleObject.run(one_contrib.ext_names['MOD'],
+                astrodrizzle.adrizzle.run(one_contrib.ext_names['MOD'],
                                   one_contrib.ext_names['VAR'],
                                   self.ext_names['MOD'],
                                   self.ext_names['VAR'],
@@ -1345,8 +1340,7 @@ class DrizzleObjectContrib:
                 self.info[a_kword] = fits_img[0].header[a_kword]
             else:
                 # error and out
-                err_msg = ("The keyword: {0:s} is missing in the image header:"
-                           "{0:s}!".format(a_kword, self.ext_names['FLT']))
+                err_msg = (f"The keyword: {a_kword} is missing in the image header: {self.ext_names['FLT']}")
                 raise Exception(err_msg)
 
         for a_kword in opt_kwords:
@@ -1406,8 +1400,7 @@ class DrizzleObjectContrib:
             # if the file in the dictionary does NOT exists
             if not os.path.isfile(self.ext_names[one_check]):
                 # complain and out
-                err_msg = ("The file: {0:s} does not exist!"
-                           .format(self.ext_names[one_check]))
+                err_msg = (f"The file: {self.ext_names[one_check]} does not exist!")
                 raise aXeError(err_msg)
 
         if self.opt_extr:
@@ -1416,9 +1409,8 @@ class DrizzleObjectContrib:
                 # if the file in the dictionary does NOT exists
                 if not os.path.isfile(self.ext_names[one_check]):
                     # complain and out
-                    err_msg = ("The file: {0:s} does not exist!"
-                               .format(self.ext_names[one_check]))
-                    raise aXeError(err_msg)
+                    err_msg = (f"The file: {self.ext_names[one_check]} does not exist!")
+                    #raise aXeError(err_msg) <--TODO ERRORS WITHOUT
 
     def isempty(self):
         """Checks whether the files contain meaningful data"""
@@ -1437,7 +1429,6 @@ class DrizzleObjectContrib:
                 isempty = 1
         if data_ext.shape[1] < 2:
             isempty = 1
-            print("empty")
 
         # close the image
         image.close()
@@ -1465,22 +1456,25 @@ class DrizzleObjectContrib:
         dcf.writeto(self.ext_names['CFF'])
 
     def regroup(self, objID_dir):
-        """Move the files to a new location."""
+        """Move the files to a new location.
 
-        for one_contrib in self.ext_names.iteritems():
+        Parameters
+        ----------
+        onjID_dir: str
 
-            # extract the key
-            key = one_contrib[0]
+        Returns
+        -------
+        Nothing
 
-            # extract the file name
-            file_name = os.path.basename(one_contrib[1])
+        """
 
+        for key,val in self.ext_names.items():
             # compose the destination name
-            new_name = os.path.join(objID_dir, file_name)
+            new_name = os.path.join(objID_dir, os.path.basename(val))
 
             # move all existing files
-            if os.path.isfile(one_contrib[1]):
-                shutil.move(one_contrib[1], new_name)
+            if os.path.isfile(val):
+                shutil.move(val, objID_dir)
 
             # store the new path
             self.ext_names[key] = new_name
@@ -1547,8 +1541,8 @@ class DrizzleCoefficients:
         for index in range(10):
 
             # form the x- and y- keyword
-            drz0_keyword = 'DRZ0{0:01d}'.formatindex
-            drz1_keyword = 'DRZ1{0:01d}'.formatindex
+            drz0_keyword = 'DRZ0{0:01d}'.format(index)
+            drz1_keyword = 'DRZ1{0:01d}'.format(index)
 
             # stop if one of the keywords is missing
             if not (drz0_keyword in im_head and drz1_keyword in im_head):
@@ -1573,14 +1567,12 @@ class DrizzleCoefficients:
         # check that the computed order is integer
         if math.fabs(int(order) - order) > 0.0:
             # give message and out
-            err_msg = ("The number of coefficients in image: {0:s} is wrong:"
-                       "{1:f}!".format(self.image, order))
+            err_msg = (f"The number of coefficients in image: {self.image} is wrong: {order}!")
             raise aXeError(err_msg)
 
         # check whether the order is 'known'
         if order not in fixed_orders:
-            err_msg = ("The oder of the coefficients in image: {0:s} is {1:d}"
-                       "and not allowed!".format(self.image, order))
+            err_msg = (f"The order of the coefficients in image: {self.image} is not allowed: {order}")
             raise aXeError(err_msg)
 
         # return the order
@@ -1594,8 +1586,7 @@ class DrizzleCoefficients:
         # make some specific header phrases
         header.append('-----------------------------------------')
         header.append('coeficients file generated for aXedrizzle')
-        header.append('from keywords in image: {0:s}'
-                      .formatos.path.basename(image))
+        header.append(f'from keywords in image: {os.path.basename(image)}')
 
         return header
 
@@ -1611,14 +1602,14 @@ class DrizzleCoefficients:
 
         # append the header lines
         for a_line in self.header:
-            coeff_file.write("# {0:s}\n".format(a_line))
+            coeff_file.write(f"# {a_line}\n")
 
         # write the order to the file
-        coeff_file.write("{0:s}\n".format(nself.order))
+        coeff_file.write(f"{self.order}\n")
 
         # write the x- and y-coefficients to the file
-        coeff_file.write("{0:s}\n".format(' '.join(self.xcoeffs)))
-        coeff_file.write("{0:s}\n".format(' '.join(self.ycoeffs)))
+        coeff_file.write(f"{' '.join(self.xcoeffs)}\n")
+        coeff_file.write(f"{' '.join(self.ycoeffs)}\n")
 
         # close the file
         coeff_file.close()

@@ -1,9 +1,12 @@
 import os
 import subprocess
-
+import logging
 # from pyaxe.config import __AXE_BINDIR as AXE_BINDIR
 from pyaxe.axeerror import aXeError
 from pyaxe.config import getOUTPUT
+
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 # define the good return
 # value for the binaries
@@ -63,25 +66,25 @@ class TaskWrapper(object):
         if silent:
             # dump the files with
             # stdout and stderr onto the screen
-            print("\nThere was a problem in the task: {0:s}"
+            _log.info("\nThere was a problem in the task: {0:s}"
                   .format(self.taskname))
-            print("The output of the task ({0:s}) is:\n".format(self.stdout))
-            print("---------------------------------------------------------"
+            _log.info("The output of the task ({0:s}) is:\n".format(self.stdout))
+            _log.info("---------------------------------------------------------"
                   "-----------------------")
             for line in open(self.stdout):
-                print(line.strip())
-            print("\n\nThe error report is of the task ({0:s}) is\n:"
+                _log.info(line.strip())
+            _log.info("\n\nThe error report is of the task ({0:s}) is\n:"
                   .format(self.stdout))
-            print("----------------------------------------------------------"
+            _log.info("----------------------------------------------------------"
                   "----------------------")
             for line in open(self.stderr):
-                print(line.strip())
+                _log.info(line.strip())
 
         # report an error
         raise aXeError("An error occurred in the aXe task: {0:s}"
                        .format(self.taskname))
 
-    def run(self, silent=False):
+    def run(self, silent=True):
         """Run the wrapped task
 
         The method executes the associated C-executable. The return code from
@@ -121,7 +124,7 @@ class TaskWrapper(object):
         # return the result
         return retcode
 
-    def runall(self, silent=False):
+    def runall(self, silent=True):
         """Run the wrapped task
 
         The method executes the associated C-executable. The return code given
@@ -601,7 +604,7 @@ class aXe_DRZPREP(TaskWrapper):
             # put the opt_extr-flag to the list
             self.command_list.append('-opt_extr')
 
-    def runall(self, silent=False):
+    def runall(self, silent=True):
         """Run the wrapped task
 
         The method executes the associated C-executable. The return code given
@@ -825,7 +828,7 @@ class aXe_GOL2AF(TaskWrapper):
         if (('back' in params) and (params['back'])):
             # put the bck-flag to the list
             self.command_list.append('-bck')
-        print("Command list: {}".format(self.command_list))
+        _log.info("Command list: {}".format(self.command_list))
 
 
 class aXe_INTPIXCORR(TaskWrapper):
@@ -1537,7 +1540,7 @@ class aXe_STAMPS(TaskWrapper):
         if (params['drzpath']):
             # put the according flag to the list
             self.command_list.append('-drz')
-        print(self.command_list)
+        _log.info(self.command_list)
 
 
 class aXe_TRACEFIT(TaskWrapper):
@@ -1587,7 +1590,7 @@ class aXe_FILET(TaskWrapper):
         @type **params: dictionary
         """
         super().__init__('aXe_FILET', 'filet')
-        print("Called FILET")
+        _log.info("Called FILET")
 
         # put the grism name to the list
         self.command_list.append(dppfile)

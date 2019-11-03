@@ -180,7 +180,7 @@ main (int argc, char *argv[])
 	  PET = get_ALL_from_next_in_PET(OPET_ptr, &aperID, &beamID);
 	  if ((aperID==-1) && (beamID==-1)) break;
 	  if (PET==NULL) continue; /* PET is empty, skip it */
-	  fprintf (stdout, "aXe_PETFF: BEAM %d%c", aperID, BEAM(beamID));
+	  /*fprintf (stdout, "aXe_PETFF: BEAM %d%c", aperID, BEAM(beamID));*/
 	  objindex =  find_object_in_object_list(oblist,aperID);
 
 	  /* Compute FF information for each pixel */
@@ -212,7 +212,7 @@ main (int argc, char *argv[])
 	      free(PET);
 	      PET=NULL;
 	    }
-	  fprintf (stdout, ".Done\n");
+	  /*fprintf (stdout, ".Done\n");*/
 	  i++;
 	}
       /* Free the FF cube */

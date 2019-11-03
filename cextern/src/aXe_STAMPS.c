@@ -229,7 +229,7 @@ main (int argc, char *argv[])
 	  /* Get the PET for this object */
 	  PET = get_ALL_from_next_in_PET(PET_ptr, &aperID, &beamID);
 	  if ((aperID==-1) && (beamID==-1)) break;
-	  fprintf (stdout, "aXe_STAMPS: BEAM %d%c.", aperID, BEAM(beamID));
+	  /*fprintf (stdout, "aXe_STAMPS: BEAM %d%c.", aperID, BEAM(beamID));*/
 	  objindex =  find_object_in_object_list(oblist,aperID);
 
 	  sprintf (label, "%s.%d%c.ps/CPS", STP_file_path,
@@ -328,7 +328,7 @@ main (int argc, char *argv[])
 	  if (PET!=NULL)
 	    free(PET);
 
-	  fprintf (stdout, " Done.\n");
+	  /*fprintf (stdout, " Done.\n");*/
 	  i++;
 	}
 

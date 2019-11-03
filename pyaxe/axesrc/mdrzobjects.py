@@ -1,8 +1,14 @@
 import sys
 import math
+import logging
+
 from pyaxe import config as config_util
+
 from . import drizzleobjects
 
+
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class MulDrzObjList(drizzleobjects.DrizzleObjectList):
     """List class for all objects to be drizzled"""
@@ -233,7 +239,7 @@ class MultDrzObj(drizzleobjects.DrizzleObject):
         """MultiDrizzle all contributors together"""
 
         msg = "MultiDrizzling object : {0:10s} ... ".format(self.objID)
-        print(msg)
+        _log.info(msg)
         sys.stdout.flush()
 
         # create a drizzle object
@@ -257,7 +263,7 @@ class MultDrzObj(drizzleobjects.DrizzleObject):
                               img_ny)
 
         # give feedback
-        print('Done!')
+        _log.info('Done!')
         sys.stdout.flush()
 
     def mediancombine(self):

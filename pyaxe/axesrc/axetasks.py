@@ -1,3 +1,5 @@
+import logging
+
 from . import axeinputs
 from . import axelowlev
 from . import axepreptor
@@ -7,12 +9,14 @@ from . import drizzleobjects
 from . import fcubeobjs
 from . import inputchecks
 from . import iolmaking
-# from . import mdrzobjects
+from . import mdrzobjects
 from . import mefobjects
 from . import pysex2gol
 
 from pyaxe.config import axe_setup
 
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 def iolprep(drizzle_image='',
             input_cat='',
@@ -211,7 +215,7 @@ def axecore(inlist='',
     for row in axe_inputs:
 
         # make an extraction object
-        print("image is located: {0}".format(row['grisim']))
+        _log.info("image is located: {0}".format(row['grisim']))
         aXeNator = axesingextr.aXeSpcExtr(row['grisim'],
                                           row['objcat'],
                                           row['dirim'],
@@ -271,8 +275,7 @@ def axecrr(inlist='',
            opt_extr=True,
            driz_separate=False):
 
-    """Function for aXedrizzle with CR-rejection"""
-    # make the general setup
+    """Function for aXedrizzle with CosmicRay-rejection"""
     axe_setup(tmpdir=True)
 
     # do all the input checks
@@ -296,6 +299,7 @@ def axecrr(inlist='',
     dols = drizzleobjects.DrizzleObjectList(drizzle_params, cont_info,
                                             opt_extr, back=False)
 
+    _log.info(f"checking files {dols}")
     # check all files
     dols.check_files()
 

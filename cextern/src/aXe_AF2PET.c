@@ -253,7 +253,7 @@ main(int argc, char *argv[])
 
 
   /* Loading the object list */
-  fprintf(stdout, "aXe_AF2PET: Loading object list...");
+  /*fprintf(stdout, "aXe_AF2PET: Loading object list...");*/
   oblist = file_to_object_list_seq(aper_file_path, obs);
   fprintf(stdout, "%d objects loaded.\n", object_list_size(oblist));
 
@@ -271,8 +271,8 @@ main(int argc, char *argv[])
   i = 0;
   if (oblist != NULL) {
     while (oblist[i] != NULL) {
-      fprintf(stdout, "aXe_AF2PET: Extracting object ID:%d",
-              oblist[i]->ID);
+      /*fprintf(stdout, "aXe_AF2PET: Extracting object ID:%d",
+              oblist[i]->ID);*/
       for (j = 0; j < oblist[i]->nbeams; j++) {
         /*
          * skip beam if ignore flag for thisbeam is
@@ -280,12 +280,12 @@ main(int argc, char *argv[])
          */
         if (oblist[i]->beams[j].ignore !=0)
           {
-            fprintf(stdout,", %c ( Ignored )",
-                    BEAM(oblist[i]->beams[j].ID));
+            /*fprintf(stdout,", %c ( Ignored )",
+                    BEAM(oblist[i]->beams[j].ID));*/
             continue;
           }
-        fprintf(stdout, ", %c (Extracted)",
-                BEAM(oblist[i]->beams[j].ID));
+        /*fprintf(stdout, ", %c (Extracted)",
+                BEAM(oblist[i]->beams[j].ID));*/
 
         quad_to_bbox(oblist[i]->beams[j].corners,
                      oblist[i]->beams[j].bbox,
@@ -386,7 +386,7 @@ main(int argc, char *argv[])
             result = NULL;
           }
       }
-      fprintf(stdout, " Done.\n");
+      /*fprintf(stdout, " Done.\n");*/
       i++;
     }
   }

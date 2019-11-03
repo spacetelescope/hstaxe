@@ -1,16 +1,19 @@
 import os
 import math
+import logging
 from astropy.io import fits
 from astropy.table import Table
 from astropy.io.registry import IORegistryError
 
 from . import axeinputs
 from . import configfile
-from . import axeiol
+# from . import axeiol
 
 from pyaxe.axeerror import aXeError, aXeSIMError
 from pyaxe import config as config_util
 
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class InputChecker:
     def __init__(self, taskname, inlist=None, configs=None, backims=None):
@@ -72,7 +75,7 @@ class InputChecker:
                 err_msg = ("{0:s}: The grism image: {1:s} does NOT have an "
                            "associated direct image!"
                            .format(self.taskname,
-                                   config_util.getDATA(one_input['GRISIM'])))
+                                   config_util.getDATA(one_input['grisim'])))
                 raise aXeError(err_msg)
 
     def _check_fluxcubes(self):
@@ -80,11 +83,11 @@ class InputChecker:
         for one_input in self.axe_inputs:
 
             # load the config file and get the extension information
-            conf = configfile.ConfigFile(config_util.getCONF(one_input['CONFIG']))
-            ext_info = config_util.get_ext_info(config_util.getDATA(one_input['GRISIM']), conf)
+            conf = configfile.ConfigFile(config_util.getCONF(one_input['config']))
+            ext_info = config_util.get_ext_info(config_util.getDATA(one_input['grisim']), conf)
 
             # derive the aXe names
-            axe_names = config_util.get_axe_names(one_input['GRISIM'], ext_info)
+            axe_names = config_util.get_axe_names(one_input['grisim'], ext_info)
 
             # check the fluxcube
             if not os.path.isfile(config_util.getDATA(axe_names['FLX'])):
@@ -100,11 +103,11 @@ class InputChecker:
         for one_input in self.axe_inputs:
 
             # load the config file and get the extension information
-            conf = configfile.ConfigFile(config_util.getCONF(one_input['CONFIG']))
-            ext_info = config_util.get_ext_info(config_util.getDATA(one_input['GRISIM']), conf)
+            conf = configfile.ConfigFile(config_util.getCONF(one_input['config']))
+            ext_info = config_util.get_ext_info(config_util.getDATA(one_input['grisim']), conf)
 
             # open the fits image
-            gri_fits = fits.open(config_util.getDATA(one_input['GRISIM']), 'readonly')
+            gri_fits = fits.open(config_util.getDATA(one_input['grisim']), 'readonly')
 
             # go to the correct header
             act_header = gri_fits[ext_info['fits_ext']].header
@@ -121,7 +124,7 @@ class InputChecker:
                            "it had NO global\nsky subtraction, which is "
                            "required for the CRR version of aXedrizzle!"
                            .format(self.taskname,
-                                   config_util.getDATA(one_input['GRISIM']),
+                                   config_util.getDATA(one_input['grisim']),
                                    ext_info['fits_ext']))
                 raise aXeError(err_msg)
 
@@ -129,11 +132,11 @@ class InputChecker:
         # go over all inputs
         for one_input in self.axe_inputs:
             # load the config file and get the extension information
-            conf = configfile.ConfigFile(config_util.getCONF(one_input['CONFIG']))
-            ext_info = config_util.get_ext_info(config_util.getDATA(one_input['GRISIM']), conf)
+            conf = configfile.ConfigFile(config_util.getCONF(one_input['config']))
+            ext_info = config_util.get_ext_info(config_util.getDATA(one_input['grisim']), conf)
 
             # derive the aXe names
-            axe_names = config_util.get_axe_names(one_input['GRISIM'], ext_info)
+            axe_names = config_util.get_axe_names(one_input['grisim'], ext_info)
 
             # check the DPP file
             if not os.path.isfile(config_util.getOUTPUT(axe_names['DPP'])):
@@ -176,7 +179,7 @@ class InputChecker:
                                "exist!".format(self.taskname, config_util.getDATA(one_input['objcat'])))
             # load the IOL to check its format
             try:
-                print("reading {}".format(config_util.getDATA(one_input['objcat'])))
+                _log.info("reading {}".format(config_util.getDATA(one_input['objcat'])))
                 Table.read(config_util.getDATA(one_input['objcat']), format='ascii.sextractor')
             except IORegistryError:
                 raise aXeError("{0:s} is not in a known format".format(one_input['objcat']))

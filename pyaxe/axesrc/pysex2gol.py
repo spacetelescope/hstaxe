@@ -1,5 +1,7 @@
 import os
 from copy import deepcopy
+import logging
+
 from stsci.tools import wcsutil
 
 from pyaxe.axeerror import aXeError
@@ -9,6 +11,9 @@ from pyaxe.config import (getCONF, getDATA,
 from . import configfile
 from . import axeiol
 
+
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class Sex2GolPy:
     """This task generates a Grism Object List file using an Input Object List."""
@@ -256,7 +261,7 @@ class Sex2GolPy:
 
         # check for an empty table
         if len(self.iol.catalog) < 1:
-            print("Empty catalog found\n")
+            _log.info("Empty catalog found\n")
             return None
 
         # create a new GOL that's a copy of the input list
@@ -321,7 +326,7 @@ class Sex2GolPy:
     def run(self, silent=False):
         """Make the SEX2GOL transformations"""
         if not silent:
-            print("py_SEX2GOL:  Start processing ...\n",)
+            _log.info("py_SEX2GOL:  Start processing ...\n",)
         else:
             sout = open(self.stdout, 'w+')
             sout.write(str(self)+"\n")
@@ -340,7 +345,7 @@ class Sex2GolPy:
             outfile = getOUTPUT(self.out_sex)
             if os.access(outfile, os.F_OK):
                 os.remove(outfile)
-            print("Saving {} objects to {}".format(len(self.gol),outfile))
+            _log.info("Saving {} objects to {}".format(len(self.gol),outfile))
             of = open(outfile, 'w')
             for num, name in zip(range(len(self.gol.colnames)), self.gol.colnames):
                 of.write("# {0:d} {1:s}\t\t{2:s}\t\t[{3:s}]\n".format(num+1, name,
@@ -356,14 +361,14 @@ class Sex2GolPy:
 
             # give feedback
             if not silent:
-                print("\npy_SEX2GOL:  Warning! Empty table copied to GOL")
+                _log.info("\npy_SEX2GOL:  Warning! Empty table copied to GOL")
             else:
                 # open stdout/stderr
                 sout.write("pysex2gol:  Warning! Empty table copied to GOL")
 
         # give feedback
         if not silent:
-            print("     Done")
+            _log.info("     Done")
         else:
             sout.write("     Done\n")
             sout.close()

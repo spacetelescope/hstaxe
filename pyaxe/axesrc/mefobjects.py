@@ -5,11 +5,9 @@ from pyaxe import config as config_utils
 from pyaxe.axeerror import aXeError
 from . import configfile
 
-# from pyaxe import axe_asciidata
-
 
 class MEFExtractor:
-    """MEF Extractor class"""
+    """Multi-Extension FITS Extractor class"""
     def __init__(self, drizzle_params, obj_dol=None, bck_dol=None, opt_extr=None):
         # determine and store the file extension names
         self.ext_names = self._get_ext_names(drizzle_params)
@@ -360,22 +358,22 @@ class DrizzleConf(configfile.ConfigList):
         keylist = []
 
         keylist.append(configfile.ConfKey('INSTRUMENT',
-                                          config.get_gvalue('INSTRUMENT')))
+                                          configfile.get_gvalue('INSTRUMENT')))
         keylist.append(configfile.ConfKey('CAMERA',
-                                          config.get_gvalue('CAMERA')))
+                                          configfile.get_gvalue('CAMERA')))
         keylist.append(configfile.ConfKey('SCIENCE_EXT', 'SCI'))
         keylist.append(configfile.ConfKey('DQ_EXT', 'DQ'))
         keylist.append(configfile.ConfKey('ERRORS_EXT', 'ERR'))
         keylist.append(configfile.ConfKey('WEIGHT_EXT', 'WHT'))
         keylist.append(configfile.ConfKey('FFNAME', 'None'))
         keylist.append(configfile.ConfKey('DRZRESOLA',
-                                          config.get_gvalue('DRZRESOLA')))
+                                          configfile.get_gvalue('DRZRESOLA')))
         keylist.append(configfile.ConfKey('DRZSCALE',
-                                          config.get_gvalue('DRZSCALE')))
+                                          configfile.get_gvalue('DRZSCALE')))
         keylist.append(configfile.ConfKey('DRZLAMB0',
-                                          config.get_gvalue('DRZLAMB0')))
+                                          configfile.get_gvalue('DRZLAMB0')))
         keylist.append(configfile.ConfKey('DRZXINI',
-                                          config.get_gvalue('DRZXINI')))
+                                          configfile.get_gvalue('DRZXINI')))
         keylist.append(configfile.ConfKey('DRZPFRAC',
                                           drizzle_params['PFRAC']))
         keylist.append(configfile.ConfKey('DRZPSCALE',
@@ -384,12 +382,12 @@ class DrizzleConf(configfile.ConfigList):
                                           drizzle_params['KERNEL']))
 
         keylist.append(configfile.ConfKey('DRZROOT', drizzle_params['ROOT']))
-        if config.get_gvalue('POBJSIZE') is not None:
+        if configfile.get_gvalue('POBJSIZE') is not None:
             keylist.append(configfile.ConfKey('POBJSIZE',
-                           config.get_gvalue('POBJSIZE')))
-        if config.get_gvalue('SMFACTOR') is not None:
+                           configfile.get_gvalue('POBJSIZE')))
+        if configfile.get_gvalue('SMFACTOR') is not None:
             keylist.append(configfile.ConfKey('SMFACTOR',
-                           config.get_gvalue('SMFACTOR')))
+                           configfile.get_gvalue('SMFACTOR')))
         keylist.append(configfile.ConfKey('BEAMA', config.beams['A'].get_bvalue('BEAMA')))
         keylist.append(configfile.ConfKey('MMAG_EXTRACT_A', config.beams['A'].get_bvalue('MMAG_EXTRACT_A')))
         keylist.append(configfile.ConfKey('MMAG_MARK_A', config.beams['A'].get_bvalue('MMAG_MARK_A')))
@@ -401,9 +399,9 @@ class DrizzleConf(configfile.ConfigList):
         keylist.append(configfile.ConfKey('YOFF_A', '0.0'))
         keylist.append(configfile.ConfKey('DISP_ORDER_A', '1'))
         keylist.append(configfile.ConfKey('DLDP_A_0',
-                                          config.get_gvalue('DRZLAMB0')))
+                                          configfile.get_gvalue('DRZLAMB0')))
         keylist.append(configfile.ConfKey('DLDP_A_1',
-                                          config.get_gvalue('DRZRESOLA')))
+                                          configfile.get_gvalue('DRZRESOLA')))
         keylist.append(configfile.ConfKey('SENSITIVITY_A', config.beams['A'].get_bvalue('SENSITIVITY_A')))
         if modvar:
             keylist.append(configfile.ConfKey('MODEL_EXT', 'MOD'))

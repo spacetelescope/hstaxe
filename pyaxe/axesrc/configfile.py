@@ -1,9 +1,12 @@
 import os
 import math
+import logging
 
 from pyaxe import config as config_util
 from pyaxe.axeerror import aXeError
 
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class ConfigList:
     """Configuration File Object"""
@@ -18,7 +21,7 @@ class ConfigList:
         header: str
             the header string
         """
-        # beam inices which might be found the file
+        # beam indices which might be found the file
         idents = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
                   'L', 'M', 'N', 'O', 'P', 'Q']
 
@@ -31,7 +34,7 @@ class ConfigList:
         # store the header
         self.header = header
 
-        # load the genral keywords
+        # load the general required keywords
         self.gkeys = self._find_gkeys(keylist)
 
         # try to load beams as long as there
@@ -53,14 +56,14 @@ class ConfigList:
 
         # inform about the useless keywords
         if len(keylist) > 0:
-            print('\nDispensable Keywords: ')
+            _log.info('\nDispensable Keywords: ')
             for key in keylist:
-                print(key)
+                _log.info(key)
 
     def __str__(self):
         """String method for the class
 
-        The method transoforms the configuration
+        The method transforms the configuration
         file object into its string representation.
 
         Returns
@@ -87,7 +90,6 @@ class ConfigList:
 
         # check whether the item was found
         if index > -1:
-            # return the identified item
             del self.gkeys[index]
 
     def __getitem__(self, item):
@@ -236,8 +238,8 @@ class ConfigList:
         """Finds and extracts the global keywords
 
         The method finds the all predefined global keywords in
-        a keyword list. The list of globale keywords is
-        returned. They counterparts in the input keyword list
+        a keyword list. The list of global keywords is
+        returned. Their counterparts in the input keyword list
         are deleted.
 
         Parameters
@@ -384,72 +386,70 @@ class ConfigList:
             # the keyword does not yet exist, just create and add it
             self.gkeys.append(ConfKey(keyword, keyvalue, comment))
 
-    def drizzle_check(self):
-        """Check for drizzle keywords
+    # def drizzle_check(self):
+    #     """Check for drizzle keywords
 
-        The method assures that all necessary drizzle keywords
-        are present. Nonexisting keywords are added with default
-        values. Finally the value for the drizzle kernel is checked
-        against all valid values.
+    #     The method assures that all necessary drizzle keywords
+    #     are present. Nonexisting keywords are added with default
+    #     values. Finally the value for the drizzle kernel is checked
+    #     against all valid values.
 
-        Returns
-        -------
-        integer:  information whether the drizzle kernel is valid
-        """
-        # list with all valid kernels
-        kernels = ['square', 'point', 'turbo', 'gaussian', 'tophat',
-                   'lanczos2', 'lanczos3']
+    #     Returns
+    #     -------
+    #     bool:  True if the drizzle kernel is valid
+    #     """
+    #     # list with all valid kernels
+    #     kernels = ['square', 'point', 'turbo', 'gaussian', 'tophat',
+    #                'lanczos2', 'lanczos3']
 
-        # make sure that some important drizzle keywords are there
-        pself = self.setdefault('DRZPSCALE', 1.0)
-        pfrac = self.setdefault('DRZPFRAC', 1.0)
-        dkernel = self.setdefault('DRZKERNEL', 'square')
-        droot = self.setdefault('DRZROOT', 'aXedrizzle')
+    #     # make sure that some important drizzle keywords are there
 
-        # check for valid drizzle kernel
-        if dkernel not in kernels:
-            # return a warning
-            return 1
+    #     pself = self.setdefault('DRZPSCALE', 1.0)
+    #     pfrac = self.setdefault('DRZPFRAC', 1.0)
+    #     dkernel = self.setdefault('DRZKERNEL', 'square')
+    #     droot = self.setdefault('DRZROOT', 'aXedrizzle')
 
-        # return the default
-        return 0
+    #     # check for valid drizzle kernel
+    #     if dkernel not in kernels:
+    #         return False
+    #     return True
 
-    def setdefault(self, keyword, keyvalue, comment=None):
-        """Add global keyword
+    # def setdefault(self, keyword, keyvalue, comment=None):
+    #     """Add global keyword
 
-        The method mimics the setdefault method for dictionary
-        objects. A keyword is added with the given value and
-        comment, but only in case that it does not yet exist.
-        If it exists, nothing is done
+    #     The method mimics the setdefault method for dictionary
+    #     objects. A keyword is added with the given value and
+    #     comment, but only in case that it does not yet exist.
+    #     If it exists, nothing is done
 
-        Parameters
-        ----------
-        keyword: str
-            name of the requested keyword
-        keyvalue: any
-            value of the requested keyword
-        comment: str
-            comment for the keyword
+    #     Parameters
+    #     ----------
+    #     keyword: str
+    #         name of the requested keyword
+    #     keyvalue: any
+    #         value of the requested keyword
+    #     comment: str
+    #         comment for the keyword
 
-        Returns
-        -------
-        The keyword value
-        """
+    #     Returns
+    #     -------
+    #     The keyword value
+    #     """
 
-        # search for the index in the keyword list
-        index = self._get_gkey_index(keyword)
+    #     # search for the index in the keyword list
+    #     index = self._get_gkey_index(keyword)
 
-        if index < 0:
-            # the keyword does not yet exist, just create and add it
-            self.gkeys.append(ConfKey(keyword, keyvalue, comment))
-            # extract the keyvalue
-            value = self.gkeys[-1].keyvalue
-        else:
-            # extract the keyvalue
-            value = self.gkeys[index].keyvalue
+    #     if index < 0:
+    #         # the keyword does not yet exist, just create and add it
+    #         self.gkeys.append(ConfKey(keyword, keyvalue, comment))
+    #         # extract the keyvalue
+    #         value = self.gkeys[-1].keyvalue
+    #     else:
+    #         # extract the keyvalue
+    #         value = self.gkeys[index].keyvalue
 
-        # return the keyvalue
-        return value
+    #     # return the keyvalue
+    #     return value
 
     def get_gvalue(self, keyword):
         """Retrieve a requested global keyword value
@@ -552,11 +552,11 @@ class ConfigFile(ConfigList):
         filename: str
             name of the configuration file
         """
-
+        _log.info(f"Initializing configfile with {filename}")
         # check if a filename is given
         if filename is None:
             # load the default
-            print('No file given, can do nothing!!')
+            _log.info('No file given, can do nothing!!')
         else:
             # safe the file name
             self.filename = filename
@@ -678,7 +678,7 @@ class ConfigBeam:
         # check if a filename is given
         if ident is None or keylist is None:
             # load the default
-            print('No ID or no keywords given, can do nothing!!')
+            _log.info('No ID or no keywords given, can do nothing!!')
         else:
             # try to load the beam keywords
             try:
@@ -1257,7 +1257,7 @@ class ConfigTrace(TwoDimPolyN):
         except CKeyNotFound as e:
             raise TraceNotFound(ident, e.keyword)
         except CKeyLengthWrong as e:
-            print('Field dependent keyword: ' + e.keyword)
+            _log.info('Field dependent keyword: ' + e.keyword)
 
     def __str__(self):
         """Returns string representation of the object"""
@@ -1305,11 +1305,11 @@ class ConfigDisp(TwoDimPolyN):
             except CKeyNotFound as e:
                 raise DispNotFound(ident, e.keyword)
             except CKeyLengthWrong as e:
-                print('\nField dependent keyword: {0:s} has wrong length!'
+                _log.info('\nField dependent keyword: {0:s} has wrong length!'
                       .format(e.keyword))
                 raise DispNotFound(ident, e.keyword)
         except CKeyLengthWrong as e:
-            print('\nField dependent keyword: {0:s} has wrong length!'
+            _log.info('\nField dependent keyword: {0:s} has wrong length!'
                   .format(e.keyword))
             raise DispNotFound(ident, e.keyword)
 
@@ -1398,7 +1398,7 @@ class ConfKey:
     This keyword class is a light, but yet versatile
     and important class to strore a keyword entry in a
     configuration file. All important values are
-    direct ly read from the object attributes.
+    directly read from the object attributes.
     """
     def __init__(self, keyword, keyvalue, comment=None):
         """Constructor for the keyword class

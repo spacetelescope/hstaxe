@@ -1,14 +1,18 @@
 import os
-import shutil
+import logging
 from astropy.io import fits
 import stsci.imagestats as imagestats
 
 from pyaxe import config as config_util
 from pyaxe.axeerror import aXeError
 
+
 from . import axelowlev
 from . import configfile
 from . import axetasks
+
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 
 class aXePrepArator:
@@ -76,7 +80,7 @@ class aXePrepArator:
         else:
             raise ValueError("No grisim image specified for axeprep")
         self.objcat = config_util.getDATA(objcat)
-        print("\n**Using object catalog: {0}\n".format(self.objcat))
+        _log.info("\n**Using object catalog: {0}\n".format(self.objcat))
         self.dirim = config_util.getDATA(dirim)
         self.config = config
         self.dmag = dmag
@@ -93,7 +97,7 @@ class aXePrepArator:
             header = fits.getval(self.grisim, 'INSTRUME')
             return "NICMOS" in header
         except KeyError:
-            print("\nData is not from NICMOS\n")
+            _log.info("\nData is not from NICMOS\n")
             return False
 
     def _is_wfc3ir_data(self):
@@ -106,7 +110,7 @@ class aXePrepArator:
                     return True
             return False
         except KeyError:
-            print("\nData is not from HST/WFC3")
+            _log.info("\nData is not from HST/WFC3")
             return False
 
     def _make_mask(self):
@@ -172,7 +176,7 @@ class aXePrepArator:
 
         if 'AXEPRBCK' in grism_file[ext_info['fits_ext']].header:
             # warn that this is the second time
-            print("WARNING: Image %25s seems to be already background "
+            _log.info("WARNING: Image %25s seems to be already background "
                   "subtracted!".format(self.grisim))
 
         npix = int(grism_file['NAXIS1']) * int(fits_head['NAXIS2'])
@@ -238,7 +242,7 @@ class aXePrepArator:
 
         if 'AXEPRBCK' in fits_head:
             # warn that this is the second time
-            print("WARNING: Image {0:25s} seems to be already background "
+            _log.info("WARNING: Image {0:25s} seems to be already background "
                   "subtracted!".format(self.grisim))
 
         # close the fits
@@ -313,10 +317,10 @@ class aXePrepArator:
         try:
             fits.getval(self.grisim,
                         'AXEPRBCK', exten=ext_info['fits_ext'])
-            print("WARNING: Image {0:25s} seems to be already background "
+            _log.info("WARNING: Image {0:25s} seems to be already background "
                   "subtracted! Continuing anyways...".format(self.grisim))
         except KeyError:
-            print("Previous subtraction not recorded, proceeding with background subtraction.")
+            _log.info("Previous subtraction not recorded, proceeding with background subtraction.")
 
         scalebck = axelowlev.aXe_SCALEBCK(os.path.split(self.grisim)[-1],
                                           os.path.split(axe_names['MSK'])[-1],
@@ -325,7 +329,7 @@ class aXePrepArator:
         try:
             scalebck.runall()
         except aXeError:
-            print("There was a problem with the background subtraction, "
+            _log.info("There was a problem with the background subtraction, "
                   "continuing without it")
             return False
 
@@ -344,7 +348,7 @@ class aXePrepArator:
         fits_image.close()
 
         if sky_frac < 0.1:
-            print("Low fraction of sky pixels found (<10%) continuing WITHOUT"
+            _log.info("Low fraction of sky pixels found (<10%) continuing WITHOUT"
                   " sky subtraction")
             return False
 
@@ -390,7 +394,7 @@ class aXePrepArator:
         if goodreturn:
             pstring = ("AXEPREP: Image {0:25s}[SCI,{1:s}] sky-subtracted."
                        .format(self.grisim, str(ext_info['ext_version'])))
-            print(pstring)
+            _log.info(pstring)
 
     def _check_low_skyfrac(self, frac):
         """Check for a low fraction of background pixels"""
@@ -434,13 +438,13 @@ class aXePrepArator:
         if 'AXEPRNOR' in grism_header:
             # check whether a second normalization
             # is really desired
-            dec = self._check_second_normalization()
+            self._check_second_normalization()
 
         # check for the exposure time keyword
         if not conf.get_gkey('EXPTIME'):
             exptime_kword = 'EXPTIME'
         else:
-            exptime_kword = conf.get_gvalue('EXPTIME')
+            exptime_kword = configfile.get_gvalue('EXPTIME')
 
         # get the exposure time
         exptime = grism_image[0].header[exptime_kword]
@@ -449,7 +453,7 @@ class aXePrepArator:
                    "{2:7.1f}.".format(self.grisim,
                                       str(ext_info['ext_version']),
                                       exptime))
-        print(pstring)
+        _log.info(pstring)
 
         # Divide the grism image SCI and ERR arrays by exptime
         grism_image['SCI', ext_info['ext_version']].data /= exptime

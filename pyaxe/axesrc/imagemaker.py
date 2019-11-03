@@ -1,7 +1,13 @@
+import logging
+
 from astropy.io import fits
+
 from pyaxe import axeerror
+
 from . import configfile
 
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class DummyImages:
     """

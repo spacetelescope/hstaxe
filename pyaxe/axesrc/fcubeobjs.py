@@ -1,9 +1,10 @@
 import os
 import numpy as np
 import math
+import logging
 
 from astropy.io import fits
-from astropy.table import Table, Column
+from astropy.table import Table
 
 from drizzlepac import astrodrizzle
 
@@ -13,6 +14,8 @@ from stwcs.wcsutil import HSTWCS
 from pyaxe.axeerror import aXeError
 from pyaxe import config as config_util
 
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class DrizzleImage:
     """Class for working with drizzled images"""
@@ -232,19 +235,19 @@ class FluxCube:
         # make sure this gets saved to the output extension header.
         # The lambda image will be bigger than the segment image
         if x_excess > 0:
-            excess_x = flt_wcs.naxis1+x_excess*2.
+            excess_x = int(flt_wcs.naxis1+x_excess*2.)
             flt_wcs.naxis1 = excess_x
             crpix = flt_wcs.wcs.crpix
-            newx = crpix[0] + x_excess
-            flt_wcs.wcs.crpix = np.array([newx, crpix[1]])
+            newx = int(crpix[0]) + x_excess
+            flt_wcs.wcs.crpix = np.array([newx, int(crpix[1])])
             flt_wcs.sip.crpix[0] = newx
 
         if y_excess > 0:
-            excess_y = flt_wcs.naxis2+y_excess*2.
+            excess_y = int(flt_wcs.naxis2+y_excess*2.)
             flt_wcs.naxis2 = excess_y
             crpix = flt_wcs.wcs.crpix
-            newy = crpix[1] + y_excess
-            flt_wcs.wcs.crpix = np.array([crpix[0], newy])
+            newy = int(crpix[1]) + y_excess
+            flt_wcs.wcs.crpix = np.array([int(crpix[0]), newy])
             flt_wcs.sip.crpix[1] = newy
 
         # outimage is just the data array
@@ -332,20 +335,21 @@ class FluxCube:
         # edit the wcs header information to add any dim_info shifts that we
         # need the segment image needs to be the same sky area cut without
         # the added pixels
+        type(x_excess)
         if x_excess > 0:
-            excess_x = flt_wcs.naxis1+x_excess*2.
+            excess_x = int(flt_wcs.naxis1 + x_excess * 2.)
             flt_wcs.naxis1 = excess_x
             crpix = flt_wcs.wcs.crpix
-            newx = crpix[0] + x_excess
+            newx = int(crpix[0]) + x_excess
             flt_wcs.wcs.crpix = np.array([newx, crpix[1]])
             flt_wcs.sip.crpix[0] = newx
 
         if y_excess > 0:
-            excess_y = flt_wcs.naxis2+y_excess*2.
+            excess_y = int(flt_wcs.naxis2 + y_excess * 2.)
             flt_wcs.naxis2 = excess_y
             crpix = flt_wcs.wcs.crpix
-            newy = crpix[1] + y_excess
-            flt_wcs.wcs.crpix = np.array([crpix[0], newy])
+            newy = int(crpix[1]) + y_excess
+            flt_wcs.wcs.crpix = np.array([int(crpix[0]), newy])
             flt_wcs.sip.crpix[1] = newy
 
         # returns a numpy.ndarray which is just the data
@@ -497,7 +501,7 @@ class FluxCube:
         x_end = self.inima_dims[0] + 2*x_excess - (x_excess - dim_info[1])
         y_end = self.inima_dims[1] + 2*y_excess - (y_excess - dim_info[3])
 
-        print('Creating {0:s}'.format(self.fcube_name))
+        _log.info('Creating {0:s}'.format(self.fcube_name))
 
         # delete a just existing, previous fluxcube image
         if os.path.isfile(self.fcube_name):
@@ -548,7 +552,7 @@ class FluxCube:
             # get a tmp-filename
             tmpname = config_util.get_random_filename('', '.fits')
 
-            print("Using excess pixels of x,y ", x_excess, y_excess)
+            _log.info("Using excess pixels of x,y ", x_excess, y_excess)
             self._a_blot_image(fluximg,
                                tmpname,
                                x_excess,
@@ -571,7 +575,7 @@ class FluxCube:
             # delete the tmp-file again
             os.unlink(tmpname)
 
-        print(' Done')
+        _log.info(' Done')
 
 
 class FluxImage:
@@ -591,7 +595,7 @@ class FluxImage:
             the wavelength of the direct image
         mag_zero: float
             the zero point for the filter
-        AB_input: bool
+        AB_zero: bool
             1 if the zeropoint is in AB, 0 if in ST
 
 
@@ -683,9 +687,9 @@ class FluxImage:
         # the expression to apply to the image data
         expon = 10.0 ** (-0.4 * (21.10 + self.st_zero))
 
-        print(' image_name: {0:s}'.format(self.image_name.split('[')[0]))
-        print(' segm_image: {0:s}'.formatsegm_image)
-        print(' flux_name: {0:s}'.formatself.flux_name)
+        _log.info(f" image_name: {self.image_name.split('[')[0]}")
+        _log.info(f" segm_image: {segm_image}")
+        _log.info(f" flux_name: {self.flux_name}")
 
         # open the input files and apply the conversion
         file_a = fits.open(self.image_name.split('[')[0], 'readonly')
@@ -716,10 +720,10 @@ class FluxImage:
         if (ftype == 'mef'):
             scihdr = file_a['SCI'].header
             scihdr._strip()
-            newhdr = fits.Header(prihdr.ascard + scihdr.ascard)
+            newhdr = fits.Header(prihdr + scihdr)
             data = file_a['SCI'].data
         else:
-            newhdr = fits.Header(prihdr.ascard)
+            newhdr = fits.Header(prihdr)
             data = file_a[0].data
 
         # write the new flux image in simple fits format
@@ -728,7 +732,7 @@ class FluxImage:
         file_a.close()
         file_b.close()
 
-        print("\n{0:s} --> {1:s}".format(self.image_name, self.flux_name))
+        _log.info(f"\n{self.image_name} --> {self.flux_name}")
 
 
 class FluxCubeMaker:
@@ -736,7 +740,7 @@ class FluxCubeMaker:
     for the list of images extracted from the header of the
     drizzled grism image.
     """
-    def __init__(self, grism_image, segm_image, filter_info, AB_input,
+    def __init__(self, grism_image, segm_image, filter_info, AB_zero,
                  dim_term, interpol):
         """
         The class data is set. While doing that, basic checks
@@ -764,7 +768,7 @@ class FluxCubeMaker:
         # check whether the grism image exist,
         # store the name if it exists
         if not os.path.isfile(grism_image):
-            raise aXeError("File {0:s} does not exist!".format(grism_image))
+            raise aXeError(f"File {grism_image} does not exist!")
         else:
             self.grism_image = grism_image
 
@@ -789,12 +793,12 @@ class FluxCubeMaker:
             self.filter_images.append(self._make_fluxim(finfo[0],
                                       finfo[1],
                                       finfo[2],
-                                      AB_input))
+                                      AB_zero))
         else:
             # in case of a file, let the information be extraced
             # and create the fluximages
             self.filter_images.extend(self._evaluate_finfolist(filter_info,
-                                                               AB_input))
+                                                               AB_zero))
 
         # resolve and get the dimension information
         self.dim_info = self._get_dimension_info(dim_term)
@@ -838,7 +842,7 @@ class FluxCubeMaker:
         fcubes = []
 
         # determine the number of iput images
-        n_fcubes = self._get_nfcube(self.grism_image)
+        n_fcubes = self._get_nfcube()
 
         # create a fluxcube object for each input image
         for index in range(1, n_fcubes+1):
@@ -884,7 +888,7 @@ class FluxCubeMaker:
         float or not. The float representation of the
         expresion or None is returned
         """
-        if isinstance(float, fcheck):
+        if isinstance(fcheck, float):
             return fcheck
         else:
             try:
@@ -900,7 +904,7 @@ class FluxCubeMaker:
         integer or not. The integer representation of the
         expression or None is returned
         """
-        if isinstance(int, icheck):
+        if isinstance(icheck, int):
             return icheck
         else:
             try:
@@ -985,7 +989,7 @@ class FluxCubeMaker:
         """
         # create the list of fluxcube instances that
         # will be created
-        self.fcube_list.extend(self._fill_fcubelist(self.grism_image))
+        self.fcube_list.extend(self._fill_fcubelist())
 
         # prepare the direct images:
         for fimage in self.filter_images:

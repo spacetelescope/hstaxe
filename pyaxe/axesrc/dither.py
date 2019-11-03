@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import logging
 
 from astropy.io import fits
 from stsci.imagestats import ImageStats
@@ -10,12 +11,14 @@ from drizzlepac import adrizzle
 
 from pyaxe.axeerror import aXeError
 
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class Drizzle:
     """Class to wrap drizzle command"""
     def __init__(self):
 
-        print("No init in class")
+        _log.info("No init in class")
 
     def run(self, data,
                   outdata,
@@ -85,7 +88,7 @@ class Drizzle:
                                kernel=drizzle_params['KERNEL'], Stdout=1)
 
         for i in range(len(ret)):
-            print(ret[i])
+            _log.info(ret[i])
 
 
 class MedianCombine:
@@ -187,11 +190,11 @@ class MedianCombine:
                 wht_data.append(in_fits[0].data)
                 in_fits.close()
             else:
-                print("{0:s} not found/created by drizzle"
+                _log.info("{0:s} not found/created by drizzle"
                       "...skipping it.".format(one_image))
 
         if len(sci_data) != len(wht_data):
-            print("The number of single_sci images created by "
+            _log.info("The number of single_sci images created by "
                   "drizzle does not match the number of single_wht"
                   " files created!")
             raise aXeError("drizzle error")
@@ -209,11 +212,11 @@ class MedianCombine:
                 tmp_mean_value = self.combine_maskpt * ImageStats(wht_arr,lower=1e-8,lsig=None,usig=None,fields="mean",nclip=0).mean
             except (ValueError, AttributeError):
                 tmp_mean_value = 0.
-                print("tmp_mean_value set to 0 because no good "
+                _log.info("tmp_mean_value set to 0 because no good "
                       "pixels found; {0:s}".format(self.ext_names["MEF"]))
             except:
                 tmp_mean_value = 0.
-                print("tmp_mean_value set to 0; possible uncaught "
+                _log.info("tmp_mean_value set to 0; possible uncaught "
                       "exception in dither.py; {0:s}"
                       .format(self.ext_names["MEF"]))
 
@@ -223,8 +226,8 @@ class MedianCombine:
             weight_mask_list.append(weight_mask)
 
         if len(sci_data) < 2:
-            print('\nNumber of images to flatten: %i!' % len(sci_data))
-            print('Set combine type to "minimum"!')
+            _log.info('\nNumber of images to flatten: %i!' % len(sci_data))
+            _log.info('Set combine type to "minimum"!')
             self.combine_type = 'minimum'
 
         if (self.combine_type == "minmed"):
@@ -240,7 +243,7 @@ class MedianCombine:
                             combine_nsigma2 = self.combine_nsigma2  # Significance for accepting minimum instead of median
                             )
         else:
-            # print 'going to other', combine_type
+            # _log.info 'going to other', combine_type
             # Create the combined array object using the numcombine task
             result = numCombine(sci_data,
                                 numarrayMaskList=weight_mask_list,
@@ -251,7 +254,7 @@ class MedianCombine:
                                 lower=self.combine_lthresh
                                 )
 
-        # print result.combArrObj
+        # _log.info result.combArrObj
         hdu = fits.PrimaryHDU(result.combArrObj)
         hdulist = fits.HDUList([hdu])
         hdulist[0].header['EXPTIME'] = (self.input_data['exp_tot'],
@@ -395,7 +398,7 @@ class Deriv:
         if os.path.isfile(self.out_name):
             os.unlink(self.out_name)
 
-        print("Running quickDeriv on ", self.in_name)
+        _log.info("Running quickDeriv on ", self.in_name)
         # OPEN THE INPUT IMAGE IN READ ONLY MODE
         img = fits.open(self.in_name, mode='readonly', memmap=0)
 

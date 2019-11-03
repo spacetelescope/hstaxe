@@ -335,7 +335,7 @@ main (int argc, char *argv[])
 
   oblist = SexObjects_to_oblistII(os, obs, conf, conf_file_path, mfwhm, dmag, auto_reorient, bck_mode);
 
-  fprintf (stdout, "Done.\n");fflush(stdout);
+  /*fprintf (stdout, "Done.\n");fflush(stdout);*/
 
   fprintf (stdout, "aXe_GOL2AF: Writing aperture file...");fflush(stdout);
   num = object_list_to_file (oblist, aper_file_path, leaveout_ignored);

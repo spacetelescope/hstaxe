@@ -146,13 +146,13 @@ main(int argc, char *argv[])
 	// skip beam if ignore flag for thisbeam is set
 	if (oblist[i]->beams[j].ignore !=0 || oblist[i]->beams[j].ID != 0)
 	  {
-	    fprintf(stdout,", %c ( Ignored )",
-		    BEAM(oblist[i]->beams[j].ID));
+	    /*fprintf(stdout,", %c ( Ignored )",
+		    BEAM(oblist[i]->beams[j].ID));*/
 	    continue;
 	  }
 
 	// print the current beam ID
-	fprintf(stdout, ", %c (Fitted)", BEAM(oblist[i]->beams[j].ID));
+	/*fprintf(stdout, ", %c (Fitted)", BEAM(oblist[i]->beams[j].ID));*/
 
 
 	// fit the trace of the beam, modify the

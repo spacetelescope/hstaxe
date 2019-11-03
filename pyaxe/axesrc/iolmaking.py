@@ -1,11 +1,16 @@
 import os
 import math
 from copy import deepcopy
+import logging
+
 from stwcs.wcsutil import HSTWCS
 from astropy.io import fits
 from astropy.table import Table
+
 from pyaxe.axeerror import aXeError
 
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class ProjectionList:
     def __init__(self, filename='', dim_info=''):
@@ -151,13 +156,13 @@ class ProjectionList:
         if not isinstance(catalog, Table):
             raise aXeError("IOLPREP: Expected input catalog to be an astropy table")
 
-        print("\n >>>> Working on Input Object List: {0:s} >>>>\n"
+        _log.info("\n >>>> Working on Input Object List: {0:s} >>>>\n"
               .format(self.iol_name))
 
         # now translate ra dec to new image pixel points
         # this must go through the wcs of the mosaic image
         # and then through the wcs for the individual image
-        print("Converting coordinates using wcs from grism image {0}\n".format(self.filename))
+        _log.info("Converting coordinates using wcs from grism image {0}\n".format(self.filename))
         trad = catalog['THETA_IMAGE']
         xcat = catalog['X_IMAGE']
         ycat = catalog['Y_IMAGE']
@@ -213,7 +218,7 @@ class ProjectionList:
                 if translate:
                     angle = math.degrees(angle)
 
-                # print("dx {} dy {}  angle {} x,y: ({},{})\n".format(dx, dy, angle, x, y))
+                # _log.info("dx {} dy {}  angle {} x,y: ({},{})\n".format(dx, dy, angle, x, y))
                 # fill in the new position and angle
                 output_catalog['X_IMAGE'][row] = trans_x[row]
                 output_catalog['Y_IMAGE'][row] = trans_y[row]
@@ -222,7 +227,7 @@ class ProjectionList:
                 else:
                     output_catalog['THETA_IMAGE'][row] = angle
             else:
-                print(f"{x}\t{y}\t{self.dim_info}\t{output_catalog['NUMBER'][row]}")
+                _log.info(f"{x}\t{y}\t{self.dim_info}\t{output_catalog['NUMBER'][row]}")
                 output_catalog.remove_row(row)
 
         # save the new IOL, this is done especially for the C
@@ -244,7 +249,7 @@ class ProjectionList:
         output_catalog.write(of, format='ascii.no_header', overwrite=False)
         of.close()
 
-        print(f"\n >>>> Catalog: {self.iol_name} written with {len(catalog)} entries.>>>> \n")
+        _log.info(f"\n >>>> Catalog: {self.iol_name} written with {len(catalog)} entries.>>>> \n")
 
 
 class IOLMaker:

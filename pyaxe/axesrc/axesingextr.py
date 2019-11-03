@@ -1,9 +1,13 @@
+import logging
 from pyaxe import config as config_util
 
 from . import axetasks
 from . import configfile
 from . import nlincoeffs
 
+
+# make sure there is a logger
+_log = logging.getLogger(__name__)
 
 class aXeSpcExtr:
     def __init__(self, grisim, objcat, dirim, config, dmag, **params):
@@ -194,7 +198,7 @@ class aXeSpcExtr:
 
             # generate the non-linear distortions from the IDCTAB;
             # and store them in the fits-file header
-            print("Generating and storing nonlinear distortions in {0}".format(config_util.getDATA(self.grisim)))
+            _log.info("Generating and storing nonlinear distortions in {0}".format(config_util.getDATA(self.grisim)))
             nlins = nlincoeffs.NonLinCoeffs(config_util.getDATA(self.grisim), ext_info)
             nlins.make()
             nlins.store_coeffs()
@@ -205,16 +209,16 @@ class aXeSpcExtr:
 
         # make a background PET if necessary
         if 'back' in self.params and self.params['back']:
-            print("\nMaking backpet\n")
+            _log.info("\nMaking backpet\n")
             self._make_bckPET()
 
         # extract the spectra
         if 'spectr' in self.params and self.params['spectr']:
-            print("\nMaking spectra\n")
+            _log.info("\nMaking spectra\n")
             self._make_spectra()
 
         # make the proper non-quantitative contamination
         if ('drzfwhm' in self.params and self.params['drzfwhm']) and \
            ('cont_model' in self.params and not config_util.is_quant_contam(self.params['cont_model'])):
-            print("\nmaking non quant contam\n")
+            _log.info("\nmaking non quant contam\n")
             self._make_drzgeocont(ext_info)

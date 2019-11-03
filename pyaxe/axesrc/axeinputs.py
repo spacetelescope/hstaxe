@@ -76,7 +76,6 @@ class aXeInput(object):
 
             # assume if it's a number it's DMAG
             if np.issubsctype(self._inimlist[name], np.float):
-                print("Renaming column 3 to dmag")
                 self._inimlist.rename_column(name, 'dmag')
             # assume if it's a string its the direct image
             elif np.issubsctype(self._inimlist.columns[0], np.str):
