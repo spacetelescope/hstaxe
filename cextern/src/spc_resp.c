@@ -248,6 +248,7 @@ apply_response_function(spectrum *spec, spectrum *resp, const int quant_cont)
   double *x1,*y1, *x2, *y2;
   int i,j;
   double r1, r2, fr, fr1, fr2;
+  double min_l, max_l;
   // test
   // int nguess;
   // double tval=0.0;
@@ -277,7 +278,17 @@ apply_response_function(spectrum *spec, spectrum *resp, const int quant_cont)
   x2 = malloc((double)(resp->spec_len) *sizeof(double));
   y2 = malloc((double)(resp->spec_len) *sizeof(double));
 
-  for (i=0;i<resp->spec_len;i++) {
+  min_l = 1e32;
+  max_l = -1e32;
+
+  for (i=0;i<resp->spec_len; i++) {
+    if (resp->spec[i].lambda_mean > max_l) {
+     max_l = resp->spec[i].lambda_mean;
+    }
+    if (resp->spec[i].lambda_mean < min_l) {
+     min_l = resp->spec[i].lambda_mean;
+    }
+     
     x1[i] = resp->spec[i].lambda_mean;
     y1[i] = resp->spec[i].flux - resp->spec[i].ferror;
     x2[i] = resp->spec[i].lambda_mean;
@@ -288,16 +299,18 @@ apply_response_function(spectrum *spec, spectrum *resp, const int quant_cont)
   gsl_spline_init (spline2, x2, y2, resp->spec_len);
   // test
   // nguess = 0;
-  // OOF, this allows the older extrapolating functionality from previous version
-  // of the gsl spline eval
-  for (j=0;j<spec->spec_len;j++) {
-    //r1 = gsl_spline_eval (spline1, spec->spec[j].lambda_mean, acc1);
-    r1 = spline1->interp->type->eval(spline1->interp->state, spline1->x, spline1->y, spline1->interp->size, spec->spec[j].lambda_mean, acc1, &y1[j]);
-    r2 = spline2->interp->type->eval(spline2->interp->state, spline2->x, spline2->y, spline2->interp->size, spec->spec[j].lambda_mean, acc2, &y2[j]);
-    //r2 = gsl_spline_eval (spline2, spec->spec[j].lambda_mean, acc2);
-    // test
-    // tval = get_response_value_plus(resp, spec->spec[j].lambda_mean, &nguess);
-
+  
+  for (j=0; j<spec->spec_len; j++) {
+    fprintf(stderr,"%f %f %f\n",spec->spec[j].lambda_mean, min_l, max_l);
+    if ((spec->spec[j].lambda_mean>=min_l) && (spec->spec[j].lambda_mean <= max_l)) {
+         fprintf(stderr,"lambda mean between min and max\n\t%f : %f %f\n", spec->spec[j].lambda_mean, min_l, max_l);
+     r1 = gsl_spline_eval(spline1, spec->spec[j].lambda_mean, acc1);
+     r2 = gsl_spline_eval(spline2, spec->spec[j].lambda_mean, acc2);
+   }
+   else {
+     r1 = 0;
+     r2 = 0;
+   }
 
     /* Need to divide by the pixel width of the
        wavelength calibration at the given lambda */
