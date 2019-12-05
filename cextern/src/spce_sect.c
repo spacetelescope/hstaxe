@@ -19,10 +19,6 @@
  *  The coordinates passed to find_section_point should be relative
  *  to the reference point within the framework of spc_extract
  *
- * @author  Martin Kuemmel, Nor Pirzkal, Markus Demleitner
- * @package spce_sect
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
  *
  */
 

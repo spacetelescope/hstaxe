@@ -1,11 +1,6 @@
 /**
  * File: spce_pgp.c
  * Various PGplot routines amd helper functions.
- *
- * @author  Nor Pirzkal, Markus Demleitner
- * @package spce_pgp
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 
 #include "spce_pgp.h"

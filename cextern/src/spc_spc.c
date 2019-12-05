@@ -36,8 +36,8 @@ allocate_spectrum (const int numbin)
   for (i = 0; i < sp->spec_len; i++)
     {
       sp->spec[i].count = 0.;
-      sp->spec[i].lambda_min = +1e38;
       sp->spec[i].lambda_max = -1e38;
+      sp->spec[i].lambda_min = +1e38;
       sp->spec[i].lambda_mean = GSL_NAN;
       sp->spec[i].error = 0.;
       sp->spec[i].flux = 0.;

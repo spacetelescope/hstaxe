@@ -1,10 +1,6 @@
 /**
  * File: specmodel_utils.c
  *
- * @author  Martin Kuemmel
- * @package specmodel_utils
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 #include "specmodel_utils.h"
 #include "aXe_grism.h"

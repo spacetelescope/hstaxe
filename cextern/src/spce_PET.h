@@ -2,10 +2,6 @@
  * File: spce_PET.h
  * The interface the the Pixel extraction table input/output routines
  *
- * @author  Martin Kuemmel, Nor Pirzkal
- * @package spce_PET
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 
 #ifndef _SPCE_PET_H

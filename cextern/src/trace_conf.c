@@ -1,9 +1,5 @@
 /**
  * File: trace_conf.c
- * @author  Martin Kuemmel, Nor Pirzkal
- * @package trace_conf
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 
 #include "trace_conf.h"

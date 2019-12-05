@@ -501,7 +501,7 @@ class FluxCube:
         x_end = self.inima_dims[0] + 2*x_excess - (x_excess - dim_info[1])
         y_end = self.inima_dims[1] + 2*y_excess - (y_excess - dim_info[3])
 
-        _log.info('Creating {0:s}'.format(self.fcube_name))
+        _log.info(f'Creating {self.fcube_name}')
 
         # delete a just existing, previous fluxcube image
         if os.path.isfile(self.fcube_name):
@@ -552,7 +552,7 @@ class FluxCube:
             # get a tmp-filename
             tmpname = config_util.get_random_filename('', '.fits')
 
-            _log.info("Using excess pixels of x,y ", x_excess, y_excess)
+            _log.info(f"Using excess pixels of {x_excess}, {y_excess} ")
             self._a_blot_image(fluximg,
                                tmpname,
                                x_excess,

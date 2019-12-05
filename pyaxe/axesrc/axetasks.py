@@ -9,7 +9,6 @@ from . import drizzleobjects
 from . import fcubeobjs
 from . import inputchecks
 from . import iolmaking
-from . import mdrzobjects
 from . import mefobjects
 from . import pysex2gol
 
@@ -251,7 +250,7 @@ def axecore(inlist='',
 def drzprep(inlist='',
             configs='',
             back=False,
-            opt_extr=False):
+            opt_extr=True):
     """Convenience function for the aXe task DRZPREP"""
     # make the general setup;
     # needed to define
@@ -296,23 +295,23 @@ def axecrr(inlist='',
     drizzle_params = drizzleobjects.DrizzleParams(configs)
 
     # make a list of drizzle objects
-    dols = drizzleobjects.DrizzleObjectList(drizzle_params, cont_info,
+    dols = drizzleobjects.DrizzleObjectList(drizzle_params,
+                                            cont_info,
                                             opt_extr, back=False)
 
     _log.info(f"checking files {dols}")
-    # check all files
     dols.check_files()
 
-    # prepare and do the drizzling
+    # prepare and perform the drizzling
     dols.prepare_drizzle()
     dols.drizzle()
 
     # if there are no background
-    # files, immediately extract
-    # the spectra
+    # files, immediately extract the spectra
     if not back and makespc:
         # extract spectra from the deep 2D stamps
-        mefs = mefobjects.MEFExtractor(drizzle_params, dols, opt_extr=opt_extr)
+        mefs = mefobjects.MEFExtractor(drizzle_params,
+                                       dols, opt_extr=opt_extr)
         mefs.extract(infwhm, outfwhm, adj_sens)
         del mefs
 
@@ -320,7 +319,6 @@ def axecrr(inlist='',
         if clean:
             dols.delete_files()
 
-        # delete the object
         del dols
 
     if back:
@@ -335,7 +333,6 @@ def axecrr(inlist='',
         # get the contamination information
         # cont_info = dpps.is_quant_contam()
 
-        # delete the object
         del dpps
 
         # make a list of drizzle objects
@@ -350,13 +347,11 @@ def axecrr(inlist='',
         back_dols.drizzle()
 
         # extract the spectra,
-        # if desired
         if makespc:
             mefs = mefobjects.MEFExtractor(drizzle_params, dols, back_dols,
                                            opt_extr=opt_extr)
             mefs.extract(infwhm, outfwhm, adj_sens)
 
-        # delete the files
         if clean:
             dols.delete_files()
             back_dols.delete_files()
@@ -393,7 +388,7 @@ def axeddd(inlist='',
     drizzle_params = drizzleobjects.DrizzleParams(configs)
 
     # make a list of drizzle objects
-    dols = mdrzobjects.MulDrzObjList(drizzle_params, mult_drizzle_par,
+    dols = drizzleobjects.DrizzleObjectList(drizzle_params, mult_drizzle_par,
                                      cont_info, opt_extr, back)
 
     # check all files
@@ -401,10 +396,9 @@ def axeddd(inlist='',
 
     # prepare and do the drizzling
     dols.prepare_drizzle()
-    dols.multidrizzle()
+    dols.drizzle()
 
-    # if there are no background
-    # files, immediately extract
+    # if there are no background files, immediately extract
     # the spectra
     if makespc:
         # extract spectra from the deep 2D stamps

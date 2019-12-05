@@ -2,10 +2,6 @@
  * File: nicback_utils.h
  * header files for nicback_utils.c
  *
- * @author  Martin Kuemmel
- * @package nicback_utils
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 #ifndef _NICKBACK_UTILS_H
 #define _NICKBACK_UTILS_H

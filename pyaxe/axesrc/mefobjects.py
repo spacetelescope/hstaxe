@@ -9,31 +9,50 @@ from . import configfile
 class MEFExtractor:
     """Multi-Extension FITS Extractor class"""
     def __init__(self, drizzle_params, obj_dol=None, bck_dol=None, opt_extr=None):
+        """
+        Parameters
+        ----------
+        drizzle_params : dict
+        Dictionary of drizzle parameters
+
+        obj_dol : drizzleobjects.DrizzleObjectList
+        List class for all objects to be drizzled
+
+        bck_dol : drizzleobjects.DrizzleObjectList
+
+        opt_extr : bool or None
+        Perform optimal extraction
+
+        """
         # determine and store the file extension names
         self.ext_names = self._get_ext_names(drizzle_params)
 
         # store the optimal extraction boolean
         self.opt_extr = opt_extr
 
+        self.obj_dol = obj_dol
+        self.bck_dol = bck_dol
+
         if opt_extr:
             self.opt_names = self._get_opt_names(drizzle_params)
 
         # save the object lists
         if obj_dol is not None:
-            self.obj_dol = obj_dol.sort()
+            self.obj_dol.sort()
 
-        if bck_dol is not None:
-            self.bck_dol = bck_dol
-
-        # generate a list with all MEF files;
-        obj_list = MEFList(self.obj_dol.get_mef_files())
-        obj_list.writeto(self.ext_names['OLIS'], overwrite=True)
-        del obj_list
-
+            # generate a list with all MEF files;
+            obj_list = self.obj_dol.get_mef_files()
+            with open(self.ext_names['OLIS'], 'w') as f:
+                for item in obj_list:
+                    f.write("%s\n" % item)
+            del obj_list
+            
         if self.bck_dol is not None:
             self.bck_dol.sort()
-            bck_list = MEFList(self.bck_dol.get_mef_files())
-            bck_list.writeto(self.ext_names['BLIS'])
+            bck_list = self.bck_dol.get_mef_files()
+            with open(self.ext_names['BLIS'], 'w') as f:
+                for item in bck_list:
+                    f.write("%s\n" % item)
             del bck_list
 
             # copy some extensions
@@ -305,15 +324,6 @@ class MEFExtractor:
                             out_stp=self.opt_names['STP'])
 
 
-class MEFList:
-    """Class for the list of drizzled MEF files"""
-    def __init__(self, mef_files):
-        """Initializes the class"""
-        # go over all MEF files
-        for mef in mef_files:
-            # insert the file name
-            self[0][index] = mef_files[index]
-
 
 class DrizzleConf(configfile.ConfigList):
     """Class for the drizzle configuration file"""
@@ -353,27 +363,38 @@ class DrizzleConf(configfile.ConfigList):
     def _make_keylist(self, config, drizzle_params, modvar):
         """
         Creates a list of configuration keywords
+
+        Parameters
+        ----------
+        config : configfile
+
+        drizzle_params : dict
+        Dictionary of drizzle parameters
+
+        modvar : bool
+
+
         """
         # initialize the list
         keylist = []
 
         keylist.append(configfile.ConfKey('INSTRUMENT',
-                                          configfile.get_gvalue('INSTRUMENT')))
+                                          config.get_gvalue('INSTRUMENT')))
         keylist.append(configfile.ConfKey('CAMERA',
-                                          configfile.get_gvalue('CAMERA')))
+                                          config.get_gvalue('CAMERA')))
         keylist.append(configfile.ConfKey('SCIENCE_EXT', 'SCI'))
         keylist.append(configfile.ConfKey('DQ_EXT', 'DQ'))
         keylist.append(configfile.ConfKey('ERRORS_EXT', 'ERR'))
         keylist.append(configfile.ConfKey('WEIGHT_EXT', 'WHT'))
         keylist.append(configfile.ConfKey('FFNAME', 'None'))
         keylist.append(configfile.ConfKey('DRZRESOLA',
-                                          configfile.get_gvalue('DRZRESOLA')))
+                                          config.get_gvalue('DRZRESOLA')))
         keylist.append(configfile.ConfKey('DRZSCALE',
-                                          configfile.get_gvalue('DRZSCALE')))
+                                          config.get_gvalue('DRZSCALE')))
         keylist.append(configfile.ConfKey('DRZLAMB0',
-                                          configfile.get_gvalue('DRZLAMB0')))
+                                          config.get_gvalue('DRZLAMB0')))
         keylist.append(configfile.ConfKey('DRZXINI',
-                                          configfile.get_gvalue('DRZXINI')))
+                                          config.get_gvalue('DRZXINI')))
         keylist.append(configfile.ConfKey('DRZPFRAC',
                                           drizzle_params['PFRAC']))
         keylist.append(configfile.ConfKey('DRZPSCALE',
@@ -382,12 +403,12 @@ class DrizzleConf(configfile.ConfigList):
                                           drizzle_params['KERNEL']))
 
         keylist.append(configfile.ConfKey('DRZROOT', drizzle_params['ROOT']))
-        if configfile.get_gvalue('POBJSIZE') is not None:
+        if config.get_gvalue('POBJSIZE') is not None:
             keylist.append(configfile.ConfKey('POBJSIZE',
-                           configfile.get_gvalue('POBJSIZE')))
-        if configfile.get_gvalue('SMFACTOR') is not None:
+                           config.get_gvalue('POBJSIZE')))
+        if config.get_gvalue('SMFACTOR') is not None:
             keylist.append(configfile.ConfKey('SMFACTOR',
-                           configfile.get_gvalue('SMFACTOR')))
+                           config.get_gvalue('SMFACTOR')))
         keylist.append(configfile.ConfKey('BEAMA', config.beams['A'].get_bvalue('BEAMA')))
         keylist.append(configfile.ConfKey('MMAG_EXTRACT_A', config.beams['A'].get_bvalue('MMAG_EXTRACT_A')))
         keylist.append(configfile.ConfKey('MMAG_MARK_A', config.beams['A'].get_bvalue('MMAG_MARK_A')))
@@ -399,9 +420,9 @@ class DrizzleConf(configfile.ConfigList):
         keylist.append(configfile.ConfKey('YOFF_A', '0.0'))
         keylist.append(configfile.ConfKey('DISP_ORDER_A', '1'))
         keylist.append(configfile.ConfKey('DLDP_A_0',
-                                          configfile.get_gvalue('DRZLAMB0')))
+                                          config.get_gvalue('DRZLAMB0')))
         keylist.append(configfile.ConfKey('DLDP_A_1',
-                                          configfile.get_gvalue('DRZRESOLA')))
+                                          config.get_gvalue('DRZRESOLA')))
         keylist.append(configfile.ConfKey('SENSITIVITY_A', config.beams['A'].get_bvalue('SENSITIVITY_A')))
         if modvar:
             keylist.append(configfile.ConfKey('MODEL_EXT', 'MOD'))

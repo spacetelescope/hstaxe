@@ -301,11 +301,11 @@ apply_response_function(spectrum *spec, spectrum *resp, const int quant_cont)
   // nguess = 0;
   
   for (j=0; j<spec->spec_len; j++) {
-    fprintf(stderr,"%f %f %f\n",spec->spec[j].lambda_mean, min_l, max_l);
+    //fprintf(stderr,"%f %f %f\n",spec->spec[j].lambda_mean, min_l, max_l);
     if ((spec->spec[j].lambda_mean>=min_l) && (spec->spec[j].lambda_mean <= max_l)) {
-         fprintf(stderr,"lambda mean between min and max\n\t%f : %f %f\n", spec->spec[j].lambda_mean, min_l, max_l);
-     r1 = gsl_spline_eval(spline1, spec->spec[j].lambda_mean, acc1);
-     r2 = gsl_spline_eval(spline2, spec->spec[j].lambda_mean, acc2);
+    //     fprintf(stderr,"lambda mean between min and max\n\t%f : %f %f\n", spec->spec[j].lambda_mean, min_l, max_l);
+      r1 = gsl_spline_eval(spline1, spec->spec[j].lambda_mean, acc1);
+      r2 = gsl_spline_eval(spline2, spec->spec[j].lambda_mean, acc2);
    }
    else {
      r1 = 0;

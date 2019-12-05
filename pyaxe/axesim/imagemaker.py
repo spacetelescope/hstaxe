@@ -1,11 +1,3 @@
-"""
-$Revision: 1.1 $ $Date: 2010/01/18 09:16:15 $
-Author: Martin Kuemmel (mkuemmel@stecf.org)
-Affiliation: Space Telescope - European Coordinating Facility
-WWW: http://www.stecf.org/software/slitless_software/axesim/
-"""
-from __future__ import absolute_import
-
 from astropy.io import fits as pyfits
 from . import configfile
 from .axeerror import *

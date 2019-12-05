@@ -2,10 +2,6 @@
  * File: nicback_utils.c
  * Subroutine for the NICMOS background subtraction
  *
- * @author  Martin Kuemmel
- * @package nickback_utils
- * @version $Revision: 1.4 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multifit_nlin.h>

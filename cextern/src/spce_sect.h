@@ -3,11 +3,6 @@
  * External definitions for spce_sect.c
  *
  *
- * @author  Martin Kuemmel, Nor Pirzkal, Markus Demleitner
- * @package spce_sect
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
- *
  */
 
 #ifndef spce_sect_H

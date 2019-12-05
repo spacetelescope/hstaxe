@@ -172,9 +172,9 @@ class aXe_AF2PET(TaskWrapper):
         out_pet : str
             Name to use for the output PET file instead of the default.
             Filename conventions for aXe are described below.
-        in_af : str
+        in_af : str or None
             Name to use for the input aperture file with the stamp images
-            instead of the default.ƒpetcont
+            instead of the default.petcont
 
         Description
         -----------

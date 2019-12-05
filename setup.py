@@ -226,19 +226,7 @@ setup(
     use_scm_version=True,
     use_2to3=False,
     setup_requires=['setuptools_scm'],
-    install_requires=['numpy',
-                      'astropy',
-                      'wcstools',
-                      'cfitsio',
-                      'gsl',
-                      'stwcs'],
     packages=find_packages(),
-    tests_require=[
-        'backports.tempfile',
-        'pytest',
-        'requests_mock',
-        'pytest-catchlog'
-    ],
     cmdclass={
         'test': PyTest,
         'build_sphinx': BuildSphinx,

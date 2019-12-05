@@ -1,11 +1,6 @@
 /**
  * File: model_utils.h
  * Header file for model_utils.c
- *
- * @author  Martin Kuemmel
- * @package modelutils
- * @version $Revision: 1.2 $
- * @date    $Date: 2009-06-18 09:50:07 $
  */
 #ifndef _MODEL_UTILS_H
 #define _MODEL_UTILS_H

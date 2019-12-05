@@ -75,10 +75,7 @@ main (int argc, char *argv[])
   if ((argc < 3) || (opt = get_online_option ("help", argc, argv)))
     {
       fprintf (stdout,
-	       "ST-ECF European Coordinating Facility\n"
-	       "Copyright (C) 2006 Martin Kuemmel\n"
-	       "aXe_PETIPC Version %s:"
-	       "\n",RELEASE);
+         "aXe_FRINGECORR Version %s:\n",RELEASE);
       exit (1);
     }
 

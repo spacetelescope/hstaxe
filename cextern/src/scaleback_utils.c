@@ -2,10 +2,6 @@
  * File: scaleback_utils.c
  * Subroutine for the WFC3 background scaling
  *
- * @author  Martin Kuemmel
- * @package scaleback_utils
- * @version $Revision: 1.8 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multifit_nlin.h>

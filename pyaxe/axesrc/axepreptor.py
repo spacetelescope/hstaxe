@@ -444,7 +444,7 @@ class aXePrepArator:
         if not conf.get_gkey('EXPTIME'):
             exptime_kword = 'EXPTIME'
         else:
-            exptime_kword = configfile.get_gvalue('EXPTIME')
+            exptime_kword = self.config.get_gvalue('EXPTIME')
 
         # get the exposure time
         exptime = grism_image[0].header[exptime_kword]

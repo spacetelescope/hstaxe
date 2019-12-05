@@ -108,8 +108,6 @@ main (int argc, char *argv[])
       || (opt = get_online_option ("help", argc, argv)))
     {
       fprintf (stdout,
-	       "ST-ECF European Coordinating Facility\n"
-	       "Copyright (C) 2002 Martin Kuemmel\n"
 	       "aXe_PET2SPC Version %s:\n"
 	       "             aXe task that produces 1-D, binned spectra using information\n"
 	       "             contained in a OPET and a BPET. A 1-D spectrum is generated\n"

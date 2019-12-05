@@ -1,10 +1,6 @@
 /**
  * File: trfit_utils.h
  *
- * @author  Martin Kuemmel
- * @package trfit_utils
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 #ifndef _TRFIT_UTILS_H
 #define _TRFIT_UTILS_H

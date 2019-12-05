@@ -2,10 +2,6 @@
  * File: spce_pgp.h
  * Interface to PGplot routines.
  *
- * @author  Nor Pirzkal, Markus Demleitner
- * @package spce_pgp
- * @version $Revision: 1.3 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 
 #ifndef _SPCE_PGP_H

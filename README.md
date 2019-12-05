@@ -2,8 +2,9 @@
 Current Requirements
 ====================
 This version of the software no longer requires IRAF or PyRAF to be installed.
-see `setup.py` for additional install dependencies. The most notable here is
-the GNU Science Library.
+see `setup.py` and `setup.cfg` for additional install dependencies. The most notable here are
+the GNU Science Library, cfitsio, and wcstools. cfitsio and wcstools are available from the
+astroconda channel at STScI.
 
 
 Software Development History
@@ -22,8 +23,11 @@ Howard Bushouse, STScI
 Richard Hook, ST-ECF/STScI
 Martin Kuemmel, ST-ECF
 Norbert Pirzkal, ST-ECF/STScI
+Markus Demleitner, ST-ECF
 
-Some versioning feature notes:
+
+
+Some versioning feature notes from the previous IRAF software package:
 
 - Version 2.4.4:
     axeprep doesn't require direct image column for input list file

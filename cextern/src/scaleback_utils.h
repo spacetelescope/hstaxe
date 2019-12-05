@@ -2,10 +2,6 @@
  * File: scaleback_utils.h
  * header files for scaleback_utils.c
  *
- * @author  Martin Kuemmel
- * @package scaleback_utils
- * @version $Revision: 1.8 $
- * @date    $Date: 2010-06-15 09:48:34 $
  */
 #ifndef _SCALEBACK_UTILS_H
 #define _SCALEBACK_UTILS_H

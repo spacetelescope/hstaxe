@@ -6,17 +6,22 @@ import numpy as np
 import shutil
 import logging
 from copy import deepcopy
+import tempfile
 
 from astropy.io import fits
 from drizzlepac import astrodrizzle
+from drizzlepac import util as driz_util
 
 from pyaxe import config as config_util
 from pyaxe.axeerror import aXeError
 
 from . import configfile
+from . import drizzleobjects
+
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)
+
 
 class DrizzleParams(dict):
     """Class to store the drizzle parameters"""
@@ -113,8 +118,14 @@ class DrizzleParams(dict):
 
 class DrizzleObjectList:
     """List class for all objects to be drizzled"""
-    def __init__(self, drizzle_params, cont_info, opt_extr=False,
-                 back=False, drztmp_dir=None, drizzle_dir=None):
+    def __init__(self,
+                 drizzle_params,
+                 cont_info,
+                 opt_extr=False,
+                 back=False,
+                 drztmp_dir=None,
+                 drizzle_dir=None):
+
         # load the drizzle parameters
         self.drizzle_params = drizzle_params.copy()
 
@@ -472,7 +483,7 @@ class DrizzleObject:
         """Defines a length"""
         return len(self.contrib_list)
 
-    def __cmp__(self, compObject):
+    def __lt__(self, compObject):
         """Define a comparison for the object"""
         # make the comparison according
         # to the member 'sortIndex'
@@ -799,44 +810,44 @@ class DrizzleObject:
 
         # Copy FLT image to MEF SCI extension
         file = fits.open(self.ext_names['FLT'], mode='readonly')
-        file[0].update_ext_name('SCI')
-        file[0].update_ext_version(1)
+        file[0].header['extname']=('SCI')
+        file[0].header['extver']= 1
         fits.append(self.ext_names['MEF'], file[0].data, file[0].header)
         file.close()
 
         # Copy ERR image to MEF ERR extension
         file = fits.open(self.ext_names['ERR'], mode='readonly')
-        file[0].update_ext_name('ERR')
-        file[0].update_ext_version(1)
+        file[0].header['extname'] = 'ERR'
+        file[0].header['extver'] = 1
         fits.append(self.ext_names['MEF'], file[0].data, file[0].header)
         file.close()
 
         # Copy WHT image to MEF EXPT extension
         file = fits.open(self.ext_names['WHT'], mode='readonly')
-        file[0].update_ext_name('EXPT')
-        file[0].update_ext_version(1)
+        file[0].header['extname'] = 'EXPT'
+        file[0].header['extver'] = 1
         fits.append(self.ext_names['MEF'], file[0].data, file[0].header)
         file.close()
 
         # Copy CON image to MEF CON extension
         file = fits.open(self.ext_names['CON'], mode='readonly')
-        file[0].update_ext_name('CON')
-        file[0].update_ext_version(1)
+        file[0].header['extname'] = 'CON'
+        file[0].header['extver'] = 1
         fits.append(self.ext_names['MEF'], file[0].data, file[0].header)
         file.close()
 
         if self.opt_extr:
             # Copy MOD image to MEF MOD extension
             file = fits.open(self.ext_names['MOD'], mode='readonly')
-            file[0].update_ext_name('MOD')
-            file[0].update_ext_version(1)
+            file[0].header['extname'] = 'MOD'
+            file[0].header['extver'] = 1
             fits.append(self.ext_names['MEF'], file[0].data, file[0].header)
             file.close()
 
             # Copy VAR image to MEF VAR extension
             file = fits.open(self.ext_names['VAR'], mode='readonly')
-            file[0].update_ext_name('VAR')
-            file[0].update_ext_version(1)
+            file[0].header['extname'] = 'VAR'
+            file[0].header['extver'] = 1
             fits.append(self.ext_names['MEF'], file[0].data, file[0].header)
             file.close()
 
@@ -1081,6 +1092,17 @@ class DrizzleObject:
         mef_image.flush()
         mef_image.close()
 
+    def _create_small_fits_ctx(self, x, y):
+        """Create a small fits image for use as a context for astrodrizzle"""
+        data = np.ones((y,x))
+        hdu = fits.PrimaryHDU(data)
+        handle, filename = tempfile.mkstemp(suffix='.fits')
+        hdu.writeto(filename)
+        os.close(handle)
+        del hdu
+        del data
+        return (filename)
+
     def drizzle(self):
         """Drizzle all contributors together"""
         if self.back:
@@ -1102,53 +1124,75 @@ class DrizzleObject:
 
             # run drizzle for the object data
             print(f"drizzle input filename is: {one_contrib.ext_names['FLT']}")
-            astrodrizzle.adrizzle.run(one_contrib.ext_names['FLT'],
-                              one_contrib.ext_names['WHT'],
-                              self.ext_names['FLT'],
-                              self.ext_names['WHT'],
-                              one_contrib.ext_names['CFF'],
-                              one_contrib.info['EXPTIME'],
-                              self.drizzle_params,
-                              img_nx,
-                              img_ny)
 
+            # drizzlepac is requiring a context image array to run
+            # I'm told this is a requirement in the C drizzle code right now
+            # and was advised to try a small empty array
+
+            ctx_name = self._create_small_fits_ctx(img_nx, img_ny)
+            # create a default configObj
+            configObj = driz_util.getDefaultConfigObj("adrizzle", 'defaults')
+            configObj["input"] = one_contrib.ext_names['FLT']
+            configObj["inweight"] = one_contrib.ext_names['WHT']
+            configObj["outdata"] = self.ext_names['FLT']
+            configObj["outweight"] = self.ext_names['WHT']
+            configObj['outcontext'] = ctx_name
+            configObj['wt_scl'] = 'exptime'
+            configObj['coeffs'] = one_contrib.ext_names['CFF']
+            configObj['pixfrac'] = self.drizzle_params['PFRAC']
+            configObj['kernel'] = self.drizzle_params['KERNEL']
+            configObj['Data Scaling Parameters'] = {'expkey':"EXPTIME",
+                                                    'in_units':self.drizzle_params['IN_UN'],
+                                                    'out_units':self.drizzle_params['OUT_UN'],
+                                                    'fillval': None}
+            configObj['User WCS Parameters'] = {'refimage':"",'outscale':"",'outnx': img_nx, 'outny': img_ny}
+            astrodrizzle.adrizzle.run(configObj)
+            os.remove(ctx_name)
+
+            ctx_name = self._create_small_fits_ctx(img_nx, img_ny)
             # run drizzle for the contamination data
-            astrodrizzle.adrizzle.run(one_contrib.ext_names['CON'],
-                              one_contrib.ext_names['WHT'],
-                              self.ext_names['CON'],
-                              self.ext_names['CONWHT'],
-                              one_contrib.ext_names['CFF'],
-                              one_contrib.info['EXPTIME'],
-                              self.drizzle_params,
-                              img_nx,
-                              img_ny)
+            configObj["input"] = one_contrib.ext_names['CON']
+            configObj["inweight"] = one_contrib.ext_names['WHT']
+            configObj["outdata"] = self.ext_names['CON']
+            configObj["outweight"] = self.ext_names['CONWHT']
+            configObj['outcontext'] = ctx_name
+            configObj['wt_scl'] = 'exptime'
+            configObj['coeffs'] = one_contrib.ext_names['CFF']
+            configObj['pixfrac'] = self.drizzle_params['PFRAC']
+            configObj['kernel'] = self.drizzle_params['KERNEL']
+            configObj['Data Scaling Parameters'] = {'expkey':"EXPTIME",
+                                                    'in_units':self.drizzle_params['IN_UN'],
+                                                    'out_units':self.drizzle_params['OUT_UN'],
+                                                    'fillval': None}
+            configObj['User WCS Parameters'] = {'refimage':"",'outscale':"",'outnx': img_nx, 'outny': img_ny}
+            astrodrizzle.adrizzle.run(configObj)
+            os.remove(ctx_name)
 
             # run drizzle for the error data
             # the format for in- and output must be changed
             self.drizzle_params['IN_UN'] = 'counts'
             self.drizzle_params['OUT_UN'] = 'counts'
-            astrodrizzle.adrizzle.run(one_contrib.ext_names['ERR'],
-                              one_contrib.ext_names['WHT'],
-                              self.ext_names['ERR'],
-                              self.ext_names['ERRWHT'],
-                              one_contrib.ext_names['CFF'],
-                              one_contrib.info['EXPTIME'],
-                              self.drizzle_params,
-                              img_nx, img_ny)
+
+            # run drizzle for the contamination data
+            configObj["input"] = one_contrib.ext_names['ERR']
+            configObj["inweight"] = one_contrib.ext_names['WHT']
+            configObj["outdata"] = self.ext_names['ERR']
+            configObj["outweight"] = self.ext_names['ERRWHT']
+            
+            astrodrizzle.adrizzle.run(configObj)
+
             self.drizzle_params['IN_UN'] = 'cps'
             self.drizzle_params['OUT_UN'] = 'cps'
 
             # in case of optimal extraction,
             # drizzle the model image....
             if self.opt_extr:
-                astrodrizzle.adrizzle.run(one_contrib.ext_names['MOD'],
-                                  one_contrib.ext_names['VAR'],
-                                  self.ext_names['MOD'],
-                                  self.ext_names['VAR'],
-                                  one_contrib.ext_names['CFF'],
-                                  1.0,
-                                  self.drizzle_params,
-                                  img_nx, img_ny)
+                configObj["input"] = one_contrib.ext_names['MOD']
+                configObj["inweight"] = one_contrib.ext_names['VAR']
+                configObj["outdata"] = self.ext_names['MOD']
+                configObj["outweight"] = self.ext_names['VAR']
+                configObj['coeffs'] = one_contrib.ext_names['CFF']
+                astrodrizzle.adrizzle.run(configObj)
 
         # give feedback
         print('Done!')
@@ -1177,18 +1221,18 @@ class DrizzleObject:
         """Generate an OAF entry"""
         # define a string
         big_string = ''
-        big_string += 'APERTURE {0:d}\n'.format(self.ID)
-        big_string += '  BEAM A\n'
-        big_string += '     REFPIXEL{0:d}A {1:0.1f} {2:0.1f}\n'.format(self.ID, self.drzimg_info['REFPNTX']-1.0, self.drzimg_info['REFPNTY']-1.0,)
-        big_string += '     CORNERS{0:d}A 1.0 1.0 {1:0.1f} 1.0 {2:0.1f} {3:0.1f} 1.0 {4:0.1f}\n'.format(self.ID, self.drzimg_info['OUTNX'], self.drzimg_info['OUTNX'], self.drzimg_info['OUTNY'], self.drzimg_info['OUTNY'])
-        big_string += '     CURVE{0:d}A   1 0.0 0.0\n'.format(self.ID)
-        big_string += '     WIDTH{0:d}A   {1:0.2f}\n'.format(self.ID, self.drzimg_info['DRZWIDTH']/infwhm*outfwhm)
-        big_string += '     ORIENT{0:d}A  90.0\n'.format(self.ID)
+        big_string += f'APERTURE {self.ID}\n'
+        big_string += f'  BEAM A\n'
+        big_string += f'     REFPIXEL{self.ID}A {self.drzimg_info["REFPNTX"]-1.0} {self.drzimg_info["REFPNTY"]-1.0}\n'
+        big_string += f'     CORNERS{self.ID}A 1.0 1.0 {self.drzimg_info["OUTNX"]} 1.0 {self.drzimg_info["OUTNX"]} {self.drzimg_info["OUTNY"]} 1.0 {self.drzimg_info["OUTNY"]}\n'
+        big_string += f'     CURVE{self.ID}A   1 0.0 0.0\n'
+        big_string += f'     WIDTH{self.ID}A   {self.drzimg_info["DRZWIDTH"]/infwhm*outfwhm}\n'
+        big_string += f'     ORIENT{self.ID}A  90.0\n'
         if self.drzimg_info['SLITWIDT']:
-            big_string += '     SLITGEOM{0:d}A 0.0 0.0 {1:0.2f} 0.0\n'.format(self.ID, self.drzimg_info['SLITWIDT'])
-        big_string += '     IGNORE{0:d}A   0\n'.format(self.ID)
-        big_string += '  BEAM END\n'
-        big_string += 'APERTURE END\n'
+            big_string += f'     SLITGEOM{self.ID}A 0.0 0.0 {self.drzimg_info["SLITWIDT"]} 0.0\n'
+        big_string += f'     IGNORE{self.ID}A   0\n'
+        big_string += f'  BEAM END\n'
+        big_string += f'APERTURE END\n'
 
         # return the big string
         return big_string
@@ -1213,7 +1257,7 @@ class DrizzleObjectContrib:
         # initialize the sort index
         self.sortIndex = 0
 
-    def __cmp__(self, compObject):
+    def __lt__(self, compObject):
         """Define a comparison for the object."""
 
         # make the comparison according
