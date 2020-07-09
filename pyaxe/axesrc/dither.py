@@ -3,11 +3,16 @@ import numpy as np
 import logging
 
 from astropy.io import fits
+
 from stsci.imagestats import ImageStats
+import stsci.convolve as convolve
 from stsci.image.numcombine import numCombine
+
+
 from drizzlepac.drizCR import quickDeriv
 from drizzlepac import minmed
 from drizzlepac import adrizzle
+from drizzlepac.astrodrizzle import ablot
 
 from pyaxe.axeerror import aXeError
 
@@ -30,21 +35,24 @@ class Drizzle:
                   img_nx,
                   img_ny):
         """
-        drizzle using drizzlepac.astrodrizzle.
+        drizzle using drizzlepac.astrodrizzle
 
         Parameters
         ----------
         data: str
             The name of the input image file or association table which is to be "drizzled"
 
-        in_mask:
+        in_mask: str
+            input mask for blocking pixels
 
         outdata: str
             The name for the output data image desired by the user
 
-        outweig:
+        outweig: str
+            The name for the output weight image
 
-        coeffs:
+        coeffs: str
+            distortion coefficients
 
         wt_scl: str
             Weighting factor for input image. If wt_scl=exptime then wt_scl
@@ -57,14 +65,17 @@ class Drizzle:
 
         drizzle_params:
 
-        img_nx:
+        img_nx: int
+            output size in x
 
-        img_ny:
+        img_ny: int
+            output size in y
 
 
         """
 
         # Check for file names that are too long for the drizzle task
+        # this is a fits limitation
         if len(data) > 80:
             err_msg = ("File name '{0:s}' is too long (>80 chars)"
                        "for drizzle task".format(data))
@@ -96,28 +107,25 @@ class MedianCombine:
     def __init__(self,
                  contributors,
                  drizzle_params,
-                 mult_drizzle_par,
                  ext_names):
         """Initialize the class"""
 
         # store the parameters
-        self.combine_maskpt = mult_drizzle_par['combine_maskpt']
-        self.combine_type = mult_drizzle_par['combine_type']
-        self.combine_nsigma1 = mult_drizzle_par['combine_nsigma1']
-        self.combine_nsigma2 = mult_drizzle_par['combine_nsigma2']
-        self.combine_nlow = mult_drizzle_par['combine_nlow']
-        self.combine_nhigh = mult_drizzle_par['combine_nhigh']
-        self.combine_lthresh = mult_drizzle_par['combine_lthresh']
-        self.combine_hthresh = mult_drizzle_par['combine_hthresh']
-        self.combine_grow = mult_drizzle_par['combine_grow']
+        self.combine_maskpt = drizzle_params['combine_maskpt']
+        self.combine_type = drizzle_params['combine_type']
+        self.combine_nsigma1 = drizzle_params['combine_nsigma1']
+        self.combine_nsigma2 = drizzle_params['combine_nsigma2']
+        self.combine_nlow = drizzle_params['combine_nlow']
+        self.combine_nhigh = drizzle_params['combine_nhigh']
+        self.combine_lthresh = drizzle_params['combine_lthresh']
+        self.combine_hthresh = drizzle_params['combine_hthresh']
+        self.combine_grow = drizzle_params['combine_grow']
+        self.rdnoise = drizzle_params['RDNOISE']
 
         self.ext_names = ext_names
 
         # store the name of the median image
         self.median_image = ext_names['MED']
-
-        # store the readout noise
-        self.rdnoise = drizzle_params['RDNOISE']
 
         self.input_data = self._get_inputs(contributors)
 
@@ -280,25 +288,82 @@ class Blot:
     def __init__(self):
         pass
 
-    def run(self, in_data, out_data, coeffs, out_nx, out_ny,
-            drizzle_params, mult_drizzle_par):
-        """
-        Do the actual blot
 
-        Currently only the iraf version of blot is invoked.
-        """
-        pydrizzle.blot(data=in_data,
-                       outdata=out_data,
-                       scale=drizzle_params['PSCALE'],
-                       coeffs=coeffs,
-                       outnx=out_nx,
-                       outny=out_ny,
-                       interpol=mult_drizzle_par['blot_interp'],
-                       sinscl=mult_drizzle_par['blot_sinscl'],
-                       in_un=drizzle_params['IN_UN'],
-                       out_un=drizzle_params['OUT_UN'],
-                       expkey='exptime',
-                       expout='input')
+    def run(self, in_data, out_data, out_nx, out_ny,
+            drizzle_params):
+    #     """
+    #     Do the actual blot
+    #     """
+    #     drizzle.blot(data=in_data,
+    #                outdata=out_data,
+    #                scale=drizzle_params['PSCALE'],
+    #                coeffs=coeffs,
+    #                outnx=out_nx,
+    #                outny=out_ny,
+    #                interpol=mult_drizzle_par['blot_interp'],
+    #                sinscl=mult_drizzle_par['blot_sinscl'],
+    #                in_un=drizzle_params['IN_UN'],
+    #                out_un=drizzle_params['OUT_UN'],
+    #                expkey='exptime',
+    #                expout='input')
+        print("\n\nCalling a_blot_image\n\n")
+        self._a_blot_image(in_data, out_data, 
+                           sinscl=drizzle_params['blot_sinscl'],
+                           out_nx=out_nx,
+                           out_ny=out_ny,
+                           interp=interpol)
+
+    def _a_blot_image(self,
+                      image_to_blot,
+                      flt_image,
+                      blotted_output,
+                      sinscl=sinscl,
+                      interp=interp):
+            """
+            Blot one image.
+
+            Thats just a simple wrapper around the task blot in astrodrizzle
+
+            Parameters
+            ----------
+            image_to_blot: str
+                the input image name, either the grism or direct drizzled image
+
+            blotted_output: str
+                the name of the output blotted image
+
+            """
+            try:
+                blot_header = fits.getheader(image_to_blot)
+                blot_wcs = HSTWCS(image_to_blot)  # assume simple
+                image_data = fits.getdata(image_to_blot)
+                flt_header = fits.getheader(flt_image)
+                flt_wcs = HSTWCS(flt_image)
+            except:
+                return IOError("File type of fits image is not "
+                               "supported {0:s}".format(image_to_blot))
+
+            # outimage is just the data array
+            outimage = ablot.do_blot(image_data.astype(np.float32),
+                                                  blot_wcs,
+                                                  flt_wcs,
+                                                  1.,
+                                                  interp=interp,
+                                                  sinscl=1.,
+                                                  coeffs=True,
+                                                  wcsmap=None,
+                                                  stepsize=10)
+
+
+            try:
+                newimage = fits.PrimaryHDU()
+                newimage.data = outimage
+                newimage.header = flt_header
+                newimage.header.update(flt_wcs.to_header())
+                newimage.verify('silentfix')
+                newimage.writeto(blotted_output)
+            except:
+                raise IOError("Problem writing fits image {0:s}".format(blotted_output))
 
 
 class Deriv:
@@ -315,7 +380,6 @@ class Deriv:
         """
         Subtract the absolute value of two images
         """
-        import numpy
         # subtract shifted image from imput image
         tmpArray = array - tmpArray
         # take the absolute value of tmpArray
@@ -331,7 +395,6 @@ class Deriv:
         """
         Take the absolute derivate of an image in memory
         """
-        import numpy
 
         # Create 2 empty arrays in memory of the same dimensions as 'array'
         tmpArray = numpy.zeros(array.shape, dtype=numpy.float64)
@@ -420,13 +483,13 @@ class Deriv:
 
 
 class CRIdent:
-    def __init__(self, drizzle_params, mult_drizzle_par):
+    def __init__(self, drizzle_params):
         """Initializes the class. """
-        self.driz_cr_scale = (float(mult_drizzle_par['driz_cr_scale'].split()[0]),
-                              float(mult_drizzle_par['driz_cr_scale'].split()[1]))
-        self.driz_cr_snr = (float(mult_drizzle_par['driz_cr_snr'].split()[0]),
-                            float(mult_drizzle_par['driz_cr_snr'].split()[1]))
-        self.driz_cr_grow = int(mult_drizzle_par['driz_cr_grow'])
+        self.driz_cr_scale = (float(drizzle_params['driz_cr_scale'].split()[0]),
+                              float(drizzle_params['driz_cr_scale'].split()[1]))
+        self.driz_cr_snr = (float(drizzle_params['driz_cr_snr'].split()[0]),
+                            float(drizzle_params['driz_cr_snr'].split()[1]))
+        self.driz_cr_grow = int(drizzle_params['driz_cr_grow'])
         self.driz_cr_ctegrow = 0
 
         # store the readout noise
@@ -438,8 +501,6 @@ class CRIdent:
         The code was taken from muldidrizzle.DrizCR. Small adjustments and
         re-factoring was done.
         """
-        import numpy
-        import stsci.convolve as convolve
 
         # create an empty file
         __crMask = numpy.zeros(in_img.shape, dtype=numpy.uint8)
@@ -553,10 +614,6 @@ class CRIdent:
         """
         Create a fits file containing the generated cosmic ray mask.
         """
-        import os
-        import os.path
-        from astropy.io import fits as pyfits
-        import numpy
 
         # migrate the data over
         _cr_file = numpy.zeros(in_imag.shape,numpy.uint8)
@@ -602,7 +659,6 @@ class CRIdent:
         """
         Do the identification
         """
-        from astropy.io import fits as pyfits
 
         # open the input image
         inImage = fits.open(in_image, 'readonly')

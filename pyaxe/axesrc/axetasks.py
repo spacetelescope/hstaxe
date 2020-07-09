@@ -359,7 +359,7 @@ def axecrr(inlist='',
 
 def axeddd(inlist='',
            configs='',
-           mult_drizzle_par=None,
+           drizzle_par=None,
            infwhm=0.0,
            outfwhm=0.0,
            back=False,
@@ -388,7 +388,7 @@ def axeddd(inlist='',
     drizzle_params = drizzleobjects.DrizzleParams(configs)
 
     # make a list of drizzle objects
-    dols = drizzleobjects.DrizzleObjectList(drizzle_params, mult_drizzle_par,
+    dols = drizzleobjects.DrizzleObjectList(drizzle_params, drizzle_par,
                                      cont_info, opt_extr, back)
 
     # check all files

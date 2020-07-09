@@ -200,7 +200,7 @@ class aXeSpcExtr:
             # and store them in the fits-file header
             _log.info("Generating and storing nonlinear distortions in {0}".format(config_util.getDATA(self.grisim)))
             nlins = nlincoeffs.NonLinCoeffs(config_util.getDATA(self.grisim), ext_info)
-            nlins.make()
+            nlins.write_file()
             nlins.store_coeffs()
             del nlins
 
