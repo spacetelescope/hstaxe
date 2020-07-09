@@ -646,6 +646,7 @@ PKG_CONFIG_PATH
 PKG_CONFIG
 GSL_CONFIG
 RPATH
+LIBTOOL_DEPS
 CPP
 LT_SYS_LIBRARY_PATH
 OTOOL64
@@ -12031,9 +12032,9 @@ CC=$lt_save_CC
 
 
 # libtools init and update
-#LT_PREREQ([2.4.6])
 
-#AC_SUBST([LIBTOOL_DEPS])
+
+
 
 # RPATH is the path used to look for shared library files.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking RPATH" >&5
@@ -12041,14 +12042,18 @@ $as_echo_n "checking RPATH... " >&6; }
 if test -z "$RPATH"
 then
 	case $host_os in
-	      *-*-linux*) RPATH='-Xlinker -rpath $(exec_prefix)/lib -Xlinker -rpath .';;
-        *-*-darwin*) RPATH='-Wl,-rpath,$(exec_prefix)/lib';;
-	*)	RPATH='';;
+	      *linux*) RPATH='-Xlinker -rpath \$ORIGIN/../lib';;
+        *darwin*) RPATH='-Wl,-rpath,${prefix}/lib';;
+	      *)	RPATH='';;
 	esac
 fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RPATH" >&5
 $as_echo "$RPATH" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $host_os" >&5
+$as_echo "$host_os" >&6; }
 
+LDFLAGS="$LDFLAGS $RPATH"
 
 
 # Checks for shared libraries.
@@ -12112,8 +12117,7 @@ if test "$GSL_CONFIG" == "notfound"
   fi
 CFLAGS="$CFLAGS `$GSL_CONFIG --cflags`"
 LDFLAGS_GSL="$LDFLAGS_INI `$GSL_CONFIG --libs`"
-#  fi
-#LDFLAGS="$LDFLAGS_GSL"
+
 
 for ac_header in gsl/gsl_vector.h gsl/gsl_linalg.h gsl/gsl_errno.h gsl/gsl_spline.h
 do :

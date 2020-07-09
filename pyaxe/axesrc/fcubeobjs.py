@@ -34,7 +34,7 @@ class DrizzleImage:
         """Get the number of requested fluxcubes
 
         The method looks in the header of the grism image
-        for the name of the input images used in the multidrizzle
+        for the name of the input images used in the drizzled
         process. This number is saved to the object.
 
         """
@@ -78,7 +78,7 @@ class FluxCube:
         Parameters
         ----------
         grism_image: string
-            the name of the multidrizzled grism image
+            the name of the drizzled grism image
         index: int
             the index number in the header of the mult. gr. im.
 
@@ -660,8 +660,8 @@ class FluxImage:
     def transform_toflux(self, segm_image):
         """Transform an image from cps to flux
 
-        The method creates a flux image for a direct multidrizzled
-        image. The direct image comes directly from multidrizzle,
+        The method creates a flux image for a direct drizzled
+        image. The direct image comes directly from drizzled,
         its unit is [cts/s], however the fluxcubes need the information
         in ergs/cm^2/s/AA.
 

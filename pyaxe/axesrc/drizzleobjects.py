@@ -11,12 +11,12 @@ import tempfile
 from astropy.io import fits
 from drizzlepac import astrodrizzle
 from drizzlepac import util as driz_util
+# from stwcs.distortion import coeff_converter
+# from stwcs.wcsutil import HSTWCS
 
 from pyaxe import config as config_util
 from pyaxe.axeerror import aXeError
-
 from . import configfile
-from . import drizzleobjects
 
 
 # make sure there is a logger
@@ -74,6 +74,7 @@ class DrizzleParams(dict):
 
         # load the first configuration file
         config = configfile.ConfigFile(config_util.getCONF(config_file))
+        #ext_info = config_util.get_ext_info(config_util.getDATA(self.ext_names['FLT']), config)
 
         # get and store the readout noise
         if config['RDNOISE'] is not None:
@@ -349,36 +350,6 @@ class DrizzleObjectList:
         """Sort the list of drizzle objects"""
         # sort the list of drizzle objects
         self.drizzle_objects.sort()
-
-    # def sort_drz_contrib(self, inima):
-    #     """Sort the contributors of the drizzle objects"""
-    #     # generate an empty list
-    #     sortList = []
-
-    #     # open the input image list
-    #     if os.access(inima, os.F_OK):
-    #         inlist = open(inima, 'r')
-
-    #     # go over the list
-    #     for index in range(inlist.nrows):
-    #         # extract the name of the grism image
-    #         grism = os.path.basename(inlist[0][index].strip())
-
-    #         # check for the fits-extension
-    #         rpos = grism.rfind(".fits")
-
-    #         # append the root to the list
-    #         if rpos > -1:
-    #             sortList.append(grism[:rpos])
-
-    #     # go over all drizzle objects
-    #     for dObject in self.drizzle_objects:
-
-    #         # generate the sort index
-    #         dObject.make_sortIndex(sortList)
-
-    #         # sort the drizzle object
-    #         dObject.sort()
 
     def check_files(self):
         """Check the files in the the whole list"""
@@ -723,19 +694,9 @@ class DrizzleObject:
             header['CONTAM'] = ("UNKNOWN", "contamination model")
 
         # go over all contributors
-        index = 0
-        for one_contrib in self.contrib_list:
-            # make the keyword
-            kword = 'IMG%04i'.format(index + 1)
-
-            # make the comment
-            comment = 'contributing image #%i'.format(index + 1)
-
+        for idx,one_contrib in enumerate(self.contrib_list):
             # store the image name
-            header[kword] = (one_contrib.rootname, comment)
-
-            # enhance the index
-            index += 1
+            header[f'IMG{idx}'] = (one_contrib.rootname, f'contributing image #{idx}')
 
     def _make_WCS_header(self):
         """Generate the WCS header"""
@@ -1285,6 +1246,7 @@ class DrizzleObjectContrib:
     def _get_ext_names(self, file_root, objID, back, drztmp_dir):
         """Determine all possible filenames for drizzle input"""
         ext_names = {}
+        self.flt_filename = f'{file_root}_flt.fits'
 
         if back:
             # fill the dictionary will all possible input files for the
@@ -1496,8 +1458,8 @@ class DrizzleObjectContrib:
         self._create_weight_image()
 
         # make the coefficients file
-        dcf = DrizzleCoefficients(self.ext_names['FLT'])
-        dcf.writeto(self.ext_names['CFF'])
+        # dcf = nlincoeffs.NonLinCoeffs(self.flt_filename, cff_filename=self.ext_names['CFF'])
+        # dcf.write_file()
 
     def regroup(self, objID_dir):
         """Move the files to a new location.
@@ -1545,115 +1507,3 @@ class DrizzleObjectContrib:
             self.nwht = nwht
 
 
-class DrizzleCoefficients:
-    """Class for a contributing image to a drizzle object"""
-    def __init__(self, image):
-        # save the image name
-        self.image = image
-
-        # extract the coefficients
-        self.xcoeffs, self.ycoeffs = self._get_coefficients(image)
-
-        # determine the order of the coefficients
-        self.order = self._get_order(self.xcoeffs)
-
-        # generate the header
-        self.header = self._make_header(self.image)
-
-    def _get_coefficients(self, image):
-        """Extracts the drizzle coefficients.
-
-        Parameters
-        ----------
-        image: str
-            Name of the image
-
-        Returns
-        -------
-        xcoeffs: list
-            drizzle x-coefficients from the header
-        ycoeffs: list
-            drizzle y-coefficients from the header
-        """
-
-        xcoeffs = []
-        ycoeffs = []
-
-        im_head = fits.getheader(image)
-
-        # search at most 10 coefficients
-        for index in range(10):
-
-            # form the x- and y- keyword
-            drz0_keyword = 'DRZ0{0:01d}'.format(index)
-            drz1_keyword = 'DRZ1{0:01d}'.format(index)
-
-            # stop if one of the keywords is missing
-            if not (drz0_keyword in im_head and drz1_keyword in im_head):
-                break
-
-            # append the keywords to the list
-            xcoeffs.append(str(im_head[drz0_keyword]))
-            ycoeffs.append(str(im_head[drz1_keyword]))
-
-        # return the coefficients
-        return xcoeffs, ycoeffs
-
-    def _get_order(self, coeff_list):
-        """Determine the order of the polynomial."""
-
-        # dictionary with the fixed names for the orders
-        fixed_orders = {1: 'constant', 2: 'linear', 3: 'quadratic', 4: 'cubic'}
-
-        # try to determine the order
-        order = (-1.0 + math.sqrt(1.0 + 8.0*len(coeff_list))) / 2.0
-
-        # check that the computed order is integer
-        if math.fabs(int(order) - order) > 0.0:
-            # give message and out
-            err_msg = (f"The number of coefficients in image: {self.image} is wrong: {order}!")
-            raise aXeError(err_msg)
-
-        # check whether the order is 'known'
-        if order not in fixed_orders:
-            err_msg = (f"The order of the coefficients in image: {self.image} is not allowed: {order}")
-            raise aXeError(err_msg)
-
-        # return the order
-        return fixed_orders[order]
-
-    def _make_header(self, image):
-        """Generate a header"""
-        # make an empty header
-        header = []
-
-        # make some specific header phrases
-        header.append('-----------------------------------------')
-        header.append('coeficients file generated for aXedrizzle')
-        header.append(f'from keywords in image: {os.path.basename(image)}')
-
-        return header
-
-    def writeto(self, file_name):
-        """Write coefficients to a file."""
-
-        # delete any previous file
-        if os.path.isfile(file_name):
-            os.unlink(file_name)
-
-        # open the file
-        coeff_file = open(file_name, 'w+')
-
-        # append the header lines
-        for a_line in self.header:
-            coeff_file.write(f"# {a_line}\n")
-
-        # write the order to the file
-        coeff_file.write(f"{self.order}\n")
-
-        # write the x- and y-coefficients to the file
-        coeff_file.write(f"{' '.join(self.xcoeffs)}\n")
-        coeff_file.write(f"{' '.join(self.ycoeffs)}\n")
-
-        # close the file
-        coeff_file.close()
