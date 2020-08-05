@@ -589,7 +589,7 @@ def pet2spc(grism='',
 
 def stamps(grism='',
            config='',
-           sampling='rectified',
+           sampling='trace',
            drzpath=False,
            in_af="",
            in_pet=None,

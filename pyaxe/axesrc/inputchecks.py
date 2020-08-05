@@ -54,9 +54,8 @@ class InputChecker:
                 filter2 = None
 
             # check whether it is prism data
-            if ((filter1 and filter1.find('PR')) or
-                    (filter2 and filter2.find('PR'))):
-                # switch to IS_PRISM
+            if ((filter1 and 'PR' in filter1) or
+                    (filter2 and 'PR' in filter2)):
                 is_prism = True
 
             # close the fits

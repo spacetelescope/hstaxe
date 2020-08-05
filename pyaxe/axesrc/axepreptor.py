@@ -172,62 +172,57 @@ class aXePrepArator:
         msk_image_sc = axe_names['MSK'] + '[SCI]'
 
         # check for a previous background subtraction
-        grism_file = fits.open(self.grisim, 'readonly')
+        with fits.open(self.grisim, mode='update') as grism_file:
 
-        if 'AXEPRBCK' in grism_file[ext_info['fits_ext']].header:
-            # warn that this is the second time
-            _log.info("WARNING: Image %25s seems to be already background "
-                  "subtracted!".format(self.grisim))
+            if 'AXEPRBCK' in grism_file[ext_info['fits_ext']].header:
+                # warn that this is the second time
+                _log.info("WARNING: Image %25s seems to be already background "
+                      "subtracted!".format(self.grisim))
 
-        npix = int(grism_file['NAXIS1']) * int(fits_head['NAXIS2'])
+            npix = int(grism_file['NAXIS1']) * int(grism_file['NAXIS2'])
 
-        # Compute the ratio of the grism SCI image to the background image
-        sci_data = grism_file['SCI', ext_info['ext_version']].data
-        bck_data = fits.getdata(self.master_bck)
-        ratio_data = sci_data / bck_data
+            # Compute the ratio of the grism SCI image to the background image
+            sci_data = grism_file['SCI', ext_info['ext_version']].data
+            bck_data = fits.getdata(self.master_bck)
+            ratio_data = sci_data / bck_data
 
-        # Flag pixels in the ratio image based on the grism image DQ array
-        grism_dq_data = grism_file['DQ', ext_info['ext_version']].data
-        ratio_data[grism_dq_data > 0.5] = flag
+            # Flag pixels in the ratio image based on the grism image DQ array
+            grism_dq_data = grism_file['DQ', ext_info['ext_version']].data
+            ratio_data[grism_dq_data > 0.5] = flag
 
-        # Flag pixels in the ratio image based on the grism image MSK file
-        msk_file = fits.open(config_util.getOUTPUT(msk_image_sc.split("[")[0]),  'readonly')
-        msk_data = msk_file['SCI'].data
-        msk_file.close()
+            # Flag pixels in the ratio image based on the grism image MSK file
+            msk_data = fits.getdata(config_util.getOUTPUT(msk_image_sc.split("[")[0]), 'SCI')
 
-        ratio_data[msk_data < -900000] = flag
+            ratio_data[msk_data < -900000] = flag
 
-        # Flag pixels in the background image based on the grism image DQ
-        # and MSK file
-        bck_data[grism_dq_data > 0.5] = flag
-        bck_data[msk_data < -900000] = flag
+            # Flag pixels in the background image based on the grism image DQ
+            # and MSK file
+            bck_data[grism_dq_data > 0.5] = flag
+            bck_data[msk_data < -900000] = flag
 
-        # Compute stats for the ratio image
-        stats = imagestats.ImageStats(ratio_data[ratio_data > flag],
-                                      fields='midpt,stddev,npix', lower=None,
-                                      upper=None, nclip=3, lsig=3.0, usig=3.0,
-                                      binwidth=0.01)
+            # Compute stats for the ratio image
+            rstats = imagestats.ImageStats(ratio_data[ratio_data > flag],
+                                           fields='midpt,stddev,npix', lower=None,
+                                           upper=None, nclip=3, lsig=3.0, usig=3.0,
+                                           binwidth=0.01)
 
-        # Compute stats for the background image
-        stats = imagestats.ImageStats(bck_data[bck_data > flag],
-                                      fields='midpt,stddev,npix', lower=None,
-                                      upper=None, nclip=3, lsig=3.0, usig=3.0,
-                                      binwidth=0.01)
+            # Compute stats for the background image
+            bstats = imagestats.ImageStats(bck_data[bck_data > flag],
+                                           fields='midpt,stddev,npix', lower=None,
+                                           upper=None, nclip=3, lsig=3.0, usig=3.0,
+                                           binwidth=0.01)
 
-        # Subtract the scaled background from the grism image
-        grism_file[ext_info['ext_version']].data -= stats.midpt * bck_data
-        grism_header = grism_file[ext_info['fits_ext']].header
+            # Subtract the scaled background from the grism image
+            grism_file[ext_info['ext_version']].data -= rstats.midpt * bck_data
+            grism_header = grism_file[ext_info['fits_ext']].header
 
-        # write some header iformation
-        grism_header['SKY_SCAL'] = (float(stats.midpt),  'scaling value for the master background')
-        grism_header['SKY_MAST'] = (float(stats.midpt),  'average value of the master background')
-        grism_header['SKY_IMG'] = (self.master_bck, 'name of the master background image')
-        grism_header['F_SKYPIX'] = (float(stats.npix)/float(npix), 'fraction of pixels used for scaling')
-        grism_header['AXEPRBCK'] = ('Done',          'flag that background subtraction was done')
+            # write some header iformation
+            grism_header['SKY_SCAL'] = (float(rstats.midpt),  'scaling value for the master background')
+            grism_header['SKY_MAST'] = (float(bstats.midpt),  'average value of the master background')
+            grism_header['SKY_IMG'] = (self.master_bck, 'name of the master background image')
+            grism_header['F_SKYPIX'] = (float(rstats.npix)/float(npix), 'fraction of pixels used for scaling')
+            grism_header['AXEPRBCK'] = ('Done',          'flag that background subtraction was done')
 
-        # save the image
-        grism_file.writeto(self.grisim)
-        grism_file.close()
         return 0
 
     def _subtract_nicsky(self, ext_info):
@@ -269,7 +264,7 @@ class aXePrepArator:
 
         # Subtract the scaled background image from the grism image
         # copy the image to the output directory first
-        sci_file = fits.open(self.grisim, 'update')
+        sci_file = fits.open(self.grisim, mode='update')
         bck_file = fits.open(config_util.getOUTPUT(axe_names['NBCK']),'readonly')
         sci_file['SCI', ext_info['ext_version']].data -= bck_file[1].data
         sci_file.close()
@@ -281,7 +276,7 @@ class aXePrepArator:
         fits_head = fits_img['BCK'].header
 
         # open the grism image and isolate the correct extension header
-        grism_img = fits.open(self.grisim, 'update')
+        grism_img = fits.open(self.grisim, mode='update')
         grism_header = grism_img[ext_info['fits_ext']].header
 
         if 'SKY_SCAL' in fits_head and 'F_SKYPIX' in fits_head:
@@ -432,7 +427,7 @@ class aXePrepArator:
         """Transform the image from [e] to [e/s]"""
 
         # check for a previous normalization
-        grism_image = fits.open(config_util.getOUTPUT(self.grisim), 'update')
+        grism_image = fits.open(self.grisim, mode='update')
         grism_header = grism_image[ext_info['fits_ext']].header
 
         if 'AXEPRNOR' in grism_header:
@@ -444,7 +439,7 @@ class aXePrepArator:
         if not conf.get_gkey('EXPTIME'):
             exptime_kword = 'EXPTIME'
         else:
-            exptime_kword = self.config.get_gvalue('EXPTIME')
+            exptime_kword = conf.get_gvalue('EXPTIME')
 
         # get the exposure time
         exptime = grism_image[0].header[exptime_kword]
@@ -518,13 +513,13 @@ class aXePrepArator:
         fits_img.close()
 
         # multiply both the sci and the error array by the gain
-        file_a = fits.open(self.grisim, 'update')
+        file_a = fits.open(self.grisim, mode='update')
         file_a["SCI"].data *= gain
         file_a["ERR"].data *= gain
         file_a.close()
 
         # open the fits image
-        fits_img = fits.open(self.grisim, 'update')
+        fits_img = fits.open(self.grisim, mode='update')
 
         # write the flag into the science extension
         fits_img[ext_info['fits_ext']].header['AXEGAINC'] = ('Done', 'flag that gain correction was done')

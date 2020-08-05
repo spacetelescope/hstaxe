@@ -11,12 +11,18 @@ import tempfile
 from astropy.io import fits
 from drizzlepac import astrodrizzle
 from drizzlepac import util as driz_util
+from drizzle import cdrizzle
+from stwcs.distortion import models
+
+
 # from stwcs.distortion import coeff_converter
 # from stwcs.wcsutil import HSTWCS
 
 from pyaxe import config as config_util
 from pyaxe.axeerror import aXeError
 from . import configfile
+
+
 
 
 # make sure there is a logger
@@ -26,15 +32,13 @@ _log = logging.getLogger(__name__)
 class DrizzleParams(dict):
     """Class to store the drizzle parameters"""
     def __init__(self, confterm):
-        # if necessary, split the configuration term
-        conflist = confterm.strip().split(',')
 
         # store the name of the primary
         # configuration file
-        self.config_file = conflist[0]
+        self.config_file = confterm.strip().split(',')[0]
 
         # extract the drizzle parameters from the configuration file
-        drizzle_params = self._load_drizzle_params(self.config_file)
+        drizzle_params = self._load_drizzle_params()
 
         # provide some general default parameters
         drizzle_params['IN_UN'] = 'cps'
@@ -43,9 +47,7 @@ class DrizzleParams(dict):
         # convert the parameters into an internal
         # dictionary
         dict.__init__(self, drizzle_params)
-
-        self['CONF'] = conflist[0]
-        print(drizzle_params)
+        self['CONF'] = self.config_file
 
     def _set_default(self, drizzle_dict, config, keyword, default_val):
         """Provide defaults if a keyword is not given"""
@@ -56,7 +58,7 @@ class DrizzleParams(dict):
         else:
             drizzle_dict[keyword] = default_val
 
-    def _load_drizzle_params(self, config_file):
+    def _load_drizzle_params(self):
         """
         Extract the drizzle parameters from config file
         """
@@ -73,8 +75,8 @@ class DrizzleParams(dict):
         drizzle_params = {}
 
         # load the first configuration file
-        config = configfile.ConfigFile(config_util.getCONF(config_file))
-        #ext_info = config_util.get_ext_info(config_util.getDATA(self.ext_names['FLT']), config)
+        config = configfile.ConfigFile(config_util.getCONF(self.config_file))
+        
 
         # get and store the readout noise
         if config['RDNOISE'] is not None:
@@ -143,7 +145,7 @@ class DrizzleObjectList:
         else:
             self.drztmp_dir = config_util.getDRZTMP()
 
-        # save then back flag
+        # save the back flag
         self.back = back
 
         # save the drizzle directory;
@@ -153,20 +155,17 @@ class DrizzleObjectList:
         else:
             self.drizzle_dir = config_util.getDRIZZLE()
 
-        # get the identifier for drizzle objects
-        self.regexp = self._get_regexp(back)
+        # set the identifier for drizzle objects
+        self._get_regexp()
 
         # get all drizzle objects
-        objectlist = self._find_drizzle_objects(self.drztmp_dir,
-                                                self.regexp,
-                                                back)
+        objectlist = self._find_drizzle_objects(self.drztmp_dir)
 
         # convert the objects list to a list of objects
         self.drizzle_objects = self._objlist_to_drzobjects(objectlist,
                                                            self.drizzle_params,
                                                            self.cont_info,
                                                            self.opt_extr,
-                                                           self.back,
                                                            self.drztmp_dir,
                                                            self.drizzle_dir)
 
@@ -192,16 +191,16 @@ class DrizzleObjectList:
         # return the drizzle object
         return self.drizzle_objects[index]
 
-    def _get_regexp(self, back):
+    def _get_regexp(self):
         """Stores and returns the regexp for finding drizzle objects"""
 
         # compile and return the regular expression
-        if back:
-            return re.compile("_flt_ID\\d+.BCK.fits$")
+        if self.back:
+            self.regexp = re.compile("_flt_ID\\d+.BCK.fits$")
         else:
-            return re.compile("_flt_ID\\d+.fits$")
+            self.regexp = re.compile("_flt_ID\\d+.fits$")
 
-    def _find_drizzle_objects(self, drztmp_dir, regexp, back):
+    def _find_drizzle_objects(self, drztmp_dir):
         """Search for drizzle objects in a directory"""
         # create an empty list
         drizzle_objects = {}
@@ -221,7 +220,7 @@ class DrizzleObjectList:
             # generate the absolute path
             one_dir = os.path.join(drztmp_dir, one_item)
 
-            # move forward if it is no directory
+            # move forward if it is not a directory
             if not os.path.isdir(one_dir):
                 continue
 
@@ -232,27 +231,24 @@ class DrizzleObjectList:
 
                 # check whether it is a flt-extension;
                 # continue if not
-                found = regexp.search(one_contrib)
-                if found is None:
-                    continue
+                flt_ext = self.regexp.search(one_contrib)
+                if flt_ext is not None:
+                    # find the root name and the ID number of the file
+                    ID, file_root = self._identify_drizzle_file(flt_ext,
+                                                                one_contrib)
 
-                # find the root name and the ID number of the file
-                ID, file_root = self._identify_drizzle_file(found,
-                                                            one_contrib,
-                                                            back)
-
-                # either append the file to an existing
-                # dictionary entry or start a new one
-                if ID in drizzle_objects:
-                    drizzle_objects[ID].append(os.path.join(one_item,
-                                                            file_root))
-                else:
-                    drizzle_objects[ID] = [os.path.join(one_item, file_root)]
+                    # either append the file to an existing
+                    # dictionary entry or start a new one
+                    if ID in drizzle_objects:
+                        drizzle_objects[ID].append(os.path.join(one_item,
+                                                                file_root))
+                    else:
+                        drizzle_objects[ID] = [os.path.join(one_item, file_root)]
 
         # return the entire dictionary
         return drizzle_objects
 
-    def _identify_drizzle_file(self, found, one_file, back):
+    def _identify_drizzle_file(self, found, one_file):
         """Get the ID and the root name of a drizzle file"""
         # get the part matching the expression
         fspan = found.span()
@@ -264,7 +260,7 @@ class DrizzleObjectList:
         # get the ID number within the extension
         ext = one_file[fspan[0]:fspan[1]]
         pos1 = ext.find("ID")
-        if back:
+        if self.back:
             pos2 = ext.find(".BCK.fits")
         else:
             pos2 = ext.find(".fits")
@@ -274,7 +270,7 @@ class DrizzleObjectList:
         return ID, file_root
 
     def _objlist_to_drzobjects(self, objectlist, drizzle_params, cont_info,
-                               opt_extr, back, drztmp_dir, drizzle_dir):
+                               opt_extr, drztmp_dir, drizzle_dir):
         """Converts the object list into drizzle objects"""
         # create an empty list
         drzobjects = []
@@ -288,7 +284,7 @@ class DrizzleObjectList:
             # create a drizzle object and append it to the list
             drzobjects.append(DrizzleObject(an_item[0], an_item[1],
                                             drizzle_params, cont_info,
-                                            opt_extr, back, drztmp_dir,
+                                            opt_extr, self.back, drztmp_dir,
                                             drizzle_dir))
 
         # return the list
@@ -426,19 +422,17 @@ class DrizzleObject:
 
         # define the name of the object directory
         self.objID_dir = self._get_objID_dirname(self.objID,
-                                                 self.drztmp_dir,
-                                                 self.back)
+                                                 self.drztmp_dir)
 
         # generate the list of contributors
         self.contrib_list = self._make_contrib_list(self.objID,
                                                     file_list,
                                                     opt_extr,
-                                                    back,
                                                     drztmp_dir)
 
         # determine all relevant names
         self.ext_names = self._get_ext_names(self.drizzle_params['ROOT'],
-                                             self.objID, back, drizzle_dir)
+                                             self.objID, drizzle_dir)
 
         # get the number of contributors
         self.ncontrib = self._get_ncontrib()
@@ -465,10 +459,10 @@ class DrizzleObject:
         else:
             return 1
 
-    def _get_objID_dirname(self, objID, drztmp_dir, back):
+    def _get_objID_dirname(self, objID, drztmp_dir):
         """Define the name of the object directory"""
         # compose th name
-        if back:
+        if self.back:
             objID_dir = os.path.join(drztmp_dir, f'{objID}.BCK')
         else:
             objID_dir = os.path.join(drztmp_dir, f'{objID}.OBJ')
@@ -481,12 +475,12 @@ class DrizzleObject:
         # return the number of contributing images
         return len(self.contrib_list)
 
-    def _get_ext_names(self, file_root, objID, back, drizzle_dir):
+    def _get_ext_names(self, file_root, objID, drizzle_dir):
         """Determine all necessary filenames for drizzle output"""
         # create an empty dictionary
         ext_names = {}
 
-        if back:
+        if self.back:
             # output names of file which are part of the final drizzle result
             ext_names['FLT'] = os.path.join(drizzle_dir,
                                             f'{file_root}_flt_{objID}.BCK.fits')
@@ -555,7 +549,7 @@ class DrizzleObject:
         # return the dictionary
         return ext_names
 
-    def _make_contrib_list(self, objID, file_list, opt_extr, back, drztmp_dir):
+    def _make_contrib_list(self, objID, file_list, opt_extr, drztmp_dir):
         """Generates a list of contributing objects"""
         # make an empty list
         contrib_list = []
@@ -564,7 +558,7 @@ class DrizzleObject:
         for a_file in file_list:
             # generate an object and append it to the list
             contrib_list.append(DrizzleObjectContrib(a_file, objID, opt_extr,
-                                                     back, drztmp_dir))
+                                                     self.back, drztmp_dir))
 
         # return the llist of contributors
         return contrib_list
@@ -603,14 +597,12 @@ class DrizzleObject:
         # if possible, compute the mean slitwidth
         if len(slitwidt) > 0:
             slitwidt_mean = np.array(slitwidt).mean()
-        # set to None
         else:
             slitwidt_mean = None
 
         # convert and store the dimension of the drizzled images
         self.drizzle_params['OUTNX'] = int(length_arr.mean())
-        self.drizzle_params['OUTNY'] = (2 *
-                                        int(math.ceil(owidth_arr.mean())) + 10)
+        self.drizzle_params['OUTNY'] = (2 * int(math.ceil(owidth_arr.mean())) + 10)
 
         # copy the image dimension to the dictionary
         drzimg_info['OUTNX'] = self.drizzle_params['OUTNX']
@@ -637,20 +629,16 @@ class DrizzleObject:
     def _convert_error(self):
         """Treat the drizzled error image"""
 
+        # MLS: This whole thing seems really wrong,
+        # why is the wht image being inverted?
+
         # The next lines check whether the weight image
         # has negative values. If yes, it is multiplied
         # by "-1.0". This is a fix to the drizzle-decennium
         # and will, artr some point, become obsolete
-
-        # open the image
-        fits_img = fits.open(self.ext_names['WHT'], mode='readonly')
-        fits_data = fits_img[0].data
-
-        # compute some statistics
+        fits_data = fits.getdata(self.ext_names['WHT'])
         img_ave = np.mean(fits_data)
 
-        # close the image
-        fits_img.close()
 
         # decide whether something must be done
         if img_ave < 0.0:
@@ -698,7 +686,7 @@ class DrizzleObject:
             # store the image name
             header[f'IMG{idx}'] = (one_contrib.rootname, f'contributing image #{idx}')
 
-    def _make_WCS_header(self):
+    def _make_wcs_header(self):
         """Generate the WCS header"""
 
         # make a dict for the WCS keys
@@ -813,7 +801,7 @@ class DrizzleObject:
             file.close()
 
         # make the WCS header
-        self._make_WCS_header()
+        self._make_wcs_header()
 
         # delete the single images
         os.unlink(self.ext_names['FLT'])
@@ -1010,7 +998,7 @@ class DrizzleObject:
                     header[kword1] = (kval1, comment1)
 
                     # store the fraction data
-                    kword2 = "RFR{0:04d".format(index + 1)
+                    kword2 = "RFR{0:04d}".format(index + 1)
                     kval2 = ("{0:0.2f}"
                              .format(100.0*reject_info[header[img_kword]][1]))
                     comment2 = ("[%] fraction of rejected pixels image #{0:d}"
@@ -1064,6 +1052,119 @@ class DrizzleObject:
         del data
         return (filename)
 
+    def drz_to_wcs(self,f):
+        
+        with fits.open(f,mode="update") as fin:
+            fin[0].header["WCSAXES"] = 2
+            fin[0].header["CTYPE1"]  = 'RA--SIP'   
+            fin[0].header["CTYPE2"]  = 'DEC-SIP'   
+            fin[0].header["CRVAL1"] = fin[0].header["DRZ00"] 
+            fin[0].header["CRVAL2"] = fin[0].header["DRZ10"] 
+
+            
+            fin[0].header["CD1_1"] = fin[0].header["DRZ01"] 
+            fin[0].header["CD1_2"] = fin[0].header["DRZ02"] 
+            fin[0].header["CD2_1"] = fin[0].header["DRZ11"] 
+            fin[0].header["CD2_2"] = fin[0].header["DRZ12"] 
+
+            fin[0].header["CRPIX1"] = 0 
+            fin[0].header["CRPIX2"] = fin[0].header["NAXIS2"]/2
+            
+        return f
+
+
+    def drizzle_ref(self,x,y):
+
+        data = np.ones((y,x))
+        hdu = fits.PrimaryHDU(data)
+        handle, filename = tempfile.mkstemp(suffix='.fits')
+        hdu.writeto(filename)
+        os.close(handle)
+
+        return filename
+
+
+    def run_drizzle(self,infile,whtfile,options):
+        """ drizzle contributors using cdrizzle in drizzle """
+        img_nx = options['outnx']
+        img_ny = options['outny']
+
+        one = np.ones(2, dtype='float64')
+
+        img_data = fits.getdata(infile)
+        header = fits.getheader(infile)
+        exptime = header["EXPTIME"]
+        inwht = fits.getdata(whtfile) * exptime
+        
+        ys,xs = np.shape(img_data)
+        idxmap = np.indices((xs, ys), dtype='float64')
+        idxmap = idxmap.T + one
+        idxmap = idxmap.reshape(ys * xs, 2)
+
+        cx = np.zeros([4,4])
+        cy = np.zeros([4,4])
+
+        cx[0,0] = header["DRZ0{}".format(0)]
+        cx[1,0] = header["DRZ0{}".format(2)]
+        cx[1,1] = header["DRZ0{}".format(1)]
+        cx[2,0] = header["DRZ0{}".format(5)]
+        cx[2,1] = header["DRZ0{}".format(4)]
+        cx[2,2] = header["DRZ0{}".format(3)]
+        cx[3,0] = header["DRZ0{}".format(9)]
+        cx[3,1] = header["DRZ0{}".format(8)]
+        cx[3,2] = header["DRZ0{}".format(7)]
+        cx[3,3] = header["DRZ0{}".format(6)]
+
+        cy[0,0] = header["DRZ1{}".format(0)]
+        cy[1,0] = header["DRZ1{}".format(2)]
+        cy[1,1] = header["DRZ1{}".format(1)]
+        cy[2,0] = header["DRZ1{}".format(5)]
+        cy[2,1] = header["DRZ1{}".format(4)]
+        cy[2,2] = header["DRZ1{}".format(3)]
+        cy[3,0] = header["DRZ1{}".format(9)]
+        cy[3,1] = header["DRZ1{}".format(8)]
+        cy[3,2] = header["DRZ1{}".format(7)]
+        cy[3,3] = header["DRZ1{}".format(6)]
+
+        _p = idxmap
+        order = 3
+
+        _cx = cx
+        _cy = cy
+
+        dxy = _p - (xs/2, ys/2)
+
+        # Apply coefficients from distortion model here...
+        c = _p * 0.
+        for i in range(order + 1):
+            for j in range(i + 1):
+                c[:, 0] = c[:, 0] + _cx[i][j] * pow(dxy[:, 0], j) * pow(dxy[:, 1], (i - j))
+                c[:, 1] = c[:, 1] + _cy[i][j] * pow(dxy[:, 0], j) * pow(dxy[:, 1], (i - j))
+        xc = c[:, 0] + img_nx/2
+        yc = c[:, 1] + img_ny/2
+
+        pixmap = np.array([xc,yc]).T
+        pixmap = pixmap.reshape(ys, xs, 2) - one
+
+        # Define input arrays now...
+        outsci = np.zeros((img_ny,img_nx),np.float32)
+        outwht = outsci.copy() * 0.0
+        outcon = outwht.astype(np.int32)
+
+        # Use pixmap with drizzle
+        #
+        # Call 'drizzle' to perform image combination
+        # This call to 'cdrizzle.tdriz' uses the new C syntax
+        #
+        _vers, nmiss, nskip = cdrizzle.tdriz(
+            img_data, inwht, pixmap, outsci, outwht, outcon,
+            uniqid=1, xmin=0, xmax=xs,
+            ymin=0, ymax=ys, scale=1.0, pixfrac=options['pixfrac'],
+            kernel=options['kernel'], in_units='cps', expscale=1.0,
+            wtscale=1.0, fillstr="0.0")
+
+        return outsci, outwht #, outcon
+
     def drizzle(self):
         """Drizzle all contributors together"""
         if self.back:
@@ -1076,6 +1177,101 @@ class DrizzleObject:
 
         # create a drizzle object
         # drizzleObject = astrodrizzle.adrizzle.drizzle()
+        img_nx = int(self.contrib_list[0].info['LENGTH'])
+        img_ny = 2*int(math.ceil(self.contrib_list[0].info['OWIDTH'])) + 10
+
+        # go over all contributing objects
+        out_flt = 0.
+        wht_flt = 0.
+        out_con = 0.
+        wht_con = 0.
+        out_err = 0.
+        wht_err = 0.
+        out_mod = 0.
+        wht_mod = 0.
+
+        header = fits.getheader(self.contrib_list[0].ext_names['FLT'])
+
+        options = {}
+        options['pixfrac'] = self.drizzle_params['PFRAC']
+        options['kernel'] = self.drizzle_params['KERNEL']
+        options['scale'] = self.drizzle_params['PSCALE']
+        options['outnx'] = img_nx
+        options['outny'] = img_ny
+
+        for one_contrib in self.contrib_list:
+            print(f"drizzle input filename is: {one_contrib.ext_names['FLT']}")
+            outsci, outwht = self.run_drizzle(one_contrib.ext_names['FLT'],one_contrib.ext_names['WHT'],options)
+            #fits.PrimaryHDU(data=outsci,header=h).writeto(one_contrib.ext_names['FLT'].split(".fits")[0]+"_single.fits",overwrite=True)
+            #fits.PrimaryHDU(data=outwht,header=h).writeto(one_contrib.ext_names['WHT'].split(".fits")[0]+"_single.fits",overwrite=True)
+
+            out_flt = out_flt + outsci*outwht
+            wht_flt = wht_flt + outwht
+
+            outsci, outwht = self.run_drizzle(one_contrib.ext_names['CON'],one_contrib.ext_names['WHT'],options)
+            out_con = out_con + outsci*outwht
+            wht_con = wht_con + outwht
+
+            outsci, outwht = self.run_drizzle(one_contrib.ext_names['ERR'],one_contrib.ext_names['WHT'],options)
+            out_err = out_err + outsci*outwht
+            wht_err = wht_err + outwht
+
+            if self.opt_extr:
+                outsci, outwht = self.run_drizzle(one_contrib.ext_names['MOD'],one_contrib.ext_names['VAR'],options)
+                out_mod = out_mod + outsci*outwht
+                wht_mod = wht_mod + outwht
+            # if self.opt_extr:
+            #     configObj["input"] = self.DRZ_to_WCS(one_contrib.ext_names['MOD'])
+            #     configObj["inweight"] = self.DRZ_to_WCS(one_contrib.ext_names['VAR'])
+            #     configObj["outdata"] = self.ext_names['MOD']
+            #     configObj["outweight"] = self.ext_names['VAR']
+            #     configObj['coeffs'] = one_contrib.ext_names['CFF']
+            #     astrodrizzle.adrizzle.run(configObj)
+
+
+        out_flt = out_flt / wht_flt
+        out_con = out_con / wht_con
+        out_err = out_err / wht_err
+
+        fits.PrimaryHDU(data=out_flt,header=header).writeto(self.ext_names['FLT'],overwrite=True)
+        fits.PrimaryHDU(data=out_con,header=header).writeto(self.ext_names['CON'],overwrite=True)
+        fits.PrimaryHDU(data=out_err,header=header).writeto(self.ext_names['ERR'],overwrite=True)
+
+
+        with fits.open(self.ext_names['FLT'], mode="update") as fin:
+            fin[0].header["CDSCALE"] = header["CDSCALE"] 
+            fin[0].header["REFPNTY"] = header["REFPNTY"]
+            fin[0].header["REFPNTX"] = header["REFPNTX"]
+            fin[0].header["DLAMBDA"] = header["DLAMBDA"]
+            fin[0].header["LAMBDA0"] = header["LAMBDA0"]
+            fin[0].header["XOFFS"] = header["XOFFS"]
+
+        if self.opt_extr:
+            out_mod = out_mod / len(self.contrib_list)
+            fits.PrimaryHDU(data=out_mod).writeto(self.ext_names['MOD'], overwrite=True)
+
+        fits.PrimaryHDU(data=wht_flt).writeto(self.ext_names['WHT'], overwrite=True)
+        fits.PrimaryHDU(data=wht_mod).writeto(self.ext_names['VAR'], overwrite=True)
+
+        print('Done!')
+
+    def drizzleOLD(self):
+        """Drizzle all contributors using astrodrizzle in drizzlepac"""
+        if self.back:
+            msg = ("Drizzling background object: {0:10s} ... "
+                   .format(self.objID))
+        else:
+            msg = f"Drizzling object : {self.objID} ... "
+        print(msg)
+        sys.stdout.flush()
+
+        # create a drizzle object
+        # drizzleObject = astrodrizzle.adrizzle.drizzle()
+        # reference size for all images
+        img_nx = int(self.contrib_list[0].info['LENGTH'])
+        img_ny = 2*int(math.ceil(self.contrib_list[0].info['OWIDTH'])) + 10
+        # refname = self.drizzle_ref(img_nx, img_ny)
+
 
         # go over all contributing objects
         for one_contrib in self.contrib_list:
@@ -1099,33 +1295,34 @@ class DrizzleObject:
             configObj["outweight"] = self.ext_names['WHT']
             configObj['outcontext'] = ctx_name
             configObj['wt_scl'] = 'exptime'
-            configObj['coeffs'] = one_contrib.ext_names['CFF']
+            configObj['coeffs'] = True # one_contrib.ext_names['CFF']
             configObj['pixfrac'] = self.drizzle_params['PFRAC']
             configObj['kernel'] = self.drizzle_params['KERNEL']
             configObj['Data Scaling Parameters'] = {'expkey':"EXPTIME",
                                                     'in_units':self.drizzle_params['IN_UN'],
                                                     'out_units':self.drizzle_params['OUT_UN'],
-                                                    'fillval': None}
-            configObj['User WCS Parameters'] = {'refimage':"",'outscale':"",'outnx': img_nx, 'outny': img_ny}
+                                                    'fillval': 0.}
+            configObj['User WCS Parameters'] = {'refimage':refname,'outscale':""}
             astrodrizzle.adrizzle.run(configObj)
             os.remove(ctx_name)
 
             ctx_name = self._create_small_fits_ctx(img_nx, img_ny)
             # run drizzle for the contamination data
-            configObj["input"] = one_contrib.ext_names['CON']
-            configObj["inweight"] = one_contrib.ext_names['WHT']
+            configObj["input"] = self.drz_to_wcs(one_contrib.ext_names['CON'])
+            configObj["inweight"] = self.drz_to_wcs(one_contrib.ext_names['WHT'])
             configObj["outdata"] = self.ext_names['CON']
             configObj["outweight"] = self.ext_names['CONWHT']
             configObj['outcontext'] = ctx_name
             configObj['wt_scl'] = 'exptime'
-            configObj['coeffs'] = one_contrib.ext_names['CFF']
+            configObj['coeffs'] = True 
+            #configObj['coeffs_name'] = one_contrib.ext_names['CFF']
             configObj['pixfrac'] = self.drizzle_params['PFRAC']
             configObj['kernel'] = self.drizzle_params['KERNEL']
             configObj['Data Scaling Parameters'] = {'expkey':"EXPTIME",
                                                     'in_units':self.drizzle_params['IN_UN'],
                                                     'out_units':self.drizzle_params['OUT_UN'],
                                                     'fillval': None}
-            configObj['User WCS Parameters'] = {'refimage':"",'outscale':"",'outnx': img_nx, 'outny': img_ny}
+            configObj['User WCS Parameters'] = {'refimage':refname,'outscale':""}
             astrodrizzle.adrizzle.run(configObj)
             os.remove(ctx_name)
 
@@ -1135,8 +1332,8 @@ class DrizzleObject:
             self.drizzle_params['OUT_UN'] = 'counts'
 
             # run drizzle for the contamination data
-            configObj["input"] = one_contrib.ext_names['ERR']
-            configObj["inweight"] = one_contrib.ext_names['WHT']
+            configObj["input"] = self.drz_to_wcs(one_contrib.ext_names['ERR'])
+            configObj["inweight"] = self.drz_to_wcs(one_contrib.ext_names['WHT'])
             configObj["outdata"] = self.ext_names['ERR']
             configObj["outweight"] = self.ext_names['ERRWHT']
             
@@ -1148,11 +1345,13 @@ class DrizzleObject:
             # in case of optimal extraction,
             # drizzle the model image....
             if self.opt_extr:
-                configObj["input"] = one_contrib.ext_names['MOD']
-                configObj["inweight"] = one_contrib.ext_names['VAR']
+                configObj["input"] = self.drz_to_wcs(one_contrib.ext_names['MOD'])
+                configObj["inweight"] = self.drz_to_wcs(one_contrib.ext_names['VAR'])
                 configObj["outdata"] = self.ext_names['MOD']
                 configObj["outweight"] = self.ext_names['VAR']
                 configObj['coeffs'] = one_contrib.ext_names['CFF']
+                configObj['coeffs_name'] = one_contrib.ext_names['CFF']
+
                 astrodrizzle.adrizzle.run(configObj)
 
         # give feedback
@@ -1230,23 +1429,14 @@ class DrizzleObjectContrib:
 
     def _get_rootname(self, file_root_path):
         """Find the root name for a file"""
-        file_root = os.path.basename(file_root_path)
-
-        # check for underscores
-        if file_root.find('_') > 0:
-            # set the name to the first section as root name
-            rootname = file_root.split('_')[0]
-        else:
-            # set everything as root name
-            rootname = file_root
-
-        # return the root name
-        return rootname
+        file_root = os.path.basename(file_root_path).split('_')[0]
+        return file_root
+        
 
     def _get_ext_names(self, file_root, objID, back, drztmp_dir):
         """Determine all possible filenames for drizzle input"""
         ext_names = {}
-        self.flt_filename = f'{file_root}_flt.fits'
+        #self.flt_filename = f'{file_root}_flt.fits'
 
         if back:
             # fill the dictionary will all possible input files for the
@@ -1272,7 +1462,7 @@ class DrizzleObjectContrib:
 
             # name of the drizzle coefficients file
             ext_names['CFF'] = os.path.join(drztmp_dir,
-                                            '{0:s}_flt_{1:s}.coeffs'
+                                            '{0:s}_flt_coeffs{1:s}.dat'
                                             .format(file_root, objID))
 
         else:
@@ -1315,7 +1505,7 @@ class DrizzleObjectContrib:
 
             # name of the drizzle coefficients file
             ext_names['CFF'] = os.path.join(drztmp_dir,
-                                            '{0:s}_flt_{0:s}.coeffs'
+                                            '{0:s}_flt_coeffs{0:s}.dat'
                                             .format(file_root, objID))
 
         # return the dictionary
@@ -1356,8 +1546,7 @@ class DrizzleObjectContrib:
                 self.info[a_kword] = fits_img[0].header[a_kword]
             else:
                 # store a default
-                self.info[a_kword] = None
-
+                self.info[a_kword] = 'NA'
         # close the image
         fits_img.close()
 
@@ -1457,9 +1646,6 @@ class DrizzleObjectContrib:
         # create the weight image
         self._create_weight_image()
 
-        # make the coefficients file
-        # dcf = nlincoeffs.NonLinCoeffs(self.flt_filename, cff_filename=self.ext_names['CFF'])
-        # dcf.write_file()
 
     def regroup(self, objID_dir):
         """Move the files to a new location.

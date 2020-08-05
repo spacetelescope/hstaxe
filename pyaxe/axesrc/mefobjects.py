@@ -286,7 +286,7 @@ class MEFExtractor:
         # run STAMPS
         axetasks.stamps(grism=self.ext_names['FITS'],
                         config=self.ext_names['CONF'],
-                        sampling="rectified",
+                        sampling="trace",
                         drzpath=True,
                         in_af=self.ext_names['DRZ_OAF'],
                         in_pet=self.ext_names['DRZ_OPET'],
