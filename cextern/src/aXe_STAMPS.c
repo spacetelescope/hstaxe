@@ -313,7 +313,7 @@ main (int argc, char *argv[])
 		  rstamp = stamp_img (PET,oblist[objindex]->beams[beamID].width, &stp_min);
 		}
 	      sprintf (label, "BEAM_%d%c",oblist[objindex]->ID, BEAM (oblist[objindex]->beams[beamID].ID));
-	      interpolate_over_NaN (rstamp);
+	      //interpolate_over_NaN (rstamp);
 	      gsl_to_FITSimage_opened (rstamp, STP_ptr ,0,label);
 	      cards = beam_to_FITScards(oblist[objindex],beamID);
               xymin_cards = stpmin_to_FITScards(stp_min);

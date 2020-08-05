@@ -1571,7 +1571,7 @@ fill_object_bbox (observation * const obs, beam * b, const float m_width,
 
      /* Compute the area of this aperture */
      area =
-          0.5 * (abs (b->corners[0].y - b->corners[4].y) *
+          0.5 * (abs (b->corners[0].y - b->corners[3].y) *
                  abs (b->corners[0].x - b->corners[1].x) +
                  abs (b->corners[2].y -
                        b->corners[1].y) * abs (b->corners[3].x -
