@@ -1249,11 +1249,10 @@ class DrizzleObject:
         if self.opt_extr:
             out_mod = out_mod / len(self.contrib_list)
             fits.PrimaryHDU(data=out_mod).writeto(self.ext_names['MOD'], overwrite=True)
+            fits.PrimaryHDU(data=wht_mod).writeto(self.ext_names['VAR'], overwrite=True)
 
         fits.PrimaryHDU(data=wht_flt).writeto(self.ext_names['WHT'], overwrite=True)
-        fits.PrimaryHDU(data=wht_mod).writeto(self.ext_names['VAR'], overwrite=True)
-
-        print('Done!')
+        print('Drizzle Done!')
 
     def drizzleOLD(self):
         """Drizzle all contributors using astrodrizzle in drizzlepac"""
