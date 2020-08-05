@@ -173,13 +173,14 @@ class aXePrepArator:
 
         # check for a previous background subtraction
         with fits.open(self.grisim, mode='update') as grism_file:
+            grism_header = grism_file['SCI', ext_info['fits_ext']].header
 
-            if 'AXEPRBCK' in grism_file[ext_info['fits_ext']].header:
+            if 'AXEPRBCK' in grism_header:
                 # warn that this is the second time
                 _log.info("WARNING: Image %25s seems to be already background "
                       "subtracted!".format(self.grisim))
 
-            npix = int(grism_file['NAXIS1']) * int(grism_file['NAXIS2'])
+            npix = int(grism_header['NAXIS1']) * int(grism_header['NAXIS2'])
 
             # Compute the ratio of the grism SCI image to the background image
             sci_data = grism_file['SCI', ext_info['ext_version']].data
@@ -213,8 +214,7 @@ class aXePrepArator:
                                            binwidth=0.01)
 
             # Subtract the scaled background from the grism image
-            grism_file[ext_info['ext_version']].data -= rstats.midpt * bck_data
-            grism_header = grism_file[ext_info['fits_ext']].header
+            grism_file['SCI', ext_info['ext_version']].data -= rstats.midpt * bck_data
 
             # write some header iformation
             grism_header['SKY_SCAL'] = (float(rstats.midpt),  'scaling value for the master background')
