@@ -173,17 +173,17 @@ class aXePrepArator:
 
         # check for a previous background subtraction
         with fits.open(self.grisim, mode='update') as grism_file:
-            grism_header = grism_file['SCI', ext_info['fits_ext']].header
-
-            if 'AXEPRBCK' in grism_header:
+            if 'AXEPRBCK' in grism_file[ext_info['fits_ext']].header:
                 # warn that this is the second time
                 _log.info("WARNING: Image %25s seems to be already background "
                       "subtracted!".format(self.grisim))
 
-            npix = int(grism_header['NAXIS1']) * int(grism_header['NAXIS2'])
-
             # Compute the ratio of the grism SCI image to the background image
             sci_data = grism_file['SCI', ext_info['ext_version']].data
+            sci_header = grism_file['SCI', ext_info['ext_version']].header
+            npix = int(sci_header["NAXIS1"]) * int(sci_header["NAXIS2"]) 
+
+
             bck_data = fits.getdata(self.master_bck)
             ratio_data = sci_data / bck_data
 
@@ -192,7 +192,9 @@ class aXePrepArator:
             ratio_data[grism_dq_data > 0.5] = flag
 
             # Flag pixels in the ratio image based on the grism image MSK file
-            msk_data = fits.getdata(config_util.getOUTPUT(msk_image_sc.split("[")[0]), 'SCI')
+            msk_file = fits.open(config_util.getOUTPUT(msk_image_sc.split("[")[0]),  'readonly')
+            msk_data = msk_file['SCI'].data
+            msk_file.close()
 
             ratio_data[msk_data < -900000] = flag
 
@@ -202,27 +204,30 @@ class aXePrepArator:
             bck_data[msk_data < -900000] = flag
 
             # Compute stats for the ratio image
-            rstats = imagestats.ImageStats(ratio_data[ratio_data > flag],
-                                           fields='midpt,stddev,npix', lower=None,
-                                           upper=None, nclip=3, lsig=3.0, usig=3.0,
-                                           binwidth=0.01)
+            stats = imagestats.ImageStats(ratio_data[ratio_data > flag],
+                                          fields='midpt,stddev,npix', lower=None,
+                                          upper=None, nclip=3, lsig=3.0, usig=3.0,
+                                          binwidth=0.01)
 
             # Compute stats for the background image
             bstats = imagestats.ImageStats(bck_data[bck_data > flag],
-                                           fields='midpt,stddev,npix', lower=None,
-                                           upper=None, nclip=3, lsig=3.0, usig=3.0,
-                                           binwidth=0.01)
+                                          fields='midpt,stddev,npix', lower=None,
+                                          upper=None, nclip=3, lsig=3.0, usig=3.0,
+                                          binwidth=0.01)
 
             # Subtract the scaled background from the grism image
-            grism_file['SCI', ext_info['ext_version']].data -= rstats.midpt * bck_data
+            # Reload a clean version of background
+            bck_data = fits.getdata(self.master_bck)
+
+            grism_file['SCI', ext_info['ext_version']].data -= bck_data * stats.midpt 
+            grism_header = grism_file['SCI', ext_info['ext_version']].header
 
             # write some header iformation
-            grism_header['SKY_SCAL'] = (float(rstats.midpt),  'scaling value for the master background')
+            grism_header['SKY_SCAL'] = (float(stats.midpt),  'scaling value for the master background')
             grism_header['SKY_MAST'] = (float(bstats.midpt),  'average value of the master background')
             grism_header['SKY_IMG'] = (self.master_bck, 'name of the master background image')
-            grism_header['F_SKYPIX'] = (float(rstats.npix)/float(npix), 'fraction of pixels used for scaling')
+            grism_header['F_SKYPIX'] = (float(stats.npix)/float(npix), 'fraction of pixels used for scaling')
             grism_header['AXEPRBCK'] = ('Done',          'flag that background subtraction was done')
-
         return 0
 
     def _subtract_nicsky(self, ext_info):
@@ -427,72 +432,70 @@ class aXePrepArator:
         """Transform the image from [e] to [e/s]"""
 
         # check for a previous normalization
-        grism_image = fits.open(self.grisim, mode='update')
-        grism_header = grism_image[ext_info['fits_ext']].header
+        with fits.open(self.grisim, mode='update') as grism_image:
+            grism_header = grism_image[ext_info['fits_ext']].header
 
-        if 'AXEPRNOR' in grism_header:
-            # check whether a second normalization
-            # is really desired
-            self._check_second_normalization()
+            if 'AXEPRNOR' in grism_header:
+                # check whether a second normalization
+                # is really desired
+                self._check_second_normalization()
 
-        # check for the exposure time keyword
-        if not conf.get_gkey('EXPTIME'):
-            exptime_kword = 'EXPTIME'
-        else:
-            exptime_kword = conf.get_gvalue('EXPTIME')
-
-        # get the exposure time
-        exptime = grism_image[0].header[exptime_kword]
-
-        pstring = ("AXEPREP: Image {0:25s}[SCI,{1:s}] exposure time "
-                   "{2:7.1f}.".format(self.grisim,
-                                      str(ext_info['ext_version']),
-                                      exptime))
-        _log.info(pstring)
-
-        # Divide the grism image SCI and ERR arrays by exptime
-        grism_image['SCI', ext_info['ext_version']].data /= exptime
-        grism_image['ERR', ext_info['ext_version']].data /= exptime
-
-        # write a header entry
-        grism_header['AXEPRNOR'] = ('Done', 'flag that exposure time normalization was done')
-
-        # extract the value of the constant
-        # sky subtracted in multidrizzle
-        if 'MDRIZSKY' in grism_image:
-            mdrizsky = grism_header['MDRIZSKY']
-        else:
-            mdrizsky = None
-
-        # check whether a global bias subtraction was done
-        # in axeprep
-        # if backgr == 'YES':
-        if ('backgr' in self.params) and (self.params['backgr']):
-            # read the desctiptors written
-            # in the global bias subtraction
-            sky_scal = grism_header['SKY_SCAL']
-            sky_mast = grism_header['SKY_MAST']
-
-            # compute the total subtracted background level
-            # in multidrizzle and axeprep (in cps)
-            if mdrizsky is not None:
-                sky_cps = (sky_scal * sky_mast + mdrizsky) / exptime
+            # check for the exposure time keyword
+            if not conf.get_gkey('EXPTIME'):
+                exptime_kword = 'EXPTIME'
             else:
-                sky_cps = (sky_scal * sky_mast) / exptime
-        else:
+                exptime_kword = conf.get_gvalue('EXPTIME')
 
-            # compute the total subtracted bias level (in cps)
-            if mdrizsky is not None:
-                sky_cps = mdrizsky / exptime
+            # get the exposure time
+            exptime = grism_image[0].header[exptime_kword]
+
+            pstring = ("AXEPREP: Image {0:25s}[SCI,{1:s}] exposure time "
+                       "{2:7.1f}.".format(self.grisim,
+                                          str(ext_info['ext_version']),
+                                          exptime))
+            _log.info(pstring)
+
+            # Divide the grism image SCI and ERR arrays by exptime
+            grism_image['SCI', ext_info['ext_version']].data /= exptime
+            grism_image['ERR', ext_info['ext_version']].data /= exptime
+
+            # write a header entry
+            grism_header['AXEPRNOR'] = ('Done', 'flag that exposure time normalization was done')
+
+            # extract the value of the constant
+            # sky subtracted in multidrizzle
+            if 'MDRIZSKY' in grism_image:
+                mdrizsky = grism_header['MDRIZSKY']
             else:
-                sky_cps = 0.0
+                mdrizsky = None
 
-        # write the subtracted background level
-        # into a defined descriptor for later use
-        grism_header['SKY_CPS'] = (sky_cps,  'sky level in cps')
+            # check whether a global bias subtraction was done
+            # in axeprep
+            # if backgr == 'YES':
+            if ('backgr' in self.params) and (self.params['backgr']):
+                # read the desctiptors written
+                # in the global bias subtraction
+                sky_scal = grism_header['SKY_SCAL']
+                sky_mast = grism_header['SKY_MAST']
 
-        # close the fits image
-        grism_image.close()
+                # compute the total subtracted background level
+                # in multidrizzle and axeprep (in cps)
+                if mdrizsky is not None:
+                    sky_cps = (sky_scal * sky_mast + mdrizsky) / exptime
+                else:
+                    sky_cps = (sky_scal * sky_mast) / exptime
+            else:
+
+                # compute the total subtracted bias level (in cps)
+                if mdrizsky is not None:
+                    sky_cps = mdrizsky / exptime
+                else:
+                    sky_cps = 0.0
+
+            # write the subtracted background level
+            # into a defined descriptor for later use
+            grism_header['SKY_CPS'] = (sky_cps,  'sky level in cps')
+
         return 0
 
     def _apply_gain_correction(self, ext_info):
