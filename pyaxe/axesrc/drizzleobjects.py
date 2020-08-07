@@ -9,10 +9,8 @@ from copy import deepcopy
 import tempfile
 
 from astropy.io import fits
-from drizzlepac import astrodrizzle
-from drizzlepac import util as driz_util
+from astropy.stats import sigma_clip
 from drizzle import cdrizzle
-from stwcs.distortion import models
 
 
 # from stwcs.distortion import coeff_converter
@@ -21,7 +19,6 @@ from stwcs.distortion import models
 from pyaxe import config as config_util
 from pyaxe.axeerror import aXeError
 from . import configfile
-
 
 
 
@@ -1042,7 +1039,7 @@ class DrizzleObject:
         mef_image.close()
 
     def _create_small_fits_ctx(self, x, y):
-        """Create a small fits image for use as a context for astrodrizzle"""
+        """Create a small fits image for use as a context for drizzle"""
         data = np.ones((y,x))
         hdu = fits.PrimaryHDU(data)
         handle, filename = tempfile.mkstemp(suffix='.fits')
@@ -1164,9 +1161,14 @@ class DrizzleObject:
             wtscale=1.0, fillstr="0.0")
 
         return outsci, outwht #, outcon
+        
+    
 
     def drizzle(self):
-        """Drizzle all contributors together"""
+        """Drizzle all contributors together. 
+
+        Performs a sigma clipping so detect outliers and updates the weigths appropriately."""
+
         if self.back:
             msg = ("Drizzling background object: {0:10s} ... "
                    .format(self.objID))
@@ -1176,19 +1178,8 @@ class DrizzleObject:
         sys.stdout.flush()
 
         # create a drizzle object
-        # drizzleObject = astrodrizzle.adrizzle.drizzle()
         img_nx = int(self.contrib_list[0].info['LENGTH'])
         img_ny = 2*int(math.ceil(self.contrib_list[0].info['OWIDTH'])) + 10
-
-        # go over all contributing objects
-        out_flt = 0.
-        wht_flt = 0.
-        out_con = 0.
-        wht_con = 0.
-        out_err = 0.
-        wht_err = 0.
-        out_mod = 0.
-        wht_mod = 0.
 
         header = fits.getheader(self.contrib_list[0].ext_names['FLT'])
 
@@ -1199,44 +1190,80 @@ class DrizzleObject:
         options['outnx'] = img_nx
         options['outny'] = img_ny
 
+        # Store and Adjust the input weigths after sigma clipping of the data
+        tmps = []
+        whts = []
         for one_contrib in self.contrib_list:
             print(f"drizzle input filename is: {one_contrib.ext_names['FLT']}")
             outsci, outwht = self.run_drizzle(one_contrib.ext_names['FLT'],one_contrib.ext_names['WHT'],options)
-            #fits.PrimaryHDU(data=outsci,header=h).writeto(one_contrib.ext_names['FLT'].split(".fits")[0]+"_single.fits",overwrite=True)
-            #fits.PrimaryHDU(data=outwht,header=h).writeto(one_contrib.ext_names['WHT'].split(".fits")[0]+"_single.fits",overwrite=True)
+            ok = (np.isfinite(outsci)) & (np.isfinite(outwht)) & (outwht>0) & (outsci!=0.0)
+            tmp = np.ma.array(outsci, mask=~ok)
+            tmps.append(tmp)
+            # exptime = fits.open(one_contrib.ext_names['FLT'])[0].header["EXPTIME"]
+            whts.append(outwht) # *exptime)
+        tmps = np.array(tmps)
+        whts = np.array(whts)
 
-            out_flt = out_flt + outsci*outwht
-            wht_flt = wht_flt + outwht
+        # sigma needs to be set properly. N.P.
+        filtered_data = sigma_clip(tmps, sigma=3, maxiters=5,axis=0,masked=True)
+        masked = filtered_data.mask
+        whts[masked] = 0.
+        whts_sum = np.nansum(whts,axis=0)
 
-            outsci, outwht = self.run_drizzle(one_contrib.ext_names['CON'],one_contrib.ext_names['WHT'],options)
-            out_con = out_con + outsci*outwht
-            wht_con = wht_con + outwht
+        # Weighted combination of FLT
+        tmps = []
+        for one_contrib in self.contrib_list:
+            outsci, outwht = self.run_drizzle(one_contrib.ext_names['FLT'],one_contrib.ext_names['WHT'],options)
+            tmps.append(outsci)
+        tmps = np.array(tmps)
+        tmps = tmps*whts
+        out_flt = np.nansum(tmps,axis=0)
+        out_flt[whts_sum!=0] = out_flt[whts_sum!=0]/whts_sum[whts_sum!=0]
 
+        # Weighted combination of ERR
+        tmps = []
+        for one_contrib in self.contrib_list:
             outsci, outwht = self.run_drizzle(one_contrib.ext_names['ERR'],one_contrib.ext_names['WHT'],options)
-            out_err = out_err + outsci*outwht
-            wht_err = wht_err + outwht
+            tmps.append(outsci)
+        tmps = np.array(tmps)
+        tmps = tmps*whts
+        out_err = np.nansum(tmps,axis=0)
+        out_err[whts_sum!=0] = out_err[whts_sum!=0]/whts_sum[whts_sum!=0]
 
-            if self.opt_extr:
+        # Weighted combination of CON
+        tmps = []
+        for one_contrib in self.contrib_list:
+            outsci, outwht = self.run_drizzle(one_contrib.ext_names['CON'],one_contrib.ext_names['WHT'],options)
+            tmps.append(outsci)
+        tmps = np.array(tmps)
+        tmps = tmps*whts
+        out_con = np.nansum(tmps,axis=0)
+        out_con[whts_sum!=0] = out_con[whts_sum!=0]/whts_sum[whts_sum!=0]
+
+        if self.opt_extr:
+            # Weighted combination of MOD
+            tmps = []
+            wtmps = []
+            
+            for one_contrib in self.contrib_list:
                 outsci, outwht = self.run_drizzle(one_contrib.ext_names['MOD'],one_contrib.ext_names['VAR'],options)
-                out_mod = out_mod + outsci*outwht
-                wht_mod = wht_mod + outwht
-            # if self.opt_extr:
-            #     configObj["input"] = self.DRZ_to_WCS(one_contrib.ext_names['MOD'])
-            #     configObj["inweight"] = self.DRZ_to_WCS(one_contrib.ext_names['VAR'])
-            #     configObj["outdata"] = self.ext_names['MOD']
-            #     configObj["outweight"] = self.ext_names['VAR']
-            #     configObj['coeffs'] = one_contrib.ext_names['CFF']
-            #     astrodrizzle.adrizzle.run(configObj)
+                tmps.append(outsci)
+                wtmps.append(outwht)
+            
+            tmps = np.array(tmps)
+            tmps = tmps*whts
+            out_mod = np.nansum(tmps,axis=0)
+            out_mod[whts_sum!=0] = out_mod[whts_sum!=0]/whts_sum[whts_sum!=0]
 
-
-        out_flt = out_flt / wht_flt
-        out_con = out_con / wht_con
-        out_err = out_err / wht_err
+            wtmps = np.array(wtmps)
+            wtmps = wtmps*whts
+            wht_mod = np.nansum(wtmps,axis=0)
+            wht_mod[whts_sum!=0] = wht_mod[whts_sum!=0]/whts_sum[whts_sum!=0]
 
         fits.PrimaryHDU(data=out_flt,header=header).writeto(self.ext_names['FLT'],overwrite=True)
         fits.PrimaryHDU(data=out_con,header=header).writeto(self.ext_names['CON'],overwrite=True)
         fits.PrimaryHDU(data=out_err,header=header).writeto(self.ext_names['ERR'],overwrite=True)
-
+        
 
         with fits.open(self.ext_names['FLT'], mode="update") as fin:
             fin[0].header["CDSCALE"] = header["CDSCALE"] 
@@ -1247,114 +1274,13 @@ class DrizzleObject:
             fin[0].header["XOFFS"] = header["XOFFS"]
 
         if self.opt_extr:
-            out_mod = out_mod / len(self.contrib_list)
             fits.PrimaryHDU(data=out_mod).writeto(self.ext_names['MOD'], overwrite=True)
             fits.PrimaryHDU(data=wht_mod).writeto(self.ext_names['VAR'], overwrite=True)
 
-        fits.PrimaryHDU(data=wht_flt).writeto(self.ext_names['WHT'], overwrite=True)
-        print('Drizzle Done!')
+        fits.PrimaryHDU(data=whts_sum).writeto(self.ext_names['WHT'], overwrite=True)
 
-    def drizzleOLD(self):
-        """Drizzle all contributors using astrodrizzle in drizzlepac"""
-        if self.back:
-            msg = ("Drizzling background object: {0:10s} ... "
-                   .format(self.objID))
-        else:
-            msg = f"Drizzling object : {self.objID} ... "
-        print(msg)
-        sys.stdout.flush()
-
-        # create a drizzle object
-        # drizzleObject = astrodrizzle.adrizzle.drizzle()
-        # reference size for all images
-        img_nx = int(self.contrib_list[0].info['LENGTH'])
-        img_ny = 2*int(math.ceil(self.contrib_list[0].info['OWIDTH'])) + 10
-        # refname = self.drizzle_ref(img_nx, img_ny)
-
-
-        # go over all contributing objects
-        for one_contrib in self.contrib_list:
-
-            img_nx = int(one_contrib.info['LENGTH'])
-            img_ny = 2*int(math.ceil(one_contrib.info['OWIDTH'])) + 10
-
-            # run drizzle for the object data
-            print(f"drizzle input filename is: {one_contrib.ext_names['FLT']}")
-
-            # drizzlepac is requiring a context image array to run
-            # I'm told this is a requirement in the C drizzle code right now
-            # and was advised to try a small empty array
-
-            ctx_name = self._create_small_fits_ctx(img_nx, img_ny)
-            # create a default configObj
-            configObj = driz_util.getDefaultConfigObj("adrizzle", 'defaults')
-            configObj["input"] = one_contrib.ext_names['FLT']
-            configObj["inweight"] = one_contrib.ext_names['WHT']
-            configObj["outdata"] = self.ext_names['FLT']
-            configObj["outweight"] = self.ext_names['WHT']
-            configObj['outcontext'] = ctx_name
-            configObj['wt_scl'] = 'exptime'
-            configObj['coeffs'] = True # one_contrib.ext_names['CFF']
-            configObj['pixfrac'] = self.drizzle_params['PFRAC']
-            configObj['kernel'] = self.drizzle_params['KERNEL']
-            configObj['Data Scaling Parameters'] = {'expkey':"EXPTIME",
-                                                    'in_units':self.drizzle_params['IN_UN'],
-                                                    'out_units':self.drizzle_params['OUT_UN'],
-                                                    'fillval': 0.}
-            configObj['User WCS Parameters'] = {'refimage':refname,'outscale':""}
-            astrodrizzle.adrizzle.run(configObj)
-            os.remove(ctx_name)
-
-            ctx_name = self._create_small_fits_ctx(img_nx, img_ny)
-            # run drizzle for the contamination data
-            configObj["input"] = self.drz_to_wcs(one_contrib.ext_names['CON'])
-            configObj["inweight"] = self.drz_to_wcs(one_contrib.ext_names['WHT'])
-            configObj["outdata"] = self.ext_names['CON']
-            configObj["outweight"] = self.ext_names['CONWHT']
-            configObj['outcontext'] = ctx_name
-            configObj['wt_scl'] = 'exptime'
-            configObj['coeffs'] = True 
-            #configObj['coeffs_name'] = one_contrib.ext_names['CFF']
-            configObj['pixfrac'] = self.drizzle_params['PFRAC']
-            configObj['kernel'] = self.drizzle_params['KERNEL']
-            configObj['Data Scaling Parameters'] = {'expkey':"EXPTIME",
-                                                    'in_units':self.drizzle_params['IN_UN'],
-                                                    'out_units':self.drizzle_params['OUT_UN'],
-                                                    'fillval': None}
-            configObj['User WCS Parameters'] = {'refimage':refname,'outscale':""}
-            astrodrizzle.adrizzle.run(configObj)
-            os.remove(ctx_name)
-
-            # run drizzle for the error data
-            # the format for in- and output must be changed
-            self.drizzle_params['IN_UN'] = 'counts'
-            self.drizzle_params['OUT_UN'] = 'counts'
-
-            # run drizzle for the contamination data
-            configObj["input"] = self.drz_to_wcs(one_contrib.ext_names['ERR'])
-            configObj["inweight"] = self.drz_to_wcs(one_contrib.ext_names['WHT'])
-            configObj["outdata"] = self.ext_names['ERR']
-            configObj["outweight"] = self.ext_names['ERRWHT']
-            
-            astrodrizzle.adrizzle.run(configObj)
-
-            self.drizzle_params['IN_UN'] = 'cps'
-            self.drizzle_params['OUT_UN'] = 'cps'
-
-            # in case of optimal extraction,
-            # drizzle the model image....
-            if self.opt_extr:
-                configObj["input"] = self.drz_to_wcs(one_contrib.ext_names['MOD'])
-                configObj["inweight"] = self.drz_to_wcs(one_contrib.ext_names['VAR'])
-                configObj["outdata"] = self.ext_names['MOD']
-                configObj["outweight"] = self.ext_names['VAR']
-                configObj['coeffs'] = one_contrib.ext_names['CFF']
-                configObj['coeffs_name'] = one_contrib.ext_names['CFF']
-
-                astrodrizzle.adrizzle.run(configObj)
-
-        # give feedback
         print('Done!')
+
 
     def make_mef(self):
         """Generate a MultiExtension FITS image."""
