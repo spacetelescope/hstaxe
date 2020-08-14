@@ -17,7 +17,7 @@ _log = logging.getLogger(__name__)
 The following deal with axe simulations
 """
 
-class DispImator(object):
+class DispImator:
     """Class to create a dispersed image"""
     def __init__(self, dummyImages, configfile, simobjects, lambda_psf=None,
                  model_spectra=None, model_images=None):
@@ -123,7 +123,7 @@ class DispImator(object):
         if os.path.isfile(result_oaf):
             os.unlink(result_oaf)
 
-class DirImator(object):
+class DirImator:
     """Class to create a direct image"""
     def __init__(self, dummyImages, configfile, simobjects, tpass_direct,
                  model_spectra=None, model_images=None, tel_area=None):
@@ -214,7 +214,7 @@ class DirImator(object):
             os.unlink(result_oaf)
 
 
-class DummyExtractor(object):
+class DummyExtractor:
     """Class to make a dummy extraction"""
     def __init__(self, dummyImages, grism_image, configfile, simobjects,
                  bck_flux, extrfwhm=3.0, orient=True, slitless_geom=True,
