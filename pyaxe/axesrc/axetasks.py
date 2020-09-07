@@ -13,6 +13,7 @@ from . import mefobjects
 from . import pysex2gol
 
 from pyaxe.config import axe_setup
+from pyaxe.axeerror import aXeError
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)
@@ -76,14 +77,13 @@ def fcubeprep(grism_image='',
               filter_info=None,
               AB_zero=True,
               dim_info='0,0,0,0',
-              interpol='nearest',
-              silent=False):
+              interpol='nearest'):
     """Convenience function for the aXe task FCUBEPREP"""
 
     # run the main command
     fcmaker = fcubeobjs.FluxCubeMaker(grism_image, segm_image, filter_info,
                                       AB_zero, dim_info, interpol)
-    fcmaker.runall(silent)
+    fcmaker.run()
 
 
 def axeprep(inlist='',
@@ -255,17 +255,18 @@ def drzprep(inlist='',
     axe_setup()
 
     # create a list with the basic aXe inputs
-    configlist=[configs]
-    if ',' in configs:
-        configlist=list(configs.split(','))
+    configlist=list(configs.split(','))
+    if len(configlist) < 1:
+      raise aXeError("No configuration file input to drzprep")
 
     for conf in configlist:
     # make the objects task object, run it an do the cleaning
+      print(f"conf: {conf}")
       prepArator = axelowlev.aXe_DRZPREP(inlist, 
                                          conf,
                                          back=back,
                                          opt_extr=opt_extr)
-    prepArator.runall()
+    prepArator.run()
 
     del prepArator
 
@@ -318,7 +319,8 @@ def axecrr(inlist='',
     if not back and makespc:
         # extract spectra from the deep 2D stamps
         mefs = mefobjects.MEFExtractor(drizzle_params,
-                                       dols, opt_extr=opt_extr)
+                                       dols, 
+                                       opt_extr=opt_extr)
         mefs.extract(infwhm, outfwhm, adj_sens)
         del mefs
 
@@ -618,8 +620,7 @@ def drz2pet(inlist='',
             opt_extr=False,
             back=False,
             in_af="",
-            out_pet=None,
-            silent=False):
+            out_pet=None):
     """Function for the aXe task DRZ2PET"""
     # check for required environment variables
     axe_setup()
@@ -631,7 +632,7 @@ def drz2pet(inlist='',
                                     back=back,
                                     in_af=in_af,
                                     out_pet=out_pet)
-    drz2pet.runall(silent)
+    drz2pet.run()
 
 
 def axegps(grism='',
