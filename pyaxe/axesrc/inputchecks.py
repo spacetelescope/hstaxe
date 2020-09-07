@@ -148,7 +148,7 @@ class InputChecker:
             # check for the background DPP file
             if back and not os.path.isfile(config_util.getOUTPUT(axe_names['BCK_DPP'])):
                 # error and out
-                err_msg = (f"{self.taskname}: The DPP file: {config_util.getOUTPUT(axe_names['BACK_DPP'])}"
+                err_msg = (f"{self.taskname}: The DPP file: {config_util.getOUTPUT(axe_names['BCK_DPP'])}"
                            f" does not exist!")
                 raise aXeError(err_msg)
 

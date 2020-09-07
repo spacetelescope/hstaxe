@@ -119,11 +119,11 @@ axetasks.axecore('aXe.lis',
 #                  back = False,
 #                  opt_extr=opt_extr)
 
-opt_extr=False
+opt_extr=True
 
 axetasks.drzprep(inlist = "aXe.lis",
                  configs="ACS.WFC.CHIP1.Cycle13.5.conf,ACS.WFC.CHIP2.Cycle13.5.conf",
-                 back = False,
+                 back = True,
                  opt_extr=opt_extr)
 
 axetasks.axecrr(inlist="aXe1.lis",

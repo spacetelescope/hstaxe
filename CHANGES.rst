@@ -1,3 +1,9 @@
+version 0.8
+-----------
+Beta release for testing.
+This version should complete for WFC3 and ACS and includes axedrizzle
+
+
 version 0.5a (December 14, 2019)
 --------------------------------
 Alpha release verison of pyaxe for testing.

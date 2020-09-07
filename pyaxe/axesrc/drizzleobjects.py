@@ -1192,7 +1192,7 @@ class DrizzleObject:
         tmps = []
         whts = []
         for one_contrib in self.contrib_list:
-            print(f"drizzle input filename is: {one_contrib.ext_names['FLT']}")
+            # print(f"drizzle input filename is: {one_contrib.ext_names['FLT']}")
             outsci, outwht = self.run_drizzle(one_contrib.ext_names['FLT'],one_contrib.ext_names['WHT'],options)
             ok = (np.isfinite(outsci)) & (np.isfinite(outwht)) & (outwht>0) & (outsci!=0.0)
             tmp = np.ma.array(outsci, mask=~ok)

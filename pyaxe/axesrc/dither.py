@@ -306,7 +306,6 @@ class Blot:
     #                out_un=drizzle_params['OUT_UN'],
     #                expkey='exptime',
     #                expout='input')
-        print("\n\nCalling a_blot_image\n\n")
         self._a_blot_image(in_data, out_data, 
                            sinscl=drizzle_params['blot_sinscl'],
                            out_nx=out_nx,
