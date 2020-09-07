@@ -1,17 +1,19 @@
 import os
 import numpy as np
+from copy import deepcopy
 
 from astropy.io import fits
 from astropy.table import Table, Column
 from astropy.io.registry import IORegistryError
 
 from pyaxe.axeerror import aXeError
-from pyaxe import config as config_utils
+from pyaxe import config as config_util
 
 
-class aXeInput(object):
+class aXeInput:
     """Class for the administration of all aXe input."""
     def __init__(self, inlist, configterm="", fringeterm=None):
+        # fringeterm and backims are the same
         # load the Input Image List
         self._inimlist = Table.read(inlist, format='ascii.no_header')
 
@@ -25,9 +27,9 @@ class aXeInput(object):
         self._check_subarray()
 
         # Now that all the basic columns have been Added
-        # expand the Input Image List if necessary
-        if ',' in self._inimlist['objcat'][0]:
-            self._extend_asciidata()
+        # expand the Input Image List if necessary    
+        self._extend_asciidata()
+
 
     def __iter__(self):
         """Allow the class to iterate over the table of inputs."""
@@ -40,8 +42,7 @@ class aXeInput(object):
 
         # check for number of columns
         if len(columns) < 2:
-            err_msg = ("Expected at least 2 columns in {0:s}!"
-                       .format(self._inimlist))
+            err_msg = ("Expected at least 2 columns in {self._inimlist}!")
             raise aXeError(err_msg)
 
         columns.reverse()
@@ -50,8 +51,8 @@ class aXeInput(object):
                 ('fits' in self._inimlist[name][0])):
             self._inimlist.rename_column(name, 'grisim')
         else:
-            err_msg = ("Column 1 should be the names of the grism"
-                       " fits files: {0}".format(self._inimlist))
+            err_msg = (f"Column 1 should be the names of the grism"
+                       " fits files: {self._inimlist}")
             raise aXeError(err_msg)
 
         # check whether second column has type string
@@ -65,7 +66,7 @@ class aXeInput(object):
         # do a check on the first object catalog to make sure it's a format
         # that we can read
         try:
-            __ = Table.read(config_utils.getDATA(self._inimlist[0]['objcat']), format='ascii.sextractor')
+            __ = Table.read(config_util.getDATA(self._inimlist[0]['objcat']), format='ascii.sextractor')
         except IORegistryError:
             raise aXeError("Catalog format not recognized , checked for: {0:s}"
                            .format(self._inimlist[name][0]))
@@ -87,18 +88,23 @@ class aXeInput(object):
                 raise aXeError(err_msg)
 
     def _complete_columns(self, configterm='', fringeterm=None):
-        """Adds columns to get standard format"""
+        """Adds columns to get standard format.
 
+        Parameters
+        ----------
+        configterm: str
+        
+        """
         # check whether a column for the configuration
         # files exist
+        # print([x for x in self._inimlist.colnames])
         if 'config' not in [x.lower() for x in self._inimlist.colnames]:
             col = Column(name='config',
                          data=[configterm]*len(self._inimlist))
-
             # add the configuration file column
             self._inimlist.add_column(col)
 
-        # files exist
+        # check whether a column for the dmag files exist
         if 'dmag' not in [x.lower() for x in self._inimlist.colnames]:
             col = Column(name='dmag',
                          data=[0]*len(self._inimlist))
@@ -112,39 +118,55 @@ class aXeInput(object):
             self._inimlist.add_column(col)
 
     def _extend_asciidata(self):
-        """Extend the table to one data set per line."""
+        """Extend the table to one data set per line.
 
-        # get a booolean for fringe correction
+        This is where the association of files and configs for
+        instruments that that contain more than one
+        science chip in a file is done. The table is expanded so that each row
+        has one file and one configuration associated with it. The rest
+        of aXe is run based on one configuration file.
 
+        """
+        new_inimlist=deepcopy(self._inimlist)
         for row in self._inimlist:
             clist = row['config'].split(',')
-            olist = row['objlist'].split(',')
-            if (len(clist) != len(olist)):
-                err_msg = ("Number of object cats in {0:s} "
-                           "is different from number of "
-                           "configs in {1:s}"
-                           .format(row['objlist'], row['config']))
-                raise aXeError(err_msg)
+            olist = row['objcat'].split(',')
 
-            if ',' in row['fringe']:
+            if len(olist) > 1:
+                if (len(clist) != len(olist)):
+                    err_msg = ("Number of object cats in {0:s} "
+                               "is different from number of "
+                               "configs in {1:s}"
+                               .format(row['objcat'], row['config']))
+                    raise aXeError(err_msg)
+            else:
+                olist=olist*len(clist) # there can be one cat and multiple config
+
+
+            if 'fringe' in row.colnames:
                 flist = row['fringe'].split(',')
                 if (len(clist) != len(flist)):
-                    err_msg = ("Number of fringe configs in: {0:s} "
-                               "is different from number of aXe configs "
-                               "in {1:s}".format(row['fringe'], row['config']))
+                    err_msg = (f"Number of fringe configs "
+                               f"is different from number of aXe configs "
+                               f"in {row['config']}")
                     raise aXeError(err_msg)
+                new_inimlist[row.index]['fringe'] = flist.pop()
 
-            # remove the original row and replace it with a row for each image
-            self._inimlist.delete_row(row.index)
-
-            while (clist and olist):
-                conf = clist.pop()
-                objcat = olist.pop()
-                new_row = [row['grisim'], row['dirim'],
-                           row['dmag'], objcat, conf]
-                if flist:
-                    new_row.append(flist.pop())
-                self._inimlist.add_row(new_row)
+            new_inimlist[row.index]['config'] = clist.pop()
+            new_inimlist[row.index]['objcat'] = olist.pop()
+            
+            if 'fringe' in row.colnames:    
+                for conf,objcat,fringe in zip(clist, olist, flist):
+                    new_row = [row['grisim'], objcat, row['dirim'],
+                               conf,row['dmag'], fringe]
+                    new_inimlist.add_row(new_row)
+            else:
+                for conf,objcat in zip(clist, olist):
+                    new_row = [row['grisim'], objcat, row['dirim'],
+                               conf,row['dmag']]
+                    new_inimlist.add_row(new_row)
+            self._inimlist = deepcopy(new_inimlist)
+        del new_inimlist
 
     def _tolist(self, inimlist):
         """Transforms the Input Image List to a list of dictionaries."""
@@ -207,7 +229,7 @@ class aXeInput(object):
         for row in self._inimlist:
 
             # check the existence of the Input Image List
-            image = config_utils.getDATA(row['grisim'])
+            image = config_util.getDATA(row['grisim'])
             subarray = fits.getval(image, "SUBARRAY", ext=0)
             if subarray:
                 err_msg = ("Grism image: {0:s} is a subarray"
@@ -215,7 +237,7 @@ class aXeInput(object):
                 raise aXeError(err_msg)
 
             if 'dirim' in self._inimlist.colnames:
-                image = config_utils.getDATA(row['dirim'])
+                image = config_util.getDATA(row['dirim'])
                 subarray = fits.getval(image, "SUBARRAY", ext=0)
                 if subarray:
                     err_msg = ("Direct image: {0:s} is a subarray"

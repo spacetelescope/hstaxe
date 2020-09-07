@@ -27,7 +27,7 @@ __user_paths['AXE_DRZTMP_LOC'] = __AXE_DRZTMP_LOC
 
 
 # notification of python only axe
-welcome_string="* Welcome to pyaxe! This version is independent of IRAF and PyRAF. *"
+welcome_string="* Welcome to pyaxe!\nThis version is independent of IRAF and PyRAF. *"
 print(f"\n{len(welcome_string)*'*'}")
 print(welcome_string)
 print(f"{len(welcome_string)*'*'}\n")
@@ -126,17 +126,37 @@ def axe_setup(tmpdir=False, axesim=False):
             handle_drztmp_dir()
 
 
+# def getCONF(name=None):
+#     # return either AXE_CONFIG_PATH or
+#     # the pathname to the input file
+#     # in AXE_CONFIG_PATH
+#     if name is None:
+#         return __user_paths['AXE_CONFIG_PATH']
+#     elif isinstance(name, list):
+#         outlist=[]
+#         for cname in name:
+#             if 'CONF' not in cname:
+#                 outlist.append(os.path.join(__user_paths['AXE_CONFIG_PATH'], cname))
+#             else:
+#                 outlist.append(cname)
+#         return outlist
+#     elif (isinstance(name,str) and ',' in name):
+#         return [os.path.join(__user_paths['AXE_CONFIG_PATH'], cname) for cname in name.split(',')]
+#     else:
+#         return [os.path.join(__user_paths['AXE_CONFIG_PATH'], name)]
+
 def getCONF(name=None):
-    # return either AXE_CONFIG_PATH or
-    # the pathname to the input file
-    # in AXE_CONFIG_PATH
+    fullpath = __user_paths['AXE_CONFIG_PATH']
+    if fullpath in name:
+        return name
     if name is None:
-        return __user_paths['AXE_CONFIG_PATH']
-    elif len(os.path.split(name)) > 1:
-        return os.path.join(__user_paths['AXE_CONFIG_PATH'],
-                            os.path.split(name)[-1])
+        raise aXeError("No name passed to getCONF")
+    if len(name.split(',')) > 1:
+        namesplit=name.split(',')        
+        newstring = [os.path.join(i,j) for i,j in zip([fullpath]*len(namesplit), namesplit) if fullpath not in j]
+        return ','.join(newstring)
     else:
-        return os.path.join(__user_paths['AXE_CONFIG_PATH'], name)
+        return  os.path.join(__user_paths['AXE_CONFIG_PATH'], name)
 
 
 def getDATA(name=None):
@@ -157,7 +177,6 @@ def getOUTPUT(name=None):
     # the pathname to the output file
     # in AXE_OUTPUT_PATH
     if name is None:
-        print("No name passed")
         return __user_paths['AXE_OUTPUT_PATH']
     elif len(os.path.split(name)) > 1:
         return os.path.join(__user_paths['AXE_OUTPUT_PATH'],

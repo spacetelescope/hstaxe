@@ -36,7 +36,6 @@ class ConfigList:
 
         # load the general required keywords
         self.gkeys = self._find_gkeys(keylist)
-
         # try to load beams as long as there
         # are keywords and as long as there
         # are candidate beam numbers
@@ -112,7 +111,6 @@ class ConfigList:
 
         # set the default return value
         found = -1
-
         # go over all items
         for index in range(len(self.gkeys)):
             # check whether it is the right item
@@ -123,37 +121,36 @@ class ConfigList:
         # return the result
         return found
 
-    def _load_file(self, filename):
+    def _load_file(self):
         """Configuration file --> keyword list
 
-        The method load a configuration file and
+        The method to load a configuration file and
         extract all valid keyword-keyvalue-comment information
         from it. The keyword-keyvalue pairs are
         organized and returned as a list of
         configuration key objects.
 
-        @param filename: name of the configuration file
-        @type filename: String
+        Returns
+        -------
+        keylist: list
+        list of ConfKey's
 
-        @return: list of ConfKey's
-        @rtype: [ConfKey]
+        Notes
+        -----
+        Double check reading two files here
         """
-        # initialize the liust
+        # initialize the list
         keylist = []
-
         # open the file and parse through it
-        fopen = open(filename, 'r')
-        for line in fopen:
-            # strip the line
-            str_line = line.strip()
+        with open(self.filename, 'r') as fopen:
+            for line in fopen:
+                # strip the line
+                str_line = line.strip()
 
-            # check whether the line contains a keyword
-            if len(str_line) and str_line[0] != '#':
-                # create and append the keyword
-                keylist.append(self._key_from_line(str_line))
-
-        # close the file
-        fopen.close()
+                # check whether the line contains a keyword
+                if len(str_line) and str_line[0] != '#':
+                    # create and append the keyword
+                    keylist.append(self._key_from_line(str_line))
 
         # return the list
         return keylist
@@ -558,14 +555,13 @@ class ConfigFile(ConfigList):
             # load the default
             _log.info('No file given, can do nothing!!')
         else:
-            # safe the file name
-            self.filename = filename
-
+            # save the file name
+            self.filename = filename  # list(filename.split(','))
             # create a keyword list
-            keylist = self._load_file(filename)
+            keylist = self._load_file()
 
             # load the header
-            header = ConfHeader(filename)
+            header = ConfHeader(self.filename)
 
             super(ConfigFile, self).__init__(keylist, header)
 
@@ -618,21 +614,23 @@ class ConfigFile(ConfigList):
         return lambda_psf
 
     def axesim_prep(self):
-        """Removes modifies some keywords"""
+        """Removes or modifies some keywords"""
         # derive the new configuration file name
         new_name = self._get_simul_name()
 
         # check whether the science extension has other
         # than the allowed values
-        if self['SCIENCE_EXT'] != 'SCI' and self['SCIENCE_EXT'] != '2':
+        if self['SCIENCE_EXT'] != 'SCI' and self['SCIENCE_EXT'] not in ['1','2']:
 
-            # find the index of the sceicne extension
+            # find the index of the sciecne extension
             index = self._find_gkey('SCIENCE_EXT')
 
             # check whether the item was found
             if index > -1:
                 # set it to the allowed value
                 self.gkeys[index].keyvalue = 'SCI'
+            else:
+                raise aXeError("No SCI index found")
 
         # check whether the telesocpe are is known
         if self['TELAREA'] is None:
@@ -1371,25 +1369,23 @@ class ConfHeader(DefConfHeader):
             start = 1
 
             # open and parse through the file
-            fopen = open(filename, 'r')
-            for line in fopen:
-                # check whether the start pointer is still set
-                if start:
-                    # strip the line
-                    str_line = line.strip()
+            with open(filename, 'r') as fopen:
+                for line in fopen:
+                    # check whether the start pointer is still set
+                    if start:
+                        # strip the line
+                        str_line = line.strip()
 
-                    # check whether the first character
-                    # is a comment, which qualifies
-                    # the line as part of the header
-                    if ((len(str_line) > 0) and (str_line[0] is '#')):
-                        # append the line to the header data
-                        self.header.append(line.strip()+'\n')
-                    else:
-                        # set the starter pointer to 0,
-                        # thus indicating the end of the header
-                        start = 0
-            # close the file
-            fopen.close
+                        # check whether the first character
+                        # is a comment, which qualifies
+                        # the line as part of the header
+                        if ((len(str_line) > 0) and (str_line[0] is '#')):
+                            # append the line to the header data
+                            self.header.append(line.strip()+'\n')
+                        else:
+                            # set the starter pointer to 0,
+                            # thus indicating the end of the header
+                            start = 0
 
 
 class ConfKey:

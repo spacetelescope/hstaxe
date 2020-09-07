@@ -82,7 +82,9 @@ class aXePrepArator:
         self.objcat = config_util.getDATA(objcat)
         _log.info("\n**Using object catalog: {0}\n".format(self.objcat))
         self.dirim = config_util.getDATA(dirim)
-        self.config = config
+        # make the config into a list of configs
+        self.config_name = config
+        self.config_obj = configfile.ConfigFile(config_util.getCONF(config))
         self.dmag = dmag
         self.params = params
 
@@ -91,8 +93,12 @@ class aXePrepArator:
             self.master_bck = config_util.getCONF(params['master_bck'])
 
     def _is_nicmos_data(self):
-        """Check whether the data comes from NICMOS"""
-        # open the image
+        """Check whether the data comes from NICMOS
+
+        Note: the package hasn't been recently tested
+        with NICMOS data
+
+        """
         try:
             header = fits.getval(self.grisim, 'INSTRUME')
             return "NICMOS" in header
@@ -127,7 +133,7 @@ class aXePrepArator:
 
         # run SEX2GOL
         axetasks.sex2gol(grism=self.grisim,
-                         config=config_util.getCONF(self.config),
+                         config=self.config_name,
                          in_sex=self.objcat,
                          use_direct=use_direct,
                          direct=self.dirim,
@@ -137,7 +143,7 @@ class aXePrepArator:
 
         # run GOL2AF
         axetasks.gol2af(grism=os.path.split(self.grisim)[-1],
-                        config=self.config,
+                        config=self.config_name,
                         mfwhm=self.params['mfwhm'],
                         back=False,
                         orient=True,
@@ -150,7 +156,7 @@ class aXePrepArator:
 
         #  run BACKEST
         axetasks.backest(grism=os.path.split(self.grisim)[-1],
-                         config=self.config,
+                         config=self.config_name,
                          np=0,
                          interp=-1,
                          niter_med=None,
@@ -168,7 +174,6 @@ class aXePrepArator:
 
         # Derive the name of all aXe products for a given image
         axe_names = config_util.get_axe_names(self.grisim, ext_info)
-
         msk_image_sc = axe_names['MSK'] + '[SCI]'
 
         # check for a previous background subtraction
@@ -182,7 +187,6 @@ class aXePrepArator:
             sci_data = grism_file['SCI', ext_info['ext_version']].data
             sci_header = grism_file['SCI', ext_info['ext_version']].header
             npix = int(sci_header["NAXIS1"]) * int(sci_header["NAXIS2"]) 
-
 
             bck_data = fits.getdata(self.master_bck)
             ratio_data = sci_data / bck_data
@@ -242,8 +246,8 @@ class aXePrepArator:
 
         if 'AXEPRBCK' in fits_head:
             # warn that this is the second time
-            _log.info("WARNING: Image {0:25s} seems to be already background "
-                  "subtracted!".format(self.grisim))
+            _log.info(f"WARNING: Image {self.grisim} seems to be already background "
+                  "subtracted!")
 
         # close the fits
         fits_img.close()
@@ -251,12 +255,12 @@ class aXePrepArator:
         # do the special background fitting for NICMOS
         if self.params['backped'] is not None:
             nicback = axelowlev.aXe_NICBACK(self.grisim,
-                                            self.config,
+                                            self.config_name,
                                             self.master_bck,
                                             self.params['backped'])
         else:
             nicback = axelowlev.aXe_NICBACK(self.grisim,
-                                            self.config,
+                                            self.config_name,
                                             self.master_bck)
         nicback.runall()
         del nicback
@@ -317,14 +321,14 @@ class aXePrepArator:
         try:
             fits.getval(self.grisim,
                         'AXEPRBCK', exten=ext_info['fits_ext'])
-            _log.info("WARNING: Image {0:25s} seems to be already background "
-                  "subtracted! Continuing anyways...".format(self.grisim))
+            _log.info(f"WARNING: Image {self.grisim} seems to be already background "
+                  "subtracted! Continuing anyways...")
         except KeyError:
             _log.info("Previous subtraction not recorded, proceeding with background subtraction.")
 
         scalebck = axelowlev.aXe_SCALEBCK(os.path.split(self.grisim)[-1],
                                           os.path.split(axe_names['MSK'])[-1],
-                                          os.path.split(self.config)[-1],
+                                          os.path.split(self.config_name)[-1],
                                           os.path.split(self.master_bck)[-1])
         try:
             scalebck.runall()
@@ -392,40 +396,38 @@ class aXePrepArator:
             goodreturn = self._subtract_sky(ext_info)
 
         if goodreturn:
-            pstring = ("AXEPREP: Image {0:25s}[SCI,{1:s}] sky-subtracted."
-                       .format(self.grisim, str(ext_info['ext_version'])))
+            pstring = (f"AXEPREP: Image {self.grisim}[SCI,{str(ext_info['ext_version'])}] sky-subtracted.")
+                       
             _log.info(pstring)
 
     def _check_low_skyfrac(self, frac):
         """Check for a low fraction of background pixels"""
 
-        msg = ("\nAXEPREP Image {0:s}: Only {1:0.1f} percent of the pixels "
-               "were used in the background scaling!".format(self.grisim,
-                                                             frac*100.0))
+        msg = (f"\nAXEPREP Image {self.grisim}: Only {frac*100.0} percent of the pixels "
+               "were used in the background scaling!")
+                                                             
         raise aXeError(msg)
 
     def _check_second_normalization(self):
         """Check whether the data is already normalized.
         """
 
-        msg = ("AXEPREP: Image %25s has already been normalized! Will not renormalize"
-               .format(self.grisim))
+        msg = (f"AXEPREP: Image {self.grisim} has already been normalized! Will not renormalize")
         raise aXeError(msg)
 
     def _check_second_gaincorr(self):
         """Check whether the gain correction had already been applied.
         """
 
-        msg = ("AXEPREP: Image: {0:s} has already been gain corrected! Will not reapply."
-               .format(self.grisim))
+        msg = (f"AXEPREP: Image: {self.grisim} has already been gain corrected! Will not reapply.")
         raise aXeError(msg)
 
     def _check_gain_correction(self):
         """Check whether the gain correction had already been applied
         """
 
-        msg = ("AXEPREP: Non-NICMOS images such as: {0:s} usually are "
-               "already gain corrected!".format(self.grisim))
+        msg = ("AXEPREP: Non-NICMOS images such as: {self.grisim} usually are "
+               "already gain corrected!")
         raise aXeError(msg)
 
     def _transform_to_cps(self, ext_info, conf):
@@ -536,10 +538,8 @@ class aXePrepArator:
     def run(self):
         """Run AXEPREP on one slitless image"""
 
-        # load the configuration files;
         # get the extension info
-        conf = configfile.ConfigFile(config_util.getCONF(self.config))
-        ext_info = config_util.get_ext_info(self.grisim, conf)
+        ext_info = config_util.get_ext_info(self.grisim, self.config_obj)
 
         # make a background PET if necessary
         if 'backgr' in self.params and self.params['backgr']:
@@ -547,7 +547,7 @@ class aXePrepArator:
 
         # make a background PET if necessary
         if 'norm' in self.params and self.params['norm']:
-            self._transform_to_cps(ext_info, conf)
+            self._transform_to_cps(ext_info, self.config_obj)
 
         # check wheter the gain correction is desired
         if 'gcorr' in self.params and self.params['gcorr']:
@@ -565,8 +565,6 @@ class aXePrepArator:
 
                 # make the gain correction
                 self._apply_gain_correction(ext_info)
-
-        del conf
 
         # return something
         return 1

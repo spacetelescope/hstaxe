@@ -31,7 +31,6 @@ class DrizzleParams(dict):
     def __init__(self, confterm):
 
         # store the name of the primary
-        # configuration file
         self.config_file = confterm.strip().split(',')[0]
 
         # extract the drizzle parameters from the configuration file
@@ -74,12 +73,11 @@ class DrizzleParams(dict):
         # load the first configuration file
         config = configfile.ConfigFile(config_util.getCONF(self.config_file))
         
-
         # get and store the readout noise
         if config['RDNOISE'] is not None:
             drizzle_params['RDNOISE'] = float(config['RDNOISE'])
         else:
-            err_msg = 'No readout noise in the configuration file!'
+            err_msg = f'No readout noise in the configuration file! {self.config_file}'
             raise aXeError(err_msg)
 
         if config['DRZRESOLA'] is not None:
