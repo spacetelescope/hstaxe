@@ -66,7 +66,8 @@ class aXeInput:
         # do a check on the first object catalog to make sure it's a format
         # that we can read
         try:
-            __ = Table.read(config_util.getDATA(self._inimlist[0]['objcat']), format='ascii.sextractor')
+            _temp_cat = self._inimlist[0]['objcat'].split(',')[0]
+            __ = Table.read(config_util.getDATA(_temp_cat), format='ascii.sextractor')
         except IORegistryError:
             raise aXeError("Catalog format not recognized , checked for: {0:s}"
                            .format(self._inimlist[name][0]))
@@ -93,11 +94,11 @@ class aXeInput:
         Parameters
         ----------
         configterm: str
+            configuration filename(s)
+        fringeterm: str
+            name of fringe files
         
         """
-        # check whether a column for the configuration
-        # files exist
-        # print([x for x in self._inimlist.colnames])
         if 'config' not in [x.lower() for x in self._inimlist.colnames]:
             col = Column(name='config',
                          data=[configterm]*len(self._inimlist))
@@ -120,11 +121,11 @@ class aXeInput:
     def _extend_asciidata(self):
         """Extend the table to one data set per line.
 
-        This is where the association of files and configs for
+        This is where the association of files, catalogs, and configs for
         instruments that that contain more than one
         science chip in a file is done. The table is expanded so that each row
-        has one file and one configuration associated with it. The rest
-        of aXe is run based on one configuration file.
+        has one file, one configuration, and one catalog associated with it. The rest
+        of aXe is run based on no comma delimited lists.
 
         """
         new_inimlist=deepcopy(self._inimlist)

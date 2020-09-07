@@ -261,11 +261,10 @@ def drzprep(inlist='',
 
     for conf in configlist:
     # make the objects task object, run it an do the cleaning
-      print(f"conf: {conf}")
-      prepArator = axelowlev.aXe_DRZPREP(inlist, 
-                                         conf,
-                                         back=back,
-                                         opt_extr=opt_extr)
+        prepArator = axelowlev.aXe_DRZPREP(inlist, 
+                                           conf,
+                                           back=back,
+                                           opt_extr=opt_extr)
     prepArator.run()
 
     del prepArator

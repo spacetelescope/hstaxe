@@ -100,7 +100,7 @@ class TaskWrapper(object):
         retcode: int
             the return code of the C-executable
         """
-        print("command list: ",self.command_list)
+        # print("command list: ",self.command_list)
         if silent:
             # open stdout/stderr
             sout = open(self.stdout, 'w+')
@@ -595,8 +595,6 @@ class aXe_DRZPREP(TaskWrapper):
             self.command_list.append('-opt_extr')
         else:
             self.bck = False
-
-        print(f"\nCommand list in drzprep: {self.command_list}\n")
             
 
     def runall(self, silent=True):
