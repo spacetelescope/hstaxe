@@ -81,8 +81,7 @@ class TaskWrapper(object):
                 _log.info(line.strip())
 
         # report an error
-        raise aXeError("An error occurred in the aXe task: {0:s}"
-                       .format(self.taskname))
+        raise aXeError(f"An error occurred in the aXe task: {self.taskname}")
 
     def run(self, silent=True):
         """Run the wrapped task
@@ -101,6 +100,7 @@ class TaskWrapper(object):
         retcode: int
             the return code of the C-executable
         """
+        print("command list: ",self.command_list)
         if silent:
             # open stdout/stderr
             sout = open(self.stdout, 'w+')
@@ -121,8 +121,6 @@ class TaskWrapper(object):
             # stderr, which is the system one
             retcode = subprocess.call(self.command_list)
 
-        # return the result
-        return retcode
 
     def runall(self, silent=True):
         """Run the wrapped task
@@ -149,9 +147,6 @@ class TaskWrapper(object):
             self._cleanup()
         else:
             self._report_all(silent)
-
-        # return the result
-        return retcode
 
 
 class aXe_AF2PET(TaskWrapper):
@@ -586,23 +581,23 @@ class aXe_DRZPREP(TaskWrapper):
         """
         super().__init__('aXe_DRZPREP', 'drzprep')
 
-        # store the 'back'-flag
-        if (('back' in params) and (params['back'])):
-            # put the opt_extr-flag to the list
-            self.bck = True
-        else:
-            self.bck = False
-
         # put the grism name to the list
         self.command_list.append(inlist)
 
         # put the config file name to the list
         self.command_list.append(configs)
 
-        # append the flag 'opt_extr'
-        if (('opt_extr' in params) and (params['opt_extr'])):
+
+        # store the 'back'-flag
+        if (('back' in params) and (params['back'])):
             # put the opt_extr-flag to the list
+            self.bck = True
             self.command_list.append('-opt_extr')
+        else:
+            self.bck = False
+
+        print(f"\nCommand list in drzprep: {self.command_list}\n")
+            
 
     def runall(self, silent=True):
         """Run the wrapped task

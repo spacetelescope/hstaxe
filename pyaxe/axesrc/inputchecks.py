@@ -140,23 +140,22 @@ class InputChecker:
             # check the DPP file
             if not os.path.isfile(config_util.getOUTPUT(axe_names['DPP'])):
                 # error and out
-                err_msg = ("{0s:}: The DPP file: {1:s} does not exist!"
-                           .format(self.taskname,
-                                   config_util.getOUTPUT(axe_names['DPP'])))
+                err_msg = (f"{self.taskname}: The DPP file: {config_util.getOUTPUT(axe_names['DPP'])}"
+                           f" does not exist!")
+                           
                 raise aXeError(err_msg)
 
             # check for the background DPP file
             if back and not os.path.isfile(config_util.getOUTPUT(axe_names['BCK_DPP'])):
                 # error and out
-                err_msg = ("{0:s}: The background DPP file: {1:s} does not "
-                           "exist!".format(self.taskname,
-                                           config_util.getOUTPUT(axe_names['BCK_DPP'])))
+                err_msg = (f"{self.taskname}: The DPP file: {config_util.getOUTPUT(axe_names['BACK_DPP'])}"
+                           f" does not exist!")
                 raise aXeError(err_msg)
 
     def check_axeprep(self, backgr, backims):
         """Comprises all file and file format checks for AXEPREP"""
 
-        # scheck for background subtraction
+        # check for background subtraction
         if backgr:
             if not backims:
                 err_msg = ("{0:s}: A background image must be given for the "

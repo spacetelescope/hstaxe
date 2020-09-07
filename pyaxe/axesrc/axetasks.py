@@ -76,13 +76,14 @@ def fcubeprep(grism_image='',
               filter_info=None,
               AB_zero=True,
               dim_info='0,0,0,0',
-              interpol='nearest'):
+              interpol='nearest',
+              silent=False):
     """Convenience function for the aXe task FCUBEPREP"""
 
     # run the main command
     fcmaker = fcubeobjs.FluxCubeMaker(grism_image, segm_image, filter_info,
                                       AB_zero, dim_info, interpol)
-    fcmaker.run()
+    fcmaker.runall(silent)
 
 
 def axeprep(inlist='',
@@ -198,7 +199,6 @@ def axecore(inlist='',
             weights=False,
             sampling='drizzle'):
     """Convenience function for the aXe task AXECORE"""
-    # only temporarily here ????
     axe_setup()
 
     # do all the file checks
@@ -252,15 +252,22 @@ def drzprep(inlist='',
             back=False,
             opt_extr=True):
     """Convenience function for the aXe task DRZPREP"""
-    # make the general setup;
-    # needed to define
-    # the BIN-directory
     axe_setup()
 
+    # create a list with the basic aXe inputs
+    configlist=[configs]
+    if ',' in configs:
+        configlist=list(configs.split(','))
+
+    for conf in configlist:
     # make the objects task object, run it an do the cleaning
-    prepArator = axelowlev.aXe_DRZPREP(inlist, configs, back=back,
-                                       opt_extr=opt_extr)
+      prepArator = axelowlev.aXe_DRZPREP(inlist, 
+                                         conf,
+                                         back=back,
+                                         opt_extr=opt_extr)
     prepArator.runall()
+
+    del prepArator
 
 
 def axecrr(inlist='',
@@ -442,8 +449,7 @@ def gol2af(grism='',
            lambda_mark=None,
            dmag=None,
            out_af="",
-           in_gol=None,
-           silent=False):
+           in_gol=None):
     """Function for the aXe task GOL2AF"""
     # check for required environment variables
     axe_setup()
@@ -459,15 +465,14 @@ def gol2af(grism='',
                                   dmag=dmag,
                                   in_gol=in_gol,
                                   out_af=out_af)
-    gol2af.runall(silent)
+    gol2af.run()
 
 
 def af2pet(grism='',
            config='',
            back=False,
            in_af="",
-           out_pet=None,
-           silent=False):
+           out_pet=None):
     """Function for the aXe task AF2PET"""
     # check for required environment variables
     axe_setup()
@@ -477,7 +482,7 @@ def af2pet(grism='',
                                   back=back,
                                   in_af=in_af,
                                   out_pet=out_pet)
-    af2pet.runall(silent)
+    af2pet.run()
 
 
 def petcont(grism='',
@@ -509,7 +514,7 @@ def petcont(grism='',
                                     no_pet=no_pet,
                                     silent=silent)
 
-    petcont.runall(silent)
+    petcont.run()
 
 
 def petff(grism='',
@@ -522,7 +527,7 @@ def petff(grism='',
 
     # run PETFF
     petff = axelowlev.aXe_PETFF(grism, config, back=back, ffname=ffname)
-    petff.runall()
+    petff.run()
 
 
 def backest(grism='',
@@ -555,7 +560,7 @@ def backest(grism='',
                                mask=mask,
                                in_af=in_af,
                                out_bck=out_bck)
-    backest.runall()
+    backest.run()
 
 
 def pet2spc(grism='',
@@ -568,8 +573,7 @@ def pet2spc(grism='',
             in_af="",
             opet=None,
             bpet=None,
-            out_spc=None,
-            silent=False):
+            out_spc=None):
     """Function for the aXe task PET2SPC"""
     # check for required environment variables
     axe_setup()
@@ -584,7 +588,7 @@ def pet2spc(grism='',
                                     opet=opet,
                                     bpet=bpet,
                                     out_spc=out_spc)
-    pet2spc.runall(silent)
+    pet2spc.run()
 
 
 def stamps(grism='',
@@ -593,8 +597,7 @@ def stamps(grism='',
            drzpath=False,
            in_af="",
            in_pet=None,
-           out_stp=None,
-           silent=False):
+           out_stp=None):
     """Function for the aXe task STAMPS"""
     # check for required environment variables
     axe_setup()
@@ -607,7 +610,7 @@ def stamps(grism='',
                                   in_pet=in_pet,
                                   out_stp=out_stp)
 
-    stamps.runall(silent)
+    stamps.run()
 
 
 def drz2pet(inlist='',
@@ -615,7 +618,8 @@ def drz2pet(inlist='',
             opt_extr=False,
             back=False,
             in_af="",
-            out_pet=None):
+            out_pet=None,
+            silent=False):
     """Function for the aXe task DRZ2PET"""
     # check for required environment variables
     axe_setup()
@@ -627,7 +631,7 @@ def drz2pet(inlist='',
                                     back=back,
                                     in_af=in_af,
                                     out_pet=out_pet)
-    drz2pet.runall()
+    drz2pet.runall(silent)
 
 
 def axegps(grism='',
