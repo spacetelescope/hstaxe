@@ -120,5 +120,5 @@ class DPPdumps(object):
 
             # create a filet objects and run the program
             filet = axelowlev.aXe_FILET(one_dpp, opt_extr=opt_extr, drztmp=root_dir_path)
-            filet.runall()
+            filet.run()
             del filet
