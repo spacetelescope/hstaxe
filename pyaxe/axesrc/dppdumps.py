@@ -2,8 +2,8 @@ import os
 import logging
 from astropy.io import fits
 
-from pyaxe.axeerror import aXeError
-import pyaxe.config as config_util
+from hstaxe.axeerror import aXeError
+import hstaxe.config as config_util
 
 from . import configfile
 from . import axelowlev

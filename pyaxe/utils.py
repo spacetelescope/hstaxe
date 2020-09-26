@@ -48,7 +48,7 @@ def set_logging(filename=None, on=True, level=logging.INFO):
                                                delay=True)
             file_handler.setLevel(logging.INFO)
             file_handler.setFormatter(formatter)
-            print("Saving pyaxe logging to {0:s}".format(repr(filename)))
+            print("Saving hstaxe logging to {0:s}".format(repr(filename)))
             root.addHandler(file_handler)
 
         if not stream_attached:

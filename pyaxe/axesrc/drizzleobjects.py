@@ -16,8 +16,8 @@ from drizzle import cdrizzle
 # from stwcs.distortion import coeff_converter
 # from stwcs.wcsutil import HSTWCS
 
-from pyaxe import config as config_util
-from pyaxe.axeerror import aXeError
+from hstaxe import config as config_util
+from hstaxe.axeerror import aXeError
 from . import configfile
 
 

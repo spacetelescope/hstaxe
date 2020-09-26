@@ -2,7 +2,7 @@
 
 """
 import os
-from pyaxe import axetasks
+from hstaxe import axetasks
 
 
 def test_af2pet():

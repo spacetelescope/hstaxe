@@ -1,8 +1,8 @@
 import os
 import numpy as np
 from astropy.io import fits
-from pyaxe import config as config_utils
-from pyaxe.axeerror import aXeError
+from hstaxe import config as config_utils
+from hstaxe.axeerror import aXeError
 from . import configfile
 
 

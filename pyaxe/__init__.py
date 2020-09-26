@@ -12,7 +12,7 @@ config.check_axe_dirs()
 
 
 try:
-    release = get_distribution('pyaxe').version
+    release = get_distribution('hstaxe').version
     __version__ = '.'.join(release.split('.')[:4])
 except DistributionNotFound:
     # package is not installed

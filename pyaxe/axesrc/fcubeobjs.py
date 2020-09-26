@@ -11,8 +11,8 @@ from drizzlepac import astrodrizzle
 from stsci.tools import fileutil
 from stwcs.wcsutil import HSTWCS
 
-from pyaxe.axeerror import aXeError
-from pyaxe import config as config_util
+from hstaxe.axeerror import aXeError
+from hstaxe import config as config_util
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)

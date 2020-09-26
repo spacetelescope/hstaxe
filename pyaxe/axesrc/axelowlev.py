@@ -1,9 +1,9 @@
 import os
 import subprocess
 import logging
-# from pyaxe.config import __AXE_BINDIR as AXE_BINDIR
-from pyaxe.axeerror import aXeError
-from pyaxe.config import getOUTPUT
+# from hstaxe.config import __AXE_BINDIR as AXE_BINDIR
+from hstaxe.axeerror import aXeError
+from hstaxe.config import getOUTPUT
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)

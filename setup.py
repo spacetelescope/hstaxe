@@ -15,7 +15,7 @@ from setuptools.command.install import install
 from subprocess import check_call, CalledProcessError
 
 if (sys.version_info < (3, 5)):
-    sys.stderr.write("ERROR: pyaxe requires Python 3.5 or later\n")
+    sys.stderr.write("ERROR: hstaxe requires Python 3.5 or later\n")
     sys.exit(1)
 
 

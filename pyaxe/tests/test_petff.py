@@ -1,7 +1,7 @@
 """Licensed under a 3-clause BSD style license - see LICENSE.rst.
 
 """
-from pyaxe import axetasks
+from hstaxe import axetasks
 
 
 def test_petff():

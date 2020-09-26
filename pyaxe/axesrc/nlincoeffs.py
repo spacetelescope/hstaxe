@@ -4,7 +4,7 @@ import numpy as np
 from astropy.io import fits
 
 from stwcs.wcsutil import HSTWCS
-from pyaxe.axeerror import aXeError
+from hstaxe.axeerror import aXeError
 
 
 class NonLinCoeffs:

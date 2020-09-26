@@ -3,8 +3,8 @@ import logging
 from astropy.io import fits
 import stsci.imagestats as imagestats
 
-from pyaxe import config as config_util
-from pyaxe.axeerror import aXeError
+from hstaxe import config as config_util
+from hstaxe.axeerror import aXeError
 
 
 from . import axelowlev

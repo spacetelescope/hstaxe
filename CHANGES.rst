@@ -1,5 +1,6 @@
-version 0.8
+version 0.6
 -----------
+package namechange from pyaxe to hstaxe
 Beta release for testing.
 This version should complete for WFC3 and ACS and includes axedrizzle
 

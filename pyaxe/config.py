@@ -6,8 +6,8 @@ import os
 import shutil
 
 from astropy.io import fits
-from pyaxe.axeerror import aXeError
-from pyaxe.utils import set_logging
+from hstaxe.axeerror import aXeError
+from hstaxe.utils import set_logging
 
 _log = set_logging(filename='axe_output.log')  # defaults to INFO
 
@@ -27,7 +27,7 @@ __user_paths['AXE_DRZTMP_LOC'] = __AXE_DRZTMP_LOC
 
 
 # notification of python only axe
-welcome_string="* Welcome to pyaxe!\nThis version is independent of IRAF and PyRAF. *"
+welcome_string="* Welcome to hstaxe!\nThis version is independent of IRAF and PyRAF. *"
 print(f"\n{len(welcome_string)*'*'}")
 print(welcome_string)
 print(f"{len(welcome_string)*'*'}\n")
