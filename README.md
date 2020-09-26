@@ -4,7 +4,7 @@ Current Requirements
 This version of the software no longer requires IRAF or PyRAF to be installed.
 see `setup.py` and `setup.cfg` for additional install dependencies. The most notable here are
 the GNU Science Library, cfitsio, and wcstools. cfitsio and wcstools are available from the
-astroconda channel at STScI.
+astroconda channel at STScI along with several other packages that are used.
 
 
 Software Development History
