@@ -1,7 +1,7 @@
 import os
 import shutil
 from drizzlepac import astrodrizzle
-from pyaxe import axetasks
+from hstaxe import axetasks
 
 cwd = os.getcwd()
 print("We are in %s" % (cwd))

@@ -3,8 +3,8 @@ import sys
 import math
 from astropy.io import fits
 from stwcs.wcsutil import HSTWCS
-from pyaxe.axeerror import aXeSIMError
-from pyaxe.axesrc.axeiol import InputObjectList
+from hstaxe.axeerror import aXeSIMError
+from hstaxe.axesrc.axeiol import InputObjectList
 
 class MagColList(InputObjectList):
     """Subclass for lists with magnitude columns

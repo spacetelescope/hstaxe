@@ -7,7 +7,7 @@ aXe_BE: Interpolation order
 
 """
 import os
-from pyaxe import axetasks
+from hstaxe import axetasks
 
 
 def test_be():

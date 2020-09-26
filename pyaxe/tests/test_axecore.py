@@ -3,8 +3,8 @@
 """
 import os
 import pytest
-from pyaxe import axetasks
-from pyaxe.axesrc import axesingextr
+from hstaxe import axetasks
+from hstaxe.axesrc import axesingextr
 
 
 @pytest.fixture(scope='module')

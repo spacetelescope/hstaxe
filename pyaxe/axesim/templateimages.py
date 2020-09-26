@@ -1,10 +1,10 @@
 import os
 import os.path
 from astropy.io import fits
-from pyaxe import axe_asciidata
+from hstaxe import axe_asciidata
 
-from pyaxe.axeerror import aXeSIMError
-from pyaxe.config import getDATA, getOUTSIM, getSIMDATA
+from hstaxe.axeerror import aXeSIMError
+from hstaxe.config import getDATA, getOUTSIM, getSIMDATA
 
 
 class ArtImaList:

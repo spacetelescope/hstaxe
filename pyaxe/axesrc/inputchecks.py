@@ -9,8 +9,8 @@ from . import axeinputs
 from . import configfile
 # from . import axeiol
 
-from pyaxe.axeerror import aXeError, aXeSIMError
-from pyaxe import config as config_util
+from hstaxe.axeerror import aXeError, aXeSIMError
+from hstaxe import config as config_util
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)

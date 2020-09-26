@@ -1,5 +1,5 @@
 import logging
-from pyaxe import config as config_util
+from hstaxe import config as config_util
 
 from . import axetasks
 from . import configfile

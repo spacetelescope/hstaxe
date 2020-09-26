@@ -6,8 +6,8 @@ from astropy.io import fits
 from astropy.table import Table, Column
 from astropy.io.registry import IORegistryError
 
-from pyaxe.axeerror import aXeError
-from pyaxe import config as config_util
+from hstaxe.axeerror import aXeError
+from hstaxe import config as config_util
 
 
 class aXeInput:

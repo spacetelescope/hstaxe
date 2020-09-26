@@ -14,7 +14,7 @@ from drizzlepac import minmed
 from drizzlepac import adrizzle
 from drizzlepac.astrodrizzle import ablot
 
-from pyaxe.axeerror import aXeError
+from hstaxe.axeerror import aXeError
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)

@@ -1,7 +1,7 @@
 import re
 from astropy.table import Table
 
-from pyaxe.axeerror import aXeError
+from hstaxe.axeerror import aXeError
 
 
 class InputObjectList(object):

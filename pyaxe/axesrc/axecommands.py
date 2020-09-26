@@ -4,7 +4,7 @@ import logging
 
 from astropy.io import fits
 
-from pyaxe import config as config_util
+from hstaxe import config as config_util
 
 from . import axetasks
 from .axeerror import aXeSIMError
