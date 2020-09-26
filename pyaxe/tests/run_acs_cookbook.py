@@ -1,11 +1,11 @@
 """
 Run the commands from nor's axe cookbook example
-but setup for pyaxe
+but setup for hstaxe
 """
 import os
 import shutil
 from drizzlepac import astrodrizzle
-from pyaxe import axetasks
+from hstaxe import axetasks
 
 cwd = os.getcwd()
 print("We are in %s" % (cwd))

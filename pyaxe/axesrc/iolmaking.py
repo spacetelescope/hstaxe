@@ -7,7 +7,7 @@ from stwcs.wcsutil import HSTWCS
 from astropy.io import fits
 from astropy.table import Table
 
-from pyaxe.axeerror import aXeError
+from hstaxe.axeerror import aXeError
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)

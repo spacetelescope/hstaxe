@@ -1,6 +1,6 @@
 """Licensed under a 3-clause BSD style license - see LICENSE.rst.
 """
-from pyaxe.axesrc import axelowlev
+from hstaxe.axesrc import axelowlev
 
 
 def test_scalebck():

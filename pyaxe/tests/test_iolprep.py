@@ -15,7 +15,7 @@ import pytest
 from astropy.table import Table
 from numpy.testing.utils import assert_allclose
 
-from pyaxe import axetasks
+from hstaxe import axetasks
 
 
 @pytest.fixture(scope='module')

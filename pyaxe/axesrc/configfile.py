@@ -2,8 +2,8 @@ import os
 import math
 import logging
 
-from pyaxe import config as config_util
-from pyaxe.axeerror import aXeError
+from hstaxe import config as config_util
+from hstaxe.axeerror import aXeError
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)

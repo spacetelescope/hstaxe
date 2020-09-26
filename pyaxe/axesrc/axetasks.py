@@ -12,8 +12,8 @@ from . import iolmaking
 from . import mefobjects
 from . import pysex2gol
 
-from pyaxe.config import axe_setup
-from pyaxe.axeerror import aXeError
+from hstaxe.config import axe_setup
+from hstaxe.axeerror import aXeError
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)

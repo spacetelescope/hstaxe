@@ -2,7 +2,7 @@ import logging
 
 from astropy.io import fits
 
-from pyaxe import axeerror
+from hstaxe import axeerror
 
 from . import configfile
 

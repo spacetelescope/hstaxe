@@ -1,7 +1,7 @@
 """Licensed under a 3-clause BSD style license - see LICENSE.rst.
 
 """
-from pyaxe import axetasks
+from hstaxe import axetasks
 
 # available contamination models
 cont_models = ['gauss', 'direct', 'fluxcube', 'geometric']

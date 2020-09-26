@@ -4,8 +4,8 @@ import logging
 
 from stsci.tools import wcsutil
 
-from pyaxe.axeerror import aXeError
-from pyaxe.config import (getCONF, getDATA,
+from hstaxe.axeerror import aXeError
+from hstaxe.config import (getCONF, getDATA,
                           getOUTPUT, get_ext_info)
 
 from . import configfile
