@@ -79,10 +79,10 @@ axetasks.axeprep(inlist="aXe.lis",
                      norm=False,
                      mfwhm=3.0)
 
-print( "sky: ",fits.open("DATA/ib6o23rsq_flt.fits")[1].header["SKY_CPS"],"e/s")
-print( "sky: ",fits.open("DATA/ib6o23ruq_flt.fits")[1].header["SKY_CPS"],"e/s")
-print( "sky: ",fits.open("DATA/ib6o23ryq_flt.fits")[1].header["SKY_CPS"],"e/s")
-print( "sky: ",fits.open("DATA/ib6o23s0q_flt.fits")[1].header["SKY_CPS"],"e/s")
+# print( "sky: ",fits.open("DATA/ib6o23rsq_flt.fits")[1].header["SKY_CPS"],"e/s")
+# print( "sky: ",fits.open("DATA/ib6o23ruq_flt.fits")[1].header["SKY_CPS"],"e/s")
+# print( "sky: ",fits.open("DATA/ib6o23ryq_flt.fits")[1].header["SKY_CPS"],"e/s")
+# print( "sky: ",fits.open("DATA/ib6o23s0q_flt.fits")[1].header["SKY_CPS"],"e/s")
 
 print("Running axecore...\n")
 axetasks.axecore('aXe.lis',
