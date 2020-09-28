@@ -3,8 +3,11 @@ Current Requirements
 ====================
 This version of the software no longer requires IRAF or PyRAF to be installed.
 see `setup.py` and `setup.cfg` for additional install dependencies. The most notable here are
-the GNU Science Library, cfitsio, and wcstools. cfitsio and wcstools are available from the
-astroconda channel at STScI along with several other packages that are used.
+the GNU Science Library, cfitsio, and wcstools. 
+
+There are some dependency packages which are only available through the Astroconda channel,
+in order to ease setup of a conda environment with specific depenedencies, use the
+`conda_environment.yml` file to create a working environment on your system. 
 
 
 Software Development History
@@ -17,14 +20,14 @@ It is located at the ESO headquarters at Garching near Munich. The ST-ECF
 staff supports the European astronomical community in exploiting the research
 opportunities provided by the earth-orbiting Hubble Space Telescope.
 
-The Developers have included, roughly in reverse order of who last worked on the software:
-Megan Sosey, STScI
-Howard Bushouse, STScI
-Richard Hook, ST-ECF/STScI
-Martin Kuemmel, ST-ECF
+The Developers have included, roughly in  order of who has worked on the software:
+
 Norbert Pirzkal, ST-ECF/STScI
 Markus Demleitner, ST-ECF
-
+Martin Kuemmel, ST-ECF
+Richard Hook, ST-ECF/STScI
+Howard Bushouse, STScI
+Megan Sosey, STScI
 
 
 Some versioning feature notes from the previous IRAF software package:
