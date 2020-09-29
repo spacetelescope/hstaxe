@@ -1,5 +1,9 @@
-version 0.6 (September 28, 2020)
---------------------------------
+version 0.6.x (unreleased)
+--------------------------
+
+
+version 0.6.0 (September 28, 2020)
+----------------------------------
 package namechange from pyaxe to hstaxe
 Beta release for testing.
 This version should complete for WFC3 and ACS and includes axedrizzle
