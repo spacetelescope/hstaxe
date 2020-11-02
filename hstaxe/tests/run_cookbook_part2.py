@@ -48,11 +48,11 @@ for dir_image in glob.glob("F*drz.fits"):
     fname = dir_image.split("_")[0]
     dir_images.append(dir_image)
 
-from astropy.io import fits 
-import numpy as np       
+from astropy.io import fits
+import numpy as np
 s = []
 for dir_image in dir_images:
-    print (dir_image)  
+    print (dir_image)
     PHOTPLAM = fits.open(dir_image)[0].header["PHOTPLAM"] # Wavelength of filter in A
     PHOTFLAM = fits.open(dir_image)[0].header["PHOTFLAM"] # Wavelength of filter in A
     ABZP = -48.60 - 2.5*np.log10(PHOTFLAM * PHOTPLAM**2/3e8/1e10 )
@@ -72,6 +72,7 @@ os.system("cp ib6o23*FLX.fits ../DATA/")
 os.chdir(cwd)
 os.system("cp G141/*flt.fits DATA/")
 
+os.system("cat aXe.lis")
 axetasks.axeprep(inlist="aXe.lis",
                      configs="G141.F140W.V4.31.conf",
                      backgr=True,
@@ -79,10 +80,11 @@ axetasks.axeprep(inlist="aXe.lis",
                      norm=False,
                      mfwhm=3.0)
 
-# print( "sky: ",fits.open("DATA/ib6o23rsq_flt.fits")[1].header["SKY_CPS"],"e/s")
-# print( "sky: ",fits.open("DATA/ib6o23ruq_flt.fits")[1].header["SKY_CPS"],"e/s")
-# print( "sky: ",fits.open("DATA/ib6o23ryq_flt.fits")[1].header["SKY_CPS"],"e/s")
-# print( "sky: ",fits.open("DATA/ib6o23s0q_flt.fits")[1].header["SKY_CPS"],"e/s")
+print("Finished axeprep\n")
+print( "sky: ",fits.open("DATA/ib6o23rsq_flt.fits")[1].header["SKY_CPS"],"e/s")
+print( "sky: ",fits.open("DATA/ib6o23ruq_flt.fits")[1].header["SKY_CPS"],"e/s")
+print( "sky: ",fits.open("DATA/ib6o23ryq_flt.fits")[1].header["SKY_CPS"],"e/s")
+print( "sky: ",fits.open("DATA/ib6o23s0q_flt.fits")[1].header["SKY_CPS"],"e/s")
 
 print("Running axecore...\n")
 axetasks.axecore('aXe.lis',
@@ -100,7 +102,7 @@ axetasks.axecore('aXe.lis',
 print("Running drzprep....\n")
 axetasks.drzprep(inlist = "aXe.lis",
 				configs =  "G141.F140W.V4.31.conf",
-				back = False)
+				back = True)
 
 print("Running axecrr....\n")
 axetasks.axecrr(inlist = "aXe.lis",

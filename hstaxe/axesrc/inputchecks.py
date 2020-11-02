@@ -136,7 +136,6 @@ class InputChecker:
 
             # derive the aXe names
             axe_names = config_util.get_axe_names(one_input['grisim'], ext_info)
-
             # check the DPP file
             if not os.path.isfile(config_util.getOUTPUT(axe_names['DPP'])):
                 # error and out
