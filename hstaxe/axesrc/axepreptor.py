@@ -331,12 +331,11 @@ class aXePrepArator:
                                           os.path.split(self.config_name)[-1],
                                           os.path.split(self.master_bck)[-1])
         try:
-            scalebck.runall()
+            scalebck.run()
         except aXeError:
             _log.info("There was a problem with the background subtraction, "
                   "continuing without it")
             return False
-
         # check whether the background image exists
         bckfilename = config_util.getOUTPUT(axe_names['SGRI'])
 
@@ -371,7 +370,7 @@ class aXePrepArator:
                                     'fraction of pixels used for scaling')
         grism_header['SKY_CPS'] = (float(scal_val),
                                    'scale used for master sky == sky value [cps]')
-        # close the grism image and sacve and the scaled image
+        # close the grism image and save and the scaled image
         grism_file.close()
         return True
 
