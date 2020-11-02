@@ -1,6 +1,6 @@
 version 0.6.x (unreleased)
 --------------------------
-
+- changed the axeprep call from runall to run
 
 version 0.6.0 (September 28, 2020)
 ----------------------------------
