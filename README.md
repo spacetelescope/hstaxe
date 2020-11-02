@@ -10,6 +10,15 @@ in order to ease setup of a conda environment with specific depenedencies, use t
 `conda_environment.yml` file to create a working environment on your system. 
 
 
+Examples
+========
+There are a couple simple test scripts in hstaxe/tests that can be run against the example data in the aXe cookbook:
+
+`run_acs_cookbook.py`: runs basic aXe against ACS data
+`run_cookbook.py`: runs basic aXe against WFC3 data
+`run_cookbook_part2.py`: runs axedrizzle against WFC3 data
+ 
+
 Software Development History
 ============================
 
