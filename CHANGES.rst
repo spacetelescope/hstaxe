@@ -1,5 +1,5 @@
-version 0.7.0 (unreleased)
---------------------------
+version 0.7.0 (November 3, 2020)
+--------------------------------
 - changed the default settings for optimal extraction for safety
 - wfc3 is verified working
 - acs tentative verification
