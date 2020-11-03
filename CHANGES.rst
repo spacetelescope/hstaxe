@@ -1,6 +1,9 @@
 version 0.7.0 (unreleased)
 --------------------------
 - changed the default settings for optimal extraction for safety
+- wfc3 is verified working
+- acs tentative verification
+- added example notebook for WFC3 full axe extraction to jupyter directory
 
 version 0.6.5 (November 1, 2020)
 --------------------------------

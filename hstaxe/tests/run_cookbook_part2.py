@@ -99,10 +99,12 @@ axetasks.axecore('aXe.lis',
                  sampling='drizzle',
                  exclude=True)
 
+# run optimal extraction
 print("Running drzprep....\n")
 axetasks.drzprep(inlist = "aXe.lis",
 				configs =  "G141.F140W.V4.31.conf",
-				back = True)
+				back = False,
+                opt_extr=True)
 
 print("Running axecrr....\n")
 axetasks.axecrr(inlist = "aXe.lis",
@@ -110,6 +112,7 @@ axetasks.axecrr(inlist = "aXe.lis",
                 infwhm = 4.0,
                 outfwhm = 3.0,
                 back = False,
+                opt_extr=True,
                 driz_separate = 'yes'
                 )
 
