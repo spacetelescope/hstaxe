@@ -20,8 +20,8 @@ There are a couple simple test scripts in hstaxe/tests that can be run against t
 
 `run_cookbook_part2.py`: runs axedrizzle against WFC3 data
  
- The aXe cookbook data can be downloaded by cloning this repository:
- `https://github.com/npirzkal/aXe_WFC3_Cookbook <https://github.com/npirzkal/aXe_WFC3_Cookbook>`_
+The aXe cookbook data can be downloaded by cloning this repository:
+https://github.com/npirzkal/aXe_WFC3_Cookbook 
 
 
 Software Development History
