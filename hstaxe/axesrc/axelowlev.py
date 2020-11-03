@@ -592,10 +592,14 @@ class aXe_DRZPREP(TaskWrapper):
         if (('back' in params) and (params['back'])):
             # put the opt_extr-flag to the list
             self.bck = True
-            self.command_list.append('-opt_extr')
+            self.command_list.append('-bck')
         else:
             self.bck = False
             
+        # store the optimal extraction flag
+        if (('opt_extr' in params) and (params['opt_extr'])):
+            self.command_list.append('-opt_extr')
+
 
     def runall(self, silent=True):
         """Run the wrapped task
@@ -616,15 +620,6 @@ class aXe_DRZPREP(TaskWrapper):
         """
         # run the method of the super class
         super().runall(silent=silent)
-
-        # check for the background flag
-        if self.bck:
-            # put the bck-flag to the list
-            self.command_list.append('-bck')
-
-            # run the method of the super class
-            super().runall(silent=silent)
-
 
 class aXe_GOL2AF(TaskWrapper):
     """Wrapper around the aXe_GOL2AF task"""

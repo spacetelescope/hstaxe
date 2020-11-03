@@ -15,9 +15,14 @@ Examples
 There are a couple simple test scripts in hstaxe/tests that can be run against the example data in the aXe cookbook:
 
 `run_acs_cookbook.py`: runs basic aXe against ACS data
+
 `run_cookbook.py`: runs basic aXe against WFC3 data
+
 `run_cookbook_part2.py`: runs axedrizzle against WFC3 data
  
+ The aXe cookbook data can be downloaded by cloning this repository:
+ `https://github.com/npirzkal/aXe_WFC3_Cookbook <https://github.com/npirzkal/aXe_WFC3_Cookbook>`_
+
 
 Software Development History
 ============================

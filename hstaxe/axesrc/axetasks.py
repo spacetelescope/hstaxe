@@ -250,7 +250,7 @@ def axecore(inlist='',
 def drzprep(inlist='',
             configs='',
             back=False,
-            opt_extr=True):
+            opt_extr=False):
     """Convenience function for the aXe task DRZPREP"""
     axe_setup()
 
@@ -278,7 +278,7 @@ def axecrr(inlist='',
            clean=True,
            makespc=True,
            adj_sens=True,
-           opt_extr=True,
+           opt_extr=False,
            driz_separate=False):
 
     """Function for aXedrizzle with CosmicRay-rejection"""
@@ -304,7 +304,7 @@ def axecrr(inlist='',
     # make a list of drizzle objects
     dols = drizzleobjects.DrizzleObjectList(drizzle_params,
                                             cont_info,
-                                            opt_extr, back=False)
+                                            opt_extr, back=back)
 
     _log.info(f"checking files {dols}")
     dols.check_files()

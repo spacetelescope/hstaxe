@@ -1,5 +1,6 @@
-version 0.7.x (unreleased)
+version 0.7.0 (unreleased)
 --------------------------
+- changed the default settings for optimal extraction for safety
 
 version 0.6.5 (November 1, 2020)
 --------------------------------
