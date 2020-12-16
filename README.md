@@ -19,6 +19,8 @@ There are a couple simple test scripts in hstaxe/tests that can be run against t
 `run_cookbook.py`: runs basic aXe against WFC3 data
 
 `run_cookbook_part2.py`: runs axedrizzle against WFC3 data
+
+`aXe_WFC3_Cookbook.ipynb`: runs through a full WFC3 dataset cookbook style
  
 The aXe cookbook data can be downloaded by cloning this repository:
 https://github.com/npirzkal/aXe_WFC3_Cookbook 
