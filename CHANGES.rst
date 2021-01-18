@@ -1,6 +1,7 @@
 version 0.7.x (unreleased)
 --------------------------
-
+- fixed bug in drzprep call to lower level C that affected ACS data
+- added more fstring conversions and some documentation text
 
 version 0.7.0 (November 3, 2020)
 --------------------------------

@@ -89,7 +89,7 @@ class NonLinCoeffs:
 
     def write_file(self):
         """Generate the non-linear coefficients file"""
-        print("\nWriting non-linear coefficients to file\n")
+        print(f"\nWriting non-linear coefficients to file: {self.coeff_filename}\n")
 
         # check whether the file exists
         with open(self.coeff_filename, 'w+') as cfile:

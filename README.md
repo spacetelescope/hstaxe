@@ -5,9 +5,7 @@ This version of the software no longer requires IRAF or PyRAF to be installed.
 see `setup.py` and `setup.cfg` for additional install dependencies. The most notable here are
 the GNU Science Library, cfitsio, and wcstools. 
 
-There are some dependency packages which are only available through the Astroconda channel,
-in order to ease setup of a conda environment with specific depenedencies, use the
-`conda_environment.yml` file to create a working environment on your system. 
+There are some dependency packages, such as cfitsio which are only available through the Astroconda channel, in order to ease setup of a conda environment with specific depenedencies, use the `conda_environment.yml` file to create a working environment on your system. Make sure that your conda environment
 
 
 Examples

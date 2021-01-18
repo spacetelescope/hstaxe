@@ -1159,6 +1159,8 @@ class aXe_PETCONT(TaskWrapper):
             Whether to write the contamination map into a FITS file.
         in_af : str
             Name to use for the input aperture file (instead of the default).
+        no_pet: bool
+            whether a PET exists
 
         Description
         -----------

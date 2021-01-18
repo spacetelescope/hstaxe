@@ -78,7 +78,31 @@ def fcubeprep(grism_image='',
               AB_zero=True,
               dim_info='0,0,0,0',
               interpol='nearest'):
-    """Convenience function for the aXe task FCUBEPREP"""
+    """Convenience function for the aXe task FCUBEPREP.
+
+    Parameters
+    ----------
+    grism_image:    the name of the combined grism image
+
+    segm_image:     name of the segmentation image
+
+    filter_info:    name, wavelength, zeropoint of the filter image(s).
+                    If there are several filter images the comma separated
+                    quantities are written in a file, and the name of this file
+                    is given here.
+
+    AB_zero:        boolean to indicate whether the zeropoints given in the
+                    parameter 'filter_info' are in AB- or ST-magnitudes
+
+    dimension_info: four numbers to specify the modifications
+                    [left, right, bottom, top] to the target area on the grism
+                    images. E.g. 100,500,10,0 would produce fluxcube images
+                    which cover the area -100 < x < x_size + 500 and -10 < y < y_size
+                    in the input grism images
+
+    interpol:       the inpolation scheme used to compute flux values at
+                    the interpolated wavelengths
+    """
 
     # run the main command
     fcmaker = fcubeobjs.FluxCubeMaker(grism_image, segm_image, filter_info,
@@ -198,7 +222,99 @@ def axecore(inlist='',
             adj_sens=True,
             weights=False,
             sampling='drizzle'):
-    """Convenience function for the aXe task AXECORE"""
+    """Convenience function for the aXe task AXECORE.
+
+    Parameters
+    ----------
+    inlist: str
+      Input Image List which gives on each line
+          a) the name of the grism image to be processed (mandatory)
+          b) the object catalog(s) (mandatory)
+          c) the direct image associated with the grism image (optional)
+          d) dmag value (see GOL2AF) for the grism image (optional)
+
+    configs: str
+      name of the axe configuration file. If several image
+      extensions are to be processed (e.g. for WFC images), one
+      configuration file per extension must be given in a comma
+      separated list.
+
+    back: Bool
+      to switch on/off the creation of a background PET with
+      mfwhm=backfwhm
+
+    extrfwhm: float
+      mfwhm value to specify the extraction width in gol2af
+
+    drzfwhm: float
+      mfwhm value to specify the extraction in axedrizzle
+
+    backfwhm: float
+      mfwhm value to specify the width of the background PET
+
+    orient: bool
+      enable tilted extraction
+
+    slitless_geom: bool
+      enable the best extraction for slitless spectroscopy
+
+    exclude: bool
+     switch off the listing of faint objects
+
+    lambda_mark: float
+      the wavelength at which to apply the cutoff magnitudes
+      MMAG_EXTRACT and MMAG_MARK
+
+    cont_model: str
+      name of the contamination model to be applied
+
+    model_scale: float
+      scale factor for the gaussian contamination model
+
+    interp_type: str
+      interpolation type for the flux values
+
+    lambda_psf: float
+      wavelength [nm] at which the object widths were measured
+
+    np: int
+      number of points for background estimation
+
+    interp: int
+      interpolation type for background determination
+      (-1: GLOBAL median; 0: local median; 1: linear fit;
+      2: quadratic fit)
+
+    niter_med: int
+      number of kappa-sigma iterations around the median
+
+    niter_fit: int
+      number of kappa-sigma iterations around the fit value
+
+    kappa: float
+      kappa value
+
+    smooth_length: int
+      number of adjacent pixels on each side to use when
+      smoothing the background estimate in x-direction
+
+    smooth_fwhm: float
+      FWHM of the Gaussian used in the background smoothing
+
+    spectr: bool
+      enable the creation of SPCs and STPs for each of the
+      grism files individually
+
+    weights: bool
+      compute and apply optimal weights
+
+    adj_sens: bool
+       adjust the sensitivity function for extended sources
+
+    sampling: str
+      the sampling mode for the stamp images
+
+    """
     axe_setup()
 
     # do all the file checks
@@ -251,7 +367,36 @@ def drzprep(inlist='',
             configs='',
             back=False,
             opt_extr=False):
-    """Convenience function for the aXe task DRZPREP"""
+    """Convenience function for the aXe task DRZPREP.
+
+    Parameters
+    ----------
+    inlist: str
+      Input Image List which gives the name of the grism image to
+      be processed as the first item on each line.
+
+    configs: str
+      name of the aXe configuration file. If several image
+      extensions are to be processed (e.g. for WFC images), one
+      configuration file per extension must be given in a comma
+      separated list.
+
+    opt_extr: bool 
+      to generate also the necessary data  for optimal
+      extraction in axedrizzle
+
+    back: bool
+      to switch on the creation of background DPPs made
+      by processing background PETs.
+
+    Output
+    ------
+    if back = False
+      $AXE_DRIZZLE_PATH/[slitless filename]_[ext number].DPP.fits
+    if back = True
+      $AXE_DRIZZLE_PATH/[slitless filename]_[ext number].BCK.DPP.fits
+
+    """
     axe_setup()
 
     # create a list with the basic aXe inputs
@@ -259,12 +404,10 @@ def drzprep(inlist='',
     if len(configlist) < 1:
       raise aXeError("No configuration file input to drzprep")
 
-    for conf in configlist:
-    # make the objects task object, run it an do the cleaning
-        prepArator = axelowlev.aXe_DRZPREP(inlist, 
-                                           conf,
-                                           back=back,
-                                           opt_extr=opt_extr)
+    prepArator = axelowlev.aXe_DRZPREP(inlist, 
+                                       configs,
+                                       back=back,
+                                       opt_extr=opt_extr)
     prepArator.run()
 
     del prepArator
@@ -281,7 +424,13 @@ def axecrr(inlist='',
            opt_extr=False,
            driz_separate=False):
 
-    """Function for aXedrizzle with CosmicRay-rejection"""
+    """Function for aXedrizzle with CosmicRay-rejection.
+
+    Parameters
+    ----------
+
+
+    """
     axe_setup(tmpdir=True)
 
     # do all the input checks
@@ -428,7 +577,39 @@ def sex2gol(grism='',
             spec_hdu=None,
             out_sex=None,
             silent=False):
-    """Function for the aXe task SEX2GOL"""
+    """Function for the aXe task SEX2GOL.
+
+    Parameters
+    ----------
+    grism: str
+      name of the grism image to be processed.
+
+    config: str
+      name of the axe configuration file.
+
+    in_sex: str
+      name of the object file.
+
+    use_direct: bool
+      indicate that the Input Object List refers to a
+      direct image
+
+    direct: str
+      name of the direct image
+
+    dir_hdu: int
+      direct image extension to be used
+
+    spec_hdu: int
+      grism/prism image extension to be used
+
+    out_SEX: str
+      overwrites the default output object catalog name
+
+    silent: bool
+      print messages
+
+    """
     # make the general setup
     axe_setup()
     sex2gol = pysex2gol.Sex2GolPy(grism, config,
@@ -451,7 +632,47 @@ def gol2af(grism='',
            dmag=None,
            out_af="",
            in_gol=None):
-    """Function for the aXe task GOL2AF"""
+    """Function for the aXe task GOL2AF.
+
+    Parameters
+    ----------
+    grism: str
+      name of the grism image
+
+    config: str
+      name of the aXe configuration file
+
+    mfwhm: float
+      the extraction width multiplicative factor
+
+    back: bool
+      to generate a BAF instead of an OAF file
+
+    orient: bool
+      switch on/off tilted extraction
+
+    slitless_geom: bool
+      switch on/off automatic orientation for the tilted extraction
+
+    exclude: bool to switch on the removal of faint
+      objects in the result
+
+    lambda_mark: float
+      the wavelength at which to apply the cutoff magnitudes
+      MMAG_EXTRACT and MMAG_MARK
+
+    dmag: float
+      a number to add to the MMAG_EXTRACT and MMAG_MARK
+      values given in the configuration file
+
+    out_af: str
+      overwrites the default output OAF or BAF filename
+
+    in_gol: str
+      overwrites the default input catalog name
+
+
+    """
     # check for required environment variables
     axe_setup()
 
@@ -474,7 +695,33 @@ def af2pet(grism='',
            back=False,
            in_af="",
            out_pet=None):
-    """Function for the aXe task AF2PET"""
+    """Function for the aXe task AF2PET.
+
+    This task uses the input slitless image together with an Object
+    Aperture File (OAF) to generate an Object Pixel Extraction Table
+    (OPET) for the input data.
+
+    Parameters
+    ----------
+    grism: str
+      name of the grism image
+
+    config: str
+      name of the aXe configuration file
+
+    back:  bool
+      generate a PET for a background image using
+      a BAF file instead of a OAF file and using a
+      background image generated by backest
+
+    in_af : str
+      Name to use for the input aperture file with the stamp images
+      instead of the default.petcont
+
+    out_pet : str
+      Name to use for the output PET file instead of the default.
+
+    """
     # check for required environment variables
     axe_setup()
 
@@ -488,17 +735,68 @@ def af2pet(grism='',
 
 def petcont(grism='',
             config='',
-            cont_model="",
+            cont_model='',
             model_scale=None,
-            spec_models="",
-            object_models="",
+            spec_models='',
+            object_models='',
             inter_type='linear',
             lambda_psf=None,
             cont_map=True,
-            in_af="",
+            in_af='',
             no_pet=False,
             silent=False):
-    """Function for the aXe task PETCONT"""
+    """Function for the aXe task PETCONT.
+
+    The task computes and stores the contamination information for a 
+    given Pixel Extraction Table. There are two distinct ways to
+    compute the contamination:
+
+    The geometrical contamination records, for each PET pixel, how often
+    it is a member of a different beam. If a pixel is a member of two 
+    separate beams, i.e. is in a region where two beams overlap, it is 
+    assigned a value of 1 in each of the two beam PET’s, thus indicating 
+    that this pixel is also part of another beam. In quantitative contamination,
+    the amount of contaminating flux from other beams is estimated for each 
+    PET pixel. This estimate is based on a model of the emitting sources.
+    There are two different methods to establish an emission model, 
+    the gaussian emission model and the fluxcube model.
+    
+    Parameters
+    ----------
+    grism: str
+      name of the grism image
+
+    config: str
+      name of the aXe configuration file
+
+    cont_model: str
+      name of the contamination model to be applied
+
+    model_scale: float
+      scale factor for the gaussian cont. model
+
+    spec_models: str
+      name of the multi-extension fits table with model spectra
+
+    object_models: str
+      name of the multi-extension fits image with object templates.
+
+    interp_type: str
+      interpolation type for the flux values
+
+    lambda_psf: float
+      wavelength [nm] at which the object widths were measured
+
+    cont_map: bool
+      write the contamination map into a FITS file
+
+    in_af: str
+      overwrites the input AF file name
+
+    no_pet: bool
+      whether a PET exists
+
+    """
     # check for required environment variables
     axe_setup()
 

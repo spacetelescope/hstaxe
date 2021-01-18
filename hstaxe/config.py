@@ -26,7 +26,7 @@ __AXE_DRZTMP_LOC = os.path.join(__user_paths["AXE_DRIZZLE_PATH"],
 __user_paths['AXE_DRZTMP_LOC'] = __AXE_DRZTMP_LOC
 
 
-# notification of python only axe
+# notification of python + C only axe
 welcome_string="* Welcome to hstaxe!\nThis version is independent of IRAF and PyRAF. *"
 print(f"\n{len(welcome_string)*'*'}")
 print(welcome_string)
@@ -44,18 +44,16 @@ def set_defaults():
     for name in __user_paths:
         if name in user_env:
             __user_paths[name] = user_env[name]
-            print("{0:s} -> {1:s}".format(name, user_env[name]))
+            print(f"{name} -> {user_env[name]}")
         else:
             if os.access(__user_paths[name], os.R_OK):
-                print("{0:s} already exists, using.".format(name))
+                print(f"{name} already exists, using.")
             else:
-                print("{0:s} not defined, using {1:s}".format(name,
-                                                              __user_paths[name]))
+                print(f"{name} not defined, using {__user_paths[name]}")
                 try:
                     os.mkdir(__user_paths[name])
                 except OSError:
-                    raise OSError("Problem creating {0:s} -> {1:s}"
-                                  .format(name, __user_paths[name]))
+                    raise OSError(f"Problem creating {name} -> {__user_paths[name]}")
             os.environ[name] = __user_paths[name]
 
 
@@ -63,10 +61,9 @@ def check_axe_dirs():
     """Check for usability of all axe directories"""
     for location in __user_paths.values():
         if not os.access(location, os.W_OK):
-            raise IOError("{0:s} not writeable".format(location))
+            raise IOError(f"{location} not writeable")
 
 
-# TODO: add the environment check here
 def check_axesim_dirs():
     """Check for existence of all directories"""
     global __user_paths
@@ -75,7 +72,7 @@ def check_axesim_dirs():
 
     for location in __user_paths:
         if not os.access(location, os.W_OK):
-            raise IOError("{0:s} not writable".format(location))
+            raise IOError(f"{location} not writable")
 
 
 def handle_drztmp_dir():
@@ -91,7 +88,7 @@ def handle_drztmp_dir():
     print('Creating temporary directory: ', __user_paths['AXE_DRZTMP_LOC'])
 
 
-# TODO: Update this for axesim
+# TODO: Update or verify this for axesim 
 def axe_setup(tmpdir=False, axesim=False):
     """Setup the aXe file and pathnames"""
 
@@ -125,25 +122,6 @@ def axe_setup(tmpdir=False, axesim=False):
             # deal with the drizzle tmp directory
             handle_drztmp_dir()
 
-
-# def getCONF(name=None):
-#     # return either AXE_CONFIG_PATH or
-#     # the pathname to the input file
-#     # in AXE_CONFIG_PATH
-#     if name is None:
-#         return __user_paths['AXE_CONFIG_PATH']
-#     elif isinstance(name, list):
-#         outlist=[]
-#         for cname in name:
-#             if 'CONF' not in cname:
-#                 outlist.append(os.path.join(__user_paths['AXE_CONFIG_PATH'], cname))
-#             else:
-#                 outlist.append(cname)
-#         return outlist
-#     elif (isinstance(name,str) and ',' in name):
-#         return [os.path.join(__user_paths['AXE_CONFIG_PATH'], cname) for cname in name.split(',')]
-#     else:
-#         return [os.path.join(__user_paths['AXE_CONFIG_PATH'], name)]
 
 def getCONF(name=None):
     fullpath = __user_paths['AXE_CONFIG_PATH']
@@ -322,47 +300,37 @@ def get_axe_names(image, ext_info):
     # FILL the dictionary with names of aXe products
     #
     # the GOL:
-    axe_names['GOL'] = ("{0:s}_{1:d}.cat".format(root, ext_info['axe_ext']))
+    axe_names['GOL'] = (f"{root}_{ext_info['axe_ext']}.cat")
 
     # the OAF/BAF:
-    axe_names['OAF'] = ("{0:s}_{1:d}.OAF".format(root, ext_info['axe_ext']))
-    axe_names['BAF'] = ("{0:s}_{1:d}.BAF".format(root, ext_info['axe_ext']))
+    axe_names['OAF'] = (f"{root}_{ext_info['axe_ext']}.OAF")
+    axe_names['BAF'] = (f"{root}_{ext_info['axe_ext']}.BAF")
 
     # the PET:
-    axe_names['PET'] = ("{0:s}_{1:d}.PET.fits"
-                        .format(root, ext_info['axe_ext']))
-    axe_names['BCK_PET'] = ("{0:s}_{1:d}.BCK.PET.fits"
-                            .format(root, ext_info['axe_ext']))
+    axe_names['PET'] = (f"{root}_{ext_info['axe_ext']}.PET.fits")
+    axe_names['BCK_PET'] = (f"{root}_{ext_info['axe_ext']}.BCK.PET.fits")
 
     # the DPP:
-    axe_names['DPP'] = ("{0:s}_{1:d}.DPP.fits"
-                        .format(root, ext_info['axe_ext']))
-    axe_names['BCK_DPP'] = ("{0:s}_{1:d}.BCK.DPP.fits"
-                            .format(root, ext_info['axe_ext']))
+    axe_names['DPP'] = (f"{root}_{ext_info['axe_ext']}.DPP.fits")
+    axe_names['BCK_DPP'] = (f"{root}_{ext_info['axe_ext']}.BCK.DPP.fits")
 
     # the SPC:
-    axe_names['SPC'] = ("{0:s}_{1:d}SPC.fits"
-                        .format(root, ext_info['axe_ext']))
+    axe_names['SPC'] = (f"{root}_{ext_info['axe_ext']}SPC.fits")
 
     # the STP:
-    axe_names['STP'] = ("{0:s}_{1:d}.STP.fits"
-                        .format(root, ext_info['axe_ext']))
+    axe_names['STP'] = (f"{root}_{ext_info['axe_ext']}.STP.fits")
 
     # the background mask:
-    axe_names['MSK'] = ("{0:s}_{1:d}.MSK.fits"
-                        .format(root, ext_info['axe_ext']))
+    axe_names['MSK'] = (f"{root}_{ext_info['axe_ext']}.MSK.fits")
 
     # the background mask:
-    axe_names['NBCK'] = ("{0:s}_{1:d}.NBCK.fits"
-                         .format(root, ext_info['axe_ext']))
+    axe_names['NBCK'] = (f"{root}_{ext_info['axe_ext']}.NBCK.fits")
 
     # the background mask:
-    axe_names['SGRI'] = ("{0:s}_{1:d}.SGRISM.fits"
-                         .format(root, ext_info['axe_ext']))
+    axe_names['SGRI'] = (f"{root}_{ext_info['axe_ext']}.SGRISM.fits")
 
     # the background mask:
-    axe_names['FLX'] = ("{0:s}_{1:d}FLX.fits"
-                        .format(root, ext_info['axe_ext']))
+    axe_names['FLX'] = (f"{root}_{ext_info['axe_ext']}FLX.fits")
 
     # return the dictionary
     return axe_names
