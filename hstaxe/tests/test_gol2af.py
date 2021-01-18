@@ -32,8 +32,7 @@ def test_gol2af():
                         lambda_mark=4000,
                         dmag=None,
                         out_af=None,
-                        in_gol=None,
-                        silent=False)
+                        in_gol=None)
 
 
         # validate the output

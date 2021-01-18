@@ -1,3 +1,7 @@
+# This script needs to be run from the same directory
+# that the cookbook_data/ directory exists for wfc3
+# excute run_cookbook.py first
+
 import os
 import shutil
 from drizzlepac import astrodrizzle

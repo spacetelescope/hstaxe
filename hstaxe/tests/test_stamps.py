@@ -31,5 +31,4 @@ def test_stamps():
                         drzpath=False,
                         in_af="",
                         in_pet=None,
-                        out_stp=None,
-                        silent=False)
+                        out_stp=None)

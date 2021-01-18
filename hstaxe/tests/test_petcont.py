@@ -2,6 +2,7 @@
 
 """
 from hstaxe import axetasks
+import os
 
 # available contamination models
 cont_models = ['gauss', 'direct', 'fluxcube', 'geometric']
@@ -9,20 +10,19 @@ inter_types = ['linear', 'polynomial', 'spline']
 
 
 def test_petcont():
-    """test the petcont task.
-
-    This should turn the translated catalog files
-    into grism object list (GOL) files that still
-    look like source extractor output catalogs.
-    """
+    """test the petcont task."""
 
     # These are the files in the OUTPUT dir
-    outfiles = ['ib6o23rsq_flt.fits',
+    infiles = ['ib6o23rsq_flt.fits',
                 'ib6o23ruq_flt.fits',
                 'ib6o23ryq_flt.fits',
                 'ib6o23s0q_flt.fits']
+    outfiles = ['OUTPUT/ib6o23rsq_flt_2.CONT.fits',
+                'OUTPUT/ib6o23ruq_flt_2.CONT.fits',
+                'OUTPUT/ib6o23ryq_flt_2.CONT.fits',
+                'OUTPUT/ib6o23s0q_flt_2.CONT.fits']
 
-    for fname in outfiles:
+    for fname in infiles:
         axetasks.petcont(grism=fname,
                          config='G141.F140W.V4.31.conf',
                          cont_model='gauss',
@@ -35,3 +35,10 @@ def test_petcont():
                          in_af=None,
                          no_pet=False,
                          silent=False)
+
+    # make some basic existence checks
+    for image in outfiles:
+        assert os.path.isfile(image)
+        stats = os.stat(image)
+        assert stats.st_size > 0
+

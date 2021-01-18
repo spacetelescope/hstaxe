@@ -1249,7 +1249,7 @@ class aXe_PETCONT(TaskWrapper):
         if (model_scale is not None):
             # put the flag to the list
             self.command_list.append('-model_scale={0:s}'
-                                     .format(str(params['model_scale'])))
+                                     .format(str(model_scale)))
 
         # append the parameter 'lambda_psf'
         if (lambda_psf is not None):

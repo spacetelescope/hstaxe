@@ -25,5 +25,4 @@ def test_pet2spc():
                          in_af="",
                          opet="",
                          bpet=False,
-                         out_spc="",
-                         silent=False)
+                         out_spc="")

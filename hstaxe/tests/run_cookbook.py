@@ -1,6 +1,9 @@
 """
-Run the commands from nor's axe cookbook example
+Quick run the commands from nor's axe cookbook example
 but setup for hstaxe
+
+This script needs to be run from the same directory
+that the cookbook_data/ directory exists for wfc3
 """
 import os
 import shutil
@@ -83,5 +86,4 @@ axetasks.axecore('aXe.lis',
                  cont_model='gauss',
                  sampling='drizzle',
                  exclude=True)
-#!ls -altr OUTPUT
 

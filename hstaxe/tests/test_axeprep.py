@@ -13,7 +13,7 @@ def global_data():
            "background_image": "WFC3.IR.G141.sky.V1.0.fits",
            "output_directory": "OUTPUT/",
            "output_roots": ["ib6o23rsq", "ib6o23ruq", "ib6o23ryq", "ib6o23s0q"],
-           "output_suffix": ["_flt.fits", "_flt_2.cat", "_flt_2.OAF", "_flt_2.MSK.fits", "_flt_2.SGRISM.fits", "_flt_2.cat"],
+           "output_suffix": ["_flt_2.cat", "_flt_2.OAF", "_flt_2.MSK.fits", "_flt_2.SGRISM.fits"],
            "reference_suffix": "_reference."
            }
 
