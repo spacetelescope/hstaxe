@@ -31,7 +31,7 @@ There are a couple simple test scripts in hstaxe/tests that can be run against t
 
 `aXe_WFC3_Cookbook.ipynb`: runs through a full WFC3 dataset cookbook style
  
-The aXe cookbook data can be downloaded by cloning this repository:
+The aXe WFC3 cookbook data can be downloaded by cloning this repository:
 https://github.com/npirzkal/aXe_WFC3_Cookbook 
 
 
@@ -47,12 +47,12 @@ opportunities provided by the earth-orbiting Hubble Space Telescope.
 
 The Developers have included, roughly in  order of who has worked on the software:
 
-Norbert Pirzkal, ST-ECF/STScI
-Markus Demleitner, ST-ECF
-Martin Kuemmel, ST-ECF
-Richard Hook, ST-ECF/STScI
-Howard Bushouse, STScI
-Megan Sosey, STScI
+    Norbert Pirzkal, ST-ECF/STScI
+    Markus Demleitner, ST-ECF
+    Martin Kuemmel, ST-ECF
+    Richard Hook, ST-ECF/STScI
+    Howard Bushouse, STScI
+    Megan Sosey, STScI
 
 
 Some versioning feature notes from the previous IRAF software package:
