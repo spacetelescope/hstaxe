@@ -33,9 +33,9 @@ AC_MSG_CHECKING(RPATH)
 if test -z "$RPATH"
 then
 	case $host_os in
-	      *linux*) RPATH='-Xlinker -rpath \$ORIGIN/../lib';;
-        *darwin*) RPATH='-Wl,-rpath,${prefix}/lib';;
-	      *)	RPATH='';;
+		*linux*) RPATH='-Xlinker -rpath,\$$ORIGIN/../lib';;
+		*darwin*) RPATH='-Wl,-rpath,${prefix}/lib';;
+		*) RPATH='';;
 	esac
 fi
 AC_SUBST([RPATH])
