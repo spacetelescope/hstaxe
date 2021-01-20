@@ -190,6 +190,8 @@ class BuildExtWithConfigure(install):
         if self.remake:
             CURRENT_ENV = sys.prefix
             try:
+                check_call(["sh", "autogen.sh"],
+                           cwd=AXELIB_DIR)
                 check_call(["sh", "./configure",
                             "--with-cfitsio="+CURRENT_ENV,
                             "--with-wcstools="+CURRENT_ENV,
