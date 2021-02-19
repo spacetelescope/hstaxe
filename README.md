@@ -18,6 +18,13 @@ Create an environment to run hstaxe:
 `conda create --name hstaxe-env --file conda_environment.yml`
 
 
+In order to build from source, make sure that you have the following installed locally 
+so that the C code will compile. The version listed below were used for the last release:
+
+    GNU Autoconf version 2.69
+    GNU Automake version 1.16.3
+    GNU Libtool version 2.4.6
+
 
 Examples
 ========
