@@ -13,9 +13,9 @@ If you want to add the astroconda channel to your default channels list:
 
 `conda config --add channels astroconda`
 
-Create an environment to run hstaxe:
+Create an environment to run hstaxe, install jupyter to follow along in the tutorial cookbook:
 
-`conda create --name hstaxe-env --file conda_environment.yml`
+`conda create --name hstaxe python=3.7 jupyter`
 
 
 In order to build from source, make sure that you have the following installed locally 
