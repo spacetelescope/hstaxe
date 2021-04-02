@@ -41,6 +41,10 @@ There are a couple simple test scripts in hstaxe/tests that can be run against t
 The aXe WFC3 cookbook data can be downloaded by cloning this repository:
 https://github.com/npirzkal/aXe_WFC3_Cookbook 
 
+The aXe ACS cookbook and associated data can be dowloaded from the following area:
+https://stsci.box.com/s/eo98zjtyccnoq7z73akfrx94jog3pg7j
+
+
 
 Software Development History
 ============================
