@@ -43,8 +43,8 @@ conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
 setup_cfg = dict(conf.items('metadata'))
 
 # General information about the project
-package = importlib.import_module(setup_cfg['package_name'])
-project = setup_cfg['package_name']
+package = importlib.import_module(setup_cfg['name'])
+project = setup_cfg['name']
 author = setup_cfg['author']
 copyright = '{0}, {1}'.format(datetime.datetime.now().year, author)
 
@@ -140,7 +140,7 @@ suppress_warnings = ['app.add_directive', ]
 # built documents.
 #
 # The short X.Y version.
-package = importlib.import_module(setup_cfg['package_name'])
+package = importlib.import_module(setup_cfg['name'])
 try:
     version = package.__version__.split('-', 1)[0]
     # The full version, including alpha/beta/rc tags.
