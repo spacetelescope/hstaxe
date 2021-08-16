@@ -51,7 +51,7 @@ AS_IF([test "x$with_gsl" != "xno"], [
        GSL="$withval"
        ])
 
-AC_PATH_PROG([GSL_CONFIG], [gsl-config], [notfound],[$with_gsl:$PATH])	
+AC_PATH_PROG([GSL_CONFIG], [gsl-config], [notfound],[$with_gsl:$PATH])
 if test "$GSL_CONFIG" == "notfound"
   then
     AC_MSG_ERROR([gsl-config not found. See ./configure --help to know how to set a proper gsl path])
@@ -81,8 +81,8 @@ AS_IF([test "x$with_wcstools" != "xno"], [
        ])
 
 if test "x$GSL" != "x"; then
-    GSL_LIBS=`$GSL/bin/gsl-config --libs`
-    GSL_CFLAGS=`$GSL/bin/gsl-config --cflags`
+    GSL_LIBS=`$GSL_CONFIG --libs`
+    GSL_CFLAGS=`$GSL_CONFIG --cflags`
 else
     PKG_CHECK_MODULES([GSL], [gsl >= 1])
 fi
