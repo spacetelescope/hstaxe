@@ -207,34 +207,17 @@ class BuildExtWithConfigure(install):
 
         install.run(self)
 
-
-
-
 # Note that requires and provides should not be included in the call to
 # ``setup``, since these are now deprecated. See this link for more details:
 # https://groups.google.com/forum/#!topic/astropy-dev/urYO8ckB2uM
 
 setup(
-    name=metadata.get('package_name', 'imexam'),
-    provides=[metadata.get('package_name', 'imexam')],
-    description=metadata.get('description'),
-    long_description=metadata.get('long_description'),
-    author=metadata.get('author'),
-    author_email=metadata.get('author_email'),
-    url=metadata.get('url'),
-    license=metadata.get('license'),
-    classifiers=metadata.get('classifier'),
-    zip_safe=False,
     use_scm_version=True,
-    use_2to3=False,
-    setup_requires=['setuptools_scm'],
-    packages=find_packages(),
     cmdclass={
         'test': PyTest,
         'build_sphinx': BuildSphinx,
         'build_ext': BuildExtWithConfigure,
         'install': BuildExtWithConfigure,
         'clean': MyClean,
-    },
-    package_dir={'': '.'},
+    }
 )
