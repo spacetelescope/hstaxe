@@ -31,7 +31,7 @@ The following are required to compile and install the aXe C code:
 - GNU CC 2.95 or later compiler
 - GNU Scientific Libraries 1.9 or later (http://www.gnu.org/software/gsl/)
 - WCStools libraries 3.5 or later (http://tdc-www.harvard.edu/wcstools/)
-- CFITSIO 3.x libraries (http://heasarc.nasa.gov/lheasoft/fitsio/fitsio.html)
+- CFITSIO 3.x libraries (https://heasarc.gsfc.nasa.gov/lheasoft/fitsio/fitsio.html)
 
 Install the libraries according to the instructions given with the
 respective source or binary distributions.
