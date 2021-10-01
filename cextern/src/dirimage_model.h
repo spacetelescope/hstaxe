@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #ifndef _DIRIMAGE_MODEL_H
 #define _DIRIMAGE_MODEL_H

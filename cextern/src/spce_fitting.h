@@ -1,3 +1,6 @@
+/**
+ * See LICENSE.txt
+*/
 #ifndef _SPC_FITTING_H
 #define _SPC_FITTING_H
 

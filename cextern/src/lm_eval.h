@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 typedef struct {
   double* user_t;

@@ -1,13 +1,14 @@
-#include "spc_FITScards.h"
-
 /**
-    Routine to return a pointer to a FITScard structure with
+ * See LICENSE.txt
+ *  Routine to return a pointer to a FITScard structure with
     room allocated for n FITS header cards strings.
 
     @param n the number of card to allocated memory for
 
     @return a pointer to an allocated FITScards structure
 */
+#include "spc_FITScards.h"
+
 FITScards *allocate_FITScards(int n)
 {
     int i;

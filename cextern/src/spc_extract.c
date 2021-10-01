@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * The driver function and some auxillaries
  * to compute the spectrum from an image and
  * information on the location and distortion of the spectra.

@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Subroutines to calculate the
  * various contamination models
  *

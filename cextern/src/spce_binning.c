@@ -1,5 +1,6 @@
 /**
-* Various binning and weighting routines for aperture pixel tables.
+ * See LICENSE.txt
+ * Various binning and weighting routines for aperture pixel tables.
 */
 
 #include <gsl/gsl_matrix.h>

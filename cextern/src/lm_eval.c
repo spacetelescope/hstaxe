@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #include "lmmin.h"
 #include "lm_eval.h"

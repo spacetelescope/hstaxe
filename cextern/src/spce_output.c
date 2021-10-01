@@ -1,4 +1,5 @@
 /**
+* See LICENSE.txt
 * Output routines for stamped images and overlaid traces.
 */
 #include <stdio.h>

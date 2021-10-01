@@ -1,6 +1,7 @@
 /**
  * File: trace_conf.c
- */
+ * See LICENSE.txt
+*/
 
 #include "trace_conf.h"
 

@@ -1,3 +1,6 @@
+/**
+ *  * See LICENSE.txt
+*/
 #ifndef _SPC_IS_IN_H
 #define _SPC_IS_IN_H
 

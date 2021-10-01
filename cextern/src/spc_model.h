@@ -1,3 +1,6 @@
+/**
+ *  * See LICENSE.txt
+*/
 #ifndef _SPC_MODEL_H
 #define _SPC_MODEL_H
 

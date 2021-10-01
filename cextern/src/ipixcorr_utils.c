@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Subroutines to correct for the intra-pixel sensitivity
  * variation in e.g. NICMOS pixels. There are routines
  * to corect both, an extracted SPC's and a list

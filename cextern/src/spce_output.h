@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Interface definitions for the postscript output routines
  */
 

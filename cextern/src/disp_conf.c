@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #include "disp_conf.h"
 #include <string.h>

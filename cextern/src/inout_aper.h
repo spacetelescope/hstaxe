@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #ifndef _INOUT_APER_H
 

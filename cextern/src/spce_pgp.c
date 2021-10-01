@@ -1,5 +1,6 @@
 /**
  * File: spce_pgp.c
+ * See LICENSE.txt
  * Various PGplot routines amd helper functions.
  */
 

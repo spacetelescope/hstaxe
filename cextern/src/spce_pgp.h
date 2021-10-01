@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * File: spce_pgp.h
  * Interface to PGplot routines.
  *

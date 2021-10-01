@@ -1,4 +1,5 @@
 /*
+ * See LICENSE.txt
  */
 #ifndef _APER_CONF_H
 #define _APER_CONF_H

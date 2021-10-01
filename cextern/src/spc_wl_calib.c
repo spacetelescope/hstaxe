@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Subroutines used in the "aXe_AF2PET.c" for the task aXe_AF2PET
  */
 

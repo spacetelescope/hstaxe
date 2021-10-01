@@ -1,5 +1,6 @@
 /**
-\ * External definitions to parametrize spectrum traces
+ * See LICENSE.txt
+ * External definitions to parametrize spectrum traces
  * in aXe grism exposures
  */
 

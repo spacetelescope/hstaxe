@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #ifndef _IPIXCORR_UTILS_H
 

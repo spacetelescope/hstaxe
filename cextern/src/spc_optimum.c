@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Various binning and weighting routines for aperture pixel tables.
  *
 */

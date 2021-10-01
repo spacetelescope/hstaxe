@@ -1,3 +1,6 @@
+/**
+ *  * See LICENSE.txt
+*/
 #ifndef _SPC_RESP_H
 
 #define _SPC_RESP_H

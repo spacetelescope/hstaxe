@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * File: model_utils.c
  * Subroutines to calculate the
  * various contamination models

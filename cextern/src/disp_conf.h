@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 
 #ifndef _DISP_CONF_H

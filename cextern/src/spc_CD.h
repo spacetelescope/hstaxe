@@ -1,3 +1,6 @@
+/**
+ *  * See LICENSE.txt
+*/
 #ifndef SPC_CD_H
 #define SPC_CD_H
 

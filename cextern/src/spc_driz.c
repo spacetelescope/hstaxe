@@ -1,4 +1,7 @@
-#include "spc_driz.h"
+/**
+ * See LICENSE.txt
+ */
+ #include "spc_driz.h"
 
 #define MIN(x,y) (((x)<(y))?(x):(y))
 #define MAX(x,y) (((x)>(y))?(x):(y))

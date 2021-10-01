@@ -1,4 +1,5 @@
 /* 
+ * See LICENSE.txt
  */
 
 #ifndef _aXe_ERRORS_H

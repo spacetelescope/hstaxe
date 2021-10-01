@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #ifndef _CROSSDISP_UTILS_H
 #define _CROSSDISP_UTILS_H

@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * File: model_utils.h
  * Header file for model_utils.c
  */

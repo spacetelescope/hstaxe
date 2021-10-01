@@ -1,4 +1,6 @@
 /**
+ * See LICENSE.txt
+ * 
  * Functions to replace an x coordinate with the path length of a given
  *   function of that x coordinate.
  *

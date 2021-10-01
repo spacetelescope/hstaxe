@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * File: scaleback_utils.c
  * Subroutine for the WFC3 background scaling
  *

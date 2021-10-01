@@ -1,5 +1,6 @@
 /**
  * File: spce_PET.c
+ * See LICENSE.txt
  * Input/Output routines of the PET FITS binary tables containing a list
  * of ap_pixel structures
  *

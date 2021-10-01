@@ -1,4 +1,5 @@
 /* 
+ * See LICENSE.txt
  * Interface for aXe_utils.c
  *
  */
