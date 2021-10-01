@@ -1,4 +1,5 @@
 /*
+ * See LICENSE.txt
  */
 #include <stdio.h>
 #include "fitsio.h"

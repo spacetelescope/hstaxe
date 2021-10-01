@@ -1,5 +1,7 @@
 /*
  * File: scpe_sect.c
+ * See LICENSE.txt
+ *
  * A function find the abscissa of the section between a curve and
  *   a line of given inclination through a number of points
  *   (and its helpers)

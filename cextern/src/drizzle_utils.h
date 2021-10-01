@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  *
  * File: drizzle_utils.h
  * Subroutines to calculate the

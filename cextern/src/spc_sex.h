@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Header files for the routines in spc_sex.c
  */
 #ifndef SPC_DEF_H

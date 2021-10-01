@@ -1,4 +1,5 @@
 /* 
+ * See LICENSE.txt
  * Some utility functions for aXe grism image processing
  */
 #ifndef aXe_UTILS_C

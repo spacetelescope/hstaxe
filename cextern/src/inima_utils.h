@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #ifndef _INIMA_UTILS_H
 #define _INIMA_UTILS_H

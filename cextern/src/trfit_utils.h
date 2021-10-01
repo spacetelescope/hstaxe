@@ -1,5 +1,6 @@
 /**
  * File: trfit_utils.h
+ * See LICENSE.txt
  *
  */
 #ifndef _TRFIT_UTILS_H

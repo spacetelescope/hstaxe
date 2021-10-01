@@ -1,5 +1,6 @@
 /*
  * File: spce_sect.h
+ * See LICENSE.txt
  * External definitions for spce_sect.c
  *
  *

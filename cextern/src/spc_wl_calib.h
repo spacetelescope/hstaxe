@@ -1,3 +1,6 @@
+/**
+ * See LICENSE.txt
+*/
 #ifndef _SPC_WL_CALIB_H
 #define _SPC_WL_CALIB_H 1
 #include "disp_conf.h"

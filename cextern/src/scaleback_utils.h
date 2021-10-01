@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * File: scaleback_utils.h
  * header files for scaleback_utils.c
  *

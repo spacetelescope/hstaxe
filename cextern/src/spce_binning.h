@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * The interface to the binning and weight routines
  */
 #ifndef _SPCE_BINNING_H

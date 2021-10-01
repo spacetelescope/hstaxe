@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Interface to flatfielding
  */
 

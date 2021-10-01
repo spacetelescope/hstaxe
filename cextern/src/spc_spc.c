@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Set of functions to handle binned spectra
  */
 #include "spc_spc.h"

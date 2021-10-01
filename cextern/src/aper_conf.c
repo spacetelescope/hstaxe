@@ -1,4 +1,5 @@
 /*
+ * See LICENSE.txt
  * Subroutines that deal with the aXe configuration file.
  *
  */

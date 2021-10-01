@@ -1,4 +1,5 @@
 /*
+ * See LICENSE.txt
  */
 #include "aper_check.h"
 #include <stdio.h>

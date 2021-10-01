@@ -1,6 +1,6 @@
 /**
  * File: trfit_utils.c
- *
+ * See LICENSE.txt
  */
 #include "trfit_utils.h"
 #include <stdio.h>

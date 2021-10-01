@@ -1,3 +1,6 @@
+ /**
+  * See LICENSE.txt
+ */
 #include "spc_flatfield.h"
 
 #define MAX_FLATS 10 /* maximal number of flatfields for xxx_multi functions */

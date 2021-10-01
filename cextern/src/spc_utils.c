@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Subroutines used mostly for working on catalogs
  * in the tasks SEX2GOL and GOL2AF.  
  *

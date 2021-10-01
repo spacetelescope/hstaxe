@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #ifndef _DRZ2PET_UTILS_H
 #define _DRZ2PET_UTILS_H

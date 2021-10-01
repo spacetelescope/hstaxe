@@ -1,4 +1,5 @@
 /*
+ * See LICENSE.txt
  *
  * Solves or minimizes the sum of squares of m nonlinear
  * functions of n variables.

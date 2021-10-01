@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #ifndef _FRINGE_UTILS_H
 #define _FRINGE_UTILS_H

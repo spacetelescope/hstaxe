@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Some functions to parametrize spectrum traces in aXe grism exposures
  */
 

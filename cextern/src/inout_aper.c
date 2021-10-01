@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #include        "inout_aper.h"
 

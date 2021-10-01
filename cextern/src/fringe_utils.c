@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #include "aXe_grism.h"
 #include <gsl/gsl_spline.h>

@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  */
 #include <math.h>
 #include <gsl/gsl_vector.h>

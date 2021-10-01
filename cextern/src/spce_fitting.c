@@ -1,5 +1,6 @@
 /**
-* Subroutines for fitting functions to data.
+ * See LICENSE.txt
+ * Subroutines for fitting functions to data.
  * Most of the functions are used for the
  * background determination.
  */

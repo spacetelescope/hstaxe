@@ -1,6 +1,7 @@
 /**
  * File: specmodel_utils.h
  * Header file for specmodel_utils.c
+ * See LICENSE.txt
  *
  */
 #ifndef _SPECMODEL_UTILS_H

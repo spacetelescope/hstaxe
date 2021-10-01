@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * File: nicback_utils.c
  * Subroutine for the NICMOS background subtraction
  *

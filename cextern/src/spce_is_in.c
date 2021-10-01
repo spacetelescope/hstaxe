@@ -1,4 +1,6 @@
 /**
+ * See LICENSE.txt
+ * 
  * A function to decide whether a point is in a given quadrangle
  * (and its helpers)
  *

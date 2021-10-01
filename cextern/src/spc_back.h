@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Header file for the subroutines in spc_back.c
  *
  */

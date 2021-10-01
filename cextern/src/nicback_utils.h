@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * File: nicback_utils.h
  * header files for nicback_utils.c
  *

@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Set of routines to handle absolute flux calibration of a spectrum
  * structure.
  * The response curves can be in ASCII or (preferably) in FITS

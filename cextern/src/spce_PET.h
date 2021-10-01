@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * File: spce_PET.h
  * The interface the the Pixel extraction table input/output routines
  *

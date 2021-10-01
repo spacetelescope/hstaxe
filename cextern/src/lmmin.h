@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  *
  */
 // parameters for calling the high-level interface lmfit

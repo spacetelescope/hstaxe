@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * APER_CHECK - create a FITS image showing the locations of
  *               apertures.
 */

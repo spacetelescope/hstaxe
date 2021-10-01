@@ -1,4 +1,5 @@
 /**
+ * See LICENSE.txt
  * Interface of spce_pathlength.h
  */
 

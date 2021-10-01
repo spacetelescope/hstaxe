@@ -1,3 +1,6 @@
+/**
+ * See LICENSE.txt
+ */
 #include "inima_utils.h"
 #include "spc_cfg.h"
 

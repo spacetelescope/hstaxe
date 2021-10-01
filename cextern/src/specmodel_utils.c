@@ -1,7 +1,7 @@
 /**
  * File: specmodel_utils.c
- *
- */
+ * See LICENSE.txt
+*/
 #include "specmodel_utils.h"
 #include "aXe_grism.h"
 #include "aXe_utils.h"

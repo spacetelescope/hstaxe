@@ -1,3 +1,6 @@
+/**
+ *  * See LICENSE.txt
+*/
 #ifndef SPC_FITSCARDS_H
 #define SPC_FITSCARDS_H
 
