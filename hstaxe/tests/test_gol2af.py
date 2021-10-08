@@ -1,5 +1,5 @@
-"""Licensed under a 3-clause BSD style license - see LICENSE.rst.
-
+"""
+See LICENSE.txt
 """
 import os
 from hstaxe import axetasks

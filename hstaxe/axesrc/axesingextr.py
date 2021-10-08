@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import logging
 from hstaxe import config as config_util
 

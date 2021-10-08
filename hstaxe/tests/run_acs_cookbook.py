@@ -1,6 +1,7 @@
 """
 Run the commands from nor's axe cookbook example
 but setup for hstaxe
+See LICENSE.txt
 """
 import os
 import shutil

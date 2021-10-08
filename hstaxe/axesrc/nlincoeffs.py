@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import numpy as np
 
@@ -53,7 +56,7 @@ class NonLinCoeffs:
         """Get the missing information about the file name"""
         # compose the name of the coefficients file
         self.coeff_filename = self.image.replace('.fits', '_coeffs'+str(self.imwcs.chip)+'.dat')
-        
+
 
 
     # def _create_dummy_coeffs(self):
@@ -100,8 +103,8 @@ class NonLinCoeffs:
                 cfile.write(("\t".join(str(j) for j in i) + " "))
             cfile.write("\n\n")
             for i in self.ycoeffs:
-                cfile.write(("\t".join(str(j) for j in i) + " "))       
-        
+                cfile.write(("\t".join(str(j) for j in i) + " "))
+
 
     def store_coeffs(self):
         """Store coeff information in the image header"""
@@ -112,12 +115,12 @@ class NonLinCoeffs:
         flt_imag = fits.open(self.image, mode='update', memmap=0)
         flt_head = flt_imag[0].header
 
-        
+
         # translate instrument and detector to
         # a linear pixel scale;
         # store this pixel scale
         flt_head['DRZSCALE'] = (self.imwcs.idcscale, 'Scale for drizzling')
-        
+
         print(f"DRZSCALE set to: {flt_head['DRZSCALE']}")
 
         # store the number of coefficients

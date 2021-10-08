@@ -1,6 +1,6 @@
 """A Place to store global variables and constants required to
 configure axe modules.
-
+See LICENSE.txt
 """
 import os
 import shutil
@@ -88,7 +88,7 @@ def handle_drztmp_dir():
     print('Creating temporary directory: ', __user_paths['AXE_DRZTMP_LOC'])
 
 
-# TODO: Update or verify this for axesim 
+# TODO: Update or verify this for axesim
 def axe_setup(tmpdir=False, axesim=False):
     """Setup the aXe file and pathnames"""
 
@@ -130,7 +130,7 @@ def getCONF(name=None):
     if name is None:
         raise aXeError("No name passed to getCONF")
     if len(name.split(',')) > 1:
-        namesplit=name.split(',')        
+        namesplit=name.split(',')
         newstring = [os.path.join(i,j) for i,j in zip([fullpath]*len(namesplit), namesplit) if fullpath not in j]
         return ','.join(newstring)
     else:

@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import numpy as np
 from astropy.io import fits
@@ -46,7 +49,7 @@ class MEFExtractor:
                 for item in obj_list:
                     f.write("%s\n" % item)
             del obj_list
-            
+
         if self.bck_dol is not None:
             self.bck_dol.sort()
             bck_list = self.bck_dol.get_mef_files()

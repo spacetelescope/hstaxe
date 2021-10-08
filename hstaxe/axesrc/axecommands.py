@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import sys
 import shutil
 import logging

@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import logging
 
 from astropy.io import fits

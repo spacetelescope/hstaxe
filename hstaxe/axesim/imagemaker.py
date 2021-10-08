@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 from astropy.io import fits as pyfits
 from . import configfile
 from .axeerror import *

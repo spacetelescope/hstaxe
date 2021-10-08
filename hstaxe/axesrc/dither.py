@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import numpy as np
 import logging
@@ -306,7 +309,7 @@ class Blot:
     #                out_un=drizzle_params['OUT_UN'],
     #                expkey='exptime',
     #                expout='input')
-        self._a_blot_image(in_data, out_data, 
+        self._a_blot_image(in_data, out_data,
                            sinscl=drizzle_params['blot_sinscl'],
                            out_nx=out_nx,
                            out_ny=out_ny,

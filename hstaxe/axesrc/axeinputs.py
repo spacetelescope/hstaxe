@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import numpy as np
 from copy import deepcopy
@@ -27,7 +30,7 @@ class aXeInput:
         self._check_subarray()
 
         # Now that all the basic columns have been Added
-        # expand the Input Image List if necessary    
+        # expand the Input Image List if necessary
         self._extend_asciidata()
 
 
@@ -97,7 +100,7 @@ class aXeInput:
             configuration filename(s)
         fringeterm: str
             name of fringe files
-        
+
         """
         if 'config' not in [x.lower() for x in self._inimlist.colnames]:
             col = Column(name='config',
@@ -155,8 +158,8 @@ class aXeInput:
 
             new_inimlist[row.index]['config'] = clist.pop()
             new_inimlist[row.index]['objcat'] = olist.pop()
-            
-            if 'fringe' in row.colnames:    
+
+            if 'fringe' in row.colnames:
                 for conf,objcat,fringe in zip(clist, olist, flist):
                     new_row = [row['grisim'], objcat, row['dirim'],
                                conf,row['dmag'], fringe]

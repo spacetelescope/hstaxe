@@ -1,5 +1,6 @@
 """
 import the toplevel functions and check the directory setup
+See LICENSE.txt
 """
 from pkg_resources import get_distribution, DistributionNotFound
 

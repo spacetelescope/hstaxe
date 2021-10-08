@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 from copy import deepcopy
 import logging
@@ -283,7 +286,7 @@ class Sex2GolPy:
             # make a position tuple
             try:
                 xy_direct = (row['X_IMAGE'], row['Y_IMAGE'])
-            except KeyError:          
+            except KeyError:
                 # self._treat_NULL_table
                 raise aXeError("No coordinate columns in catalog, empty?")
 

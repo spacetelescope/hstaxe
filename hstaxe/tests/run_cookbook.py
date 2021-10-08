@@ -4,6 +4,7 @@ but setup for hstaxe
 
 This script needs to be run from the same directory
 that the cookbook_data/ directory exists for wfc3
+See LICENSE.txt
 """
 import os
 import shutil
