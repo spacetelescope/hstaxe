@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import math
 import logging
@@ -44,7 +47,7 @@ class InputChecker:
             # read the keyword 'FILTER1'
             try:
                 filter1 = one_fits[0].header['FILTER1']
-            except KeyError:               
+            except KeyError:
                 filter1 = None
 
             # read the keyword 'FILTER2'
@@ -141,7 +144,7 @@ class InputChecker:
                 # error and out
                 err_msg = (f"{self.taskname}: The DPP file: {config_util.getOUTPUT(axe_names['DPP'])}"
                            f" does not exist!")
-                           
+
                 raise aXeError(err_msg)
 
             # check for the background DPP file

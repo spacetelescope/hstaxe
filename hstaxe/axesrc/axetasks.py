@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import logging
 
 from . import axeinputs
@@ -52,7 +55,7 @@ def iolprep(drizzle_image='',
     The names and drizzle parameters of the input images are retrieved from
     the header of the Astrodrizzle combined image. The projection of the object
     positions into the coordinate system of the input images is done by going
-    through the WCS information. 
+    through the WCS information.
 
     There is a parameter to influence the sensitive area to include objects
     in the IOL's. This allows objects beyond the physical boundaries of the
@@ -144,8 +147,8 @@ def axeprep(inlist='',
 
     backims: string
       name of the background image. If several image extensions
-      are to be processed (e.g. for WFC images), one background 
-      image per extension must be specified in a comma separated 
+      are to be processed (e.g. for WFC images), one background
+      image per extension must be specified in a comma separated
       list.
     backped: None
       UNKNOWN
@@ -381,7 +384,7 @@ def drzprep(inlist='',
       configuration file per extension must be given in a comma
       separated list.
 
-    opt_extr: bool 
+    opt_extr: bool
       to generate also the necessary data  for optimal
       extraction in axedrizzle
 
@@ -404,7 +407,7 @@ def drzprep(inlist='',
     if len(configlist) < 1:
       raise aXeError("No configuration file input to drzprep")
 
-    prepArator = axelowlev.aXe_DRZPREP(inlist, 
+    prepArator = axelowlev.aXe_DRZPREP(inlist,
                                        configs,
                                        back=back,
                                        opt_extr=opt_extr)
@@ -467,7 +470,7 @@ def axecrr(inlist='',
     if not back and makespc:
         # extract spectra from the deep 2D stamps
         mefs = mefobjects.MEFExtractor(drizzle_params,
-                                       dols, 
+                                       dols,
                                        opt_extr=opt_extr)
         mefs.extract(infwhm, outfwhm, adj_sens)
         del mefs
@@ -747,20 +750,20 @@ def petcont(grism='',
             silent=False):
     """Function for the aXe task PETCONT.
 
-    The task computes and stores the contamination information for a 
+    The task computes and stores the contamination information for a
     given Pixel Extraction Table. There are two distinct ways to
     compute the contamination:
 
     The geometrical contamination records, for each PET pixel, how often
-    it is a member of a different beam. If a pixel is a member of two 
-    separate beams, i.e. is in a region where two beams overlap, it is 
-    assigned a value of 1 in each of the two beam PET’s, thus indicating 
+    it is a member of a different beam. If a pixel is a member of two
+    separate beams, i.e. is in a region where two beams overlap, it is
+    assigned a value of 1 in each of the two beam PET’s, thus indicating
     that this pixel is also part of another beam. In quantitative contamination,
-    the amount of contaminating flux from other beams is estimated for each 
+    the amount of contaminating flux from other beams is estimated for each
     PET pixel. This estimate is based on a model of the emitting sources.
-    There are two different methods to establish an emission model, 
+    There are two different methods to establish an emission model,
     the gaussian emission model and the fluxcube model.
-    
+
     Parameters
     ----------
     grism: str

@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 from __future__ import (absolute_import, unicode_literals, division,
                         print_function)
 def get_HRC_PR200L_WCS():

@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import math
 from copy import deepcopy

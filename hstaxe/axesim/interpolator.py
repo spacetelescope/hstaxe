@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import copy
 import math
 import logging

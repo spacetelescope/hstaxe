@@ -1,4 +1,5 @@
-"""Licensed under a 3-clause BSD style license - see LICENSE.rst.
+"""
+See LICENSE.txt
 basic run test
 """
 from hstaxe import axetasks

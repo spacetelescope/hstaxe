@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import subprocess
 import logging
@@ -595,7 +598,7 @@ class aXe_DRZPREP(TaskWrapper):
             self.command_list.append('-bck')
         else:
             self.bck = False
-            
+
         # store the optimal extraction flag
         if (('opt_extr' in params) and (params['opt_extr'])):
             self.command_list.append('-opt_extr')

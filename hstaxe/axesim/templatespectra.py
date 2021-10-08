@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 from astropy.io import fits
 

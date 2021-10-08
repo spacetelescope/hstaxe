@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import re
 import sys
@@ -72,7 +75,7 @@ class DrizzleParams(dict):
 
         # load the first configuration file
         config = configfile.ConfigFile(config_util.getCONF(self.config_file))
-        
+
         # get and store the readout noise
         if config['RDNOISE'] is not None:
             drizzle_params['RDNOISE'] = float(config['RDNOISE'])
@@ -1048,23 +1051,23 @@ class DrizzleObject:
         return (filename)
 
     def drz_to_wcs(self,f):
-        
+
         with fits.open(f,mode="update") as fin:
             fin[0].header["WCSAXES"] = 2
-            fin[0].header["CTYPE1"]  = 'RA--SIP'   
-            fin[0].header["CTYPE2"]  = 'DEC-SIP'   
-            fin[0].header["CRVAL1"] = fin[0].header["DRZ00"] 
-            fin[0].header["CRVAL2"] = fin[0].header["DRZ10"] 
+            fin[0].header["CTYPE1"]  = 'RA--SIP'
+            fin[0].header["CTYPE2"]  = 'DEC-SIP'
+            fin[0].header["CRVAL1"] = fin[0].header["DRZ00"]
+            fin[0].header["CRVAL2"] = fin[0].header["DRZ10"]
 
-            
-            fin[0].header["CD1_1"] = fin[0].header["DRZ01"] 
-            fin[0].header["CD1_2"] = fin[0].header["DRZ02"] 
-            fin[0].header["CD2_1"] = fin[0].header["DRZ11"] 
-            fin[0].header["CD2_2"] = fin[0].header["DRZ12"] 
 
-            fin[0].header["CRPIX1"] = 0 
+            fin[0].header["CD1_1"] = fin[0].header["DRZ01"]
+            fin[0].header["CD1_2"] = fin[0].header["DRZ02"]
+            fin[0].header["CD2_1"] = fin[0].header["DRZ11"]
+            fin[0].header["CD2_2"] = fin[0].header["DRZ12"]
+
+            fin[0].header["CRPIX1"] = 0
             fin[0].header["CRPIX2"] = fin[0].header["NAXIS2"]/2
-            
+
         return f
 
 
@@ -1090,7 +1093,7 @@ class DrizzleObject:
         header = fits.getheader(infile)
         exptime = header["EXPTIME"]
         inwht = fits.getdata(whtfile) * exptime
-        
+
         ys,xs = np.shape(img_data)
         idxmap = np.indices((xs, ys), dtype='float64')
         idxmap = idxmap.T + one
@@ -1159,11 +1162,11 @@ class DrizzleObject:
             wtscale=1.0, fillstr="0.0")
 
         return outsci, outwht #, outcon
-        
-    
+
+
 
     def drizzle(self):
-        """Drizzle all contributors together. 
+        """Drizzle all contributors together.
 
         Performs a sigma clipping so detect outliers and updates the weigths appropriately."""
 
@@ -1242,12 +1245,12 @@ class DrizzleObject:
             # Weighted combination of MOD
             tmps = []
             wtmps = []
-            
+
             for one_contrib in self.contrib_list:
                 outsci, outwht = self.run_drizzle(one_contrib.ext_names['MOD'],one_contrib.ext_names['VAR'],options)
                 tmps.append(outsci)
                 wtmps.append(outwht)
-            
+
             tmps = np.array(tmps)
             tmps = tmps*whts
             out_mod = np.nansum(tmps,axis=0)
@@ -1261,10 +1264,10 @@ class DrizzleObject:
         fits.PrimaryHDU(data=out_flt,header=header).writeto(self.ext_names['FLT'],overwrite=True)
         fits.PrimaryHDU(data=out_con,header=header).writeto(self.ext_names['CON'],overwrite=True)
         fits.PrimaryHDU(data=out_err,header=header).writeto(self.ext_names['ERR'],overwrite=True)
-        
+
 
         with fits.open(self.ext_names['FLT'], mode="update") as fin:
-            fin[0].header["CDSCALE"] = header["CDSCALE"] 
+            fin[0].header["CDSCALE"] = header["CDSCALE"]
             fin[0].header["REFPNTY"] = header["REFPNTY"]
             fin[0].header["REFPNTX"] = header["REFPNTX"]
             fin[0].header["DLAMBDA"] = header["DLAMBDA"]
@@ -1354,7 +1357,7 @@ class DrizzleObjectContrib:
         """Find the root name for a file"""
         file_root = os.path.basename(file_root_path).split('_')[0]
         return file_root
-        
+
 
     def _get_ext_names(self, file_root, objID, back, drztmp_dir):
         """Determine all possible filenames for drizzle input"""

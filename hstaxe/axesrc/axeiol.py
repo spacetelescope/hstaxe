@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import re
 from astropy.table import Table
 

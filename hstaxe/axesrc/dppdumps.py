@@ -1,3 +1,6 @@
+"""
+See LICENSE.txt
+"""
 import os
 import logging
 from astropy.io import fits
@@ -107,7 +110,7 @@ class DPPdumps(object):
 
     def filet_dpp(self, opt_extr=False):
         """Dump all DPP files"""
- 
+
         drztmp = config_util.getDRZTMP()
 
         # go over all DPP files
