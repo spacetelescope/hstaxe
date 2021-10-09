@@ -6,7 +6,7 @@
 #
 import sys
 import os
-
+import pathlib
 
 from distutils.command.clean import clean
 from setuptools import find_packages, Command, setup
@@ -15,7 +15,7 @@ from setuptools.command.install import install
 from subprocess import check_call, CalledProcessError
 
 if (sys.version_info < (3, 5)):
-    sys.stderr.write("ERROR: hstaxe requires Python 3.5 or later\n")
+    sys.stderr.write("ERROR: hstaxe requires Python 3.7 or later\n")
     sys.exit(1)
 
 
@@ -68,6 +68,7 @@ try:
 except ImportError:
     class BuildSphinx(Command):
         user_options = []
+        description = "Build the sphinx documentation"
 
         def initialize_options(self):
             pass
@@ -80,31 +81,8 @@ except ImportError:
             exit(1)
 
 
-class PyTest(TestCommand):
-
-    def initialize_options(self):
-        TestCommand.initialize_options(self)
-        self.pytest_args = [PACKAGENAME]
-
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        try:
-            import pytest
-        except ImportError:
-            print('Unable to run tests...')
-            print('To continue, please install "pytest" using:')
-            print('    pip install pytest')
-            exit(1)
-
-        errno = pytest.main(self.pytest_args)
-        sys.exit(errno)
-
-
 class MyClean(Command):
+    description = "Cleanup python and C binaries for hstaxe"
     user_options = []
 
     def initialize_options(self):
@@ -125,7 +103,7 @@ class MyClean(Command):
                                    ('bdist_base', 'bdist_base'))
 
     def run(self):
-        print("** cleaning python and C binaries for aXe **")
+        print("** cleaning python and C binaries for hstaxe **")
         current_env = sys.prefix + "/bin/"
         axe_bins = ["aXe_GOL2AF",
                     "aXe_AF2PET",
@@ -167,6 +145,7 @@ class MyClean(Command):
 
 class BuildExtWithConfigure(install):
     """Configure, build, and install the aXe C code."""
+    description = "Configure, build, and install the aXe C code."
     user_options = install.user_options +\
         [('noremake', None, "Don't remake the aXe C executables [default True]")]
 
@@ -207,14 +186,14 @@ class BuildExtWithConfigure(install):
 
         install.run(self)
 
-# Note that requires and provides should not be included in the call to
-# ``setup``, since these are now deprecated. See this link for more details:
-# https://groups.google.com/forum/#!topic/astropy-dev/urYO8ckB2uM
 
+this_dir = pathlib.Path(__file__).parent
+full_readme = (this_dir / "README.md").read_text()
 setup(
     use_scm_version=True,
+    packages=find_packages(exclude=["tests"]),
+    long_description=full_readme,
     cmdclass={
-        'test': PyTest,
         'build_sphinx': BuildSphinx,
         'build_ext': BuildExtWithConfigure,
         'install': BuildExtWithConfigure,

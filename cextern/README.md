@@ -90,7 +90,7 @@ and aXe tasks:
 >make
 
 to execute the Makefile and create the c-tasks. The tasks must be
-installed in the bin directory within the iraf-directory. Simply execute
+installed in the bin directory within the environment. Simply execute
 
 >make install
 

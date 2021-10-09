@@ -28,11 +28,16 @@ In addition to the above Python packages, `hstaxe` depends on the
 following C-based packages to be installed:
 
   * cfitsio
+      * [CFITSIO](https://heasarc.gsfc.nasa.gov/lheasoft/fitsio/fitsio.html)
   * gsl
-  * [libwcs](http://tdc-www.harvard.edu/software/wcstools/subroutines/libwcs.wcs.html) from [wcstools](http://tdc-www.harvard.edu/wcstools/)
+      * [GSL](https://www.gnu.org/software/gsl/)
+  * wcstools
+      * [libwcs](http://tdc-www.harvard.edu/software/wcstools/subroutines/libwcs.wcs.html) from [wcstools](http://tdc-www.harvard.edu/wcstools/)
+
+These packages must be installed in your environment before you can install hstaxe using pip or setup. They can be compiled and installed locally or installed using conda.
 
 
-### Installing using conda
+### Installing `hstaxe` using conda
 
 `hstaxe` can be installed with
 [conda](https://docs.conda.io/en/latest/) if you have installed
@@ -75,7 +80,10 @@ retrieved and installed via:
 
     git clone https://github.com/spacetelescope/hstaxe.git
     cd hstaxe
-    pip install ".[all]"
+    pip install .
+
+Note: using pip to install will quiet all build messages by default. If you would like
+to see the full output from all build commands, including the C compile statements, use `pip install . -v`
 
 
 ## Examples
