@@ -93,9 +93,9 @@ against the example data in the aXe cookbook:
 
   * `run_acs_cookbook.py`: runs basic aXe against ACS data
 
-  * `run_cookbook.py`: runs basic aXe against WFC3 data
+  * `run_cookbook.py`: runs basic aXe against WFC3 data from the cookbook
 
-  * `run_cookbook_part2.py`: runs axedrizzle against WFC3 data
+  * `run_cookbook_part2.py`: runs axedrizzle against WFC3 data from the cookbook
 
   * `aXe_WFC3_Cookbook.ipynb`: runs through a full WFC3 dataset cookbook style
 
