@@ -2,6 +2,7 @@ version 1.0.x (unreleased)
 --------------------------
 - changed licensing to be inline with GPLv3
 - updates to setup and cfg
+- updated package setup to allow pip installations
 
 version 1.0.0 (2021-02-19)
 --------------------------
@@ -9,7 +10,6 @@ version 1.0.0 (2021-02-19)
 - added more fstring conversions and some documentation text
 - minor changes to the pytests
 - update build system for inclusion in astroconda
-
 
 version 0.7.0 (2020-11-03)
 --------------------------
@@ -28,14 +28,12 @@ package namechange from pyaxe to hstaxe
 Beta release for testing.
 This version should complete for WFC3 and ACS and includes axedrizzle
 
-
 version 0.5a (2019-12-14)
 -------------------------
 Alpha release verison of pyaxe for testing.
 This version should complete for both regular extraction and optimal extraction, except optimal extraction still has a bug in the final STP and SPC files, which may have blank data.
 
 submit all bugs and problems to the issue tracker for this repository
-
 
 
 Some feature notes from the previous IRAF software package
