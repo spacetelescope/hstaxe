@@ -1,3 +1,7 @@
+version 1.x.x (unreleased)
+--------------------------
+- no changes yet
+
 version 1.0.1 (2021-01-10)
 --------------------------
 - changed licensing to be inline with GPLv3
