@@ -1,4 +1,4 @@
-version 1.0.x (unreleased)
+version 1.0.1 (2021-01-10)
 --------------------------
 - changed licensing to be inline with GPLv3
 - updates to setup and cfg
