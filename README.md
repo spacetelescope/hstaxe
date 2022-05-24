@@ -11,6 +11,90 @@ features provided by the previous IRAF-based aXe package.
 
 ## Installation
 
+----
+----
+### UPDATE (May, 2022)!!!
+
+The WFC3 team has recently tested `hstaxe` installation and found three distinct pathways to get the package installed successfully. Each of these installations were tested with The HSTaXe WFC3 cookbook (`aXe_WFC3_Cookbook`; available from this repository: https://github.com/npirzkal/aXe_WFC3_Cookbook) and were found to execute all the cookbook steps successfully. NOTE: These installation pathways were tested on macOS Catalina.
+
+#### ----
+
+#### A. Installing the development version of HSTaXe from source distribution:
+
+These instructions describe the installation of the latest development version of the HSTaXe source code. This workflow involves the retrieval of the source code from this repository (https://github.com/spacetelescope/hstaxe), the creation of a new conda environment, and the installation of the HSTaXe software and its dependencies in that environment. Some of the dependancies need to be installed using pip owing to bugs in importing these packages if installed using conda.
+
+Create a directory where `hstaxe` would be cloned. cd into that directory. We call this directory `test` in this example:
+
+    mkdir test
+    cd test
+
+Create a conda environment where `hstaxe` and all its dependencies will be installed in. We call it `hstaxe_test` in this example:
+
+    conda create --name hstaxe_test python=3
+
+Activate this environment:
+
+    conda activate hstaxe_test
+
+Install supporting packages before installing `hstaxe`:
+
+    conda install numpy astropy gsl cfitsio wcstools stwcs stsci.imagestats jupyter make automake autoconf libtool pkg-config
+
+Due to recent issues with Astroconda, several other dependancies need to be installed in our environment via `pip`:
+
+    pip install drizzle drizzlepac gwcs photutils tweakwcs spherical-geometry
+
+Clone the `hstaxe` software from this repository:
+
+    git clone https://github.com/spacetelescope/hstaxe.git
+
+Install `hstaxe`:
+
+    cd hstaxe
+    python setup.py install
+    ** OR (if installing with pip) **
+    pip install .
+
+#### ----
+
+#### B. Installing the PyPI release of HSTaXe (v.1.0.1):
+
+Installing the latest released version of `hstaxe` with `pip` (instead of retrieving the source code of the development version as described above) involves the following steps:
+
+    conda create --name hstaxe_test python=3
+    conda activate hstaxe_test
+    conda install numpy astropy gsl cfitsio wcstools stwcs stsci.imagestats jupyter make automake autoconf libtool pkg-config
+    pip install drizzle drizzlepac gwcs photutils tweakwcs spherical-geometry hstaxe
+
+NOTE: The last step installs the latest released version of HSTaXe along with some of its dependencies.
+
+#### ----
+
+#### C. Installing the Astroconda release of HSTaXe (v.1.0.0):
+
+The following steps should be followed to install `hstaxe` from Astroconda. This installation should start by downloading only the `conda_environment.yml` file from this repository (https://github.com/spacetelescope/hstaxe) followed by creating a conda environment using this file:
+
+    conda create --name hstaxe_test --file conda_environment.yml
+
+Activate this environment:
+
+    conda activate hstaxe_test
+
+Install HSTaXe from Astroconda:
+
+    conda install hstaxe -c https://ssb.stsci.edu/astroconda
+
+#### ----
+
+Please follow the following steps to retrieve and run the aXe_WFC3_Cookbook:
+
+1. git clone https://github.com/npirzkal/aXe_WFC3_Cookbook.git
+
+2. Enter the 'aXe_WFC3_Cookbook' directory and work through aXe_WFC3_Cookbook.ipynb within the conda environment created as part of the `hstaxe` installation.
+
+----
+----
+
 ### Requirements
 
 `hstaxe` has the following Python requirements:
