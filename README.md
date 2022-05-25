@@ -11,7 +11,7 @@ features provided by the previous IRAF-based aXe package.
 
 ## Installation
 
-### UPDATE (May, 2022)
+### UPDATE (May 2022)
 
 The WFC3 team has recently tested `hstaxe` installation and found
 three distinct pathways to get the package installed successfully.
