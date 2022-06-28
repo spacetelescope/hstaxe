@@ -24,15 +24,18 @@ pathways were tested on macOS Catalina.
 ### Option 1. Installing the PyPI release of HSTaXe (v.1.0.1):
 
 Installing the latest released version of `hstaxe` with `pip` involves
-the following steps (`conda` is used to install some dependencies):
+the following steps (`conda` is used to install some non-Python
+dependencies):
 
     conda create --name hstaxe_test python=3
     conda activate hstaxe_test
-    conda install numpy astropy gsl cfitsio wcstools stwcs stsci.imagestats jupyter make automake autoconf libtool pkg-config
-    pip install drizzle drizzlepac gwcs photutils tweakwcs spherical-geometry hstaxe
+    conda install gsl cfitsio make automake autoconf libtool pkg-config -y
+    conda install wcstools -c https://ssb.stsci.edu/astroconda -y
+    pip install hstaxe
 
-NOTE: The last step installs the latest released version of HSTaXe along
-with some of its dependencies.
+Optionally install Jupyter:
+
+    pip install jupyter
 
 
 ### Option 2. Installing the Astroconda release of HSTaXe (v.1.0.0):
