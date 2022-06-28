@@ -24,15 +24,18 @@ pathways were tested on macOS Catalina.
 ### Option 1. Installing the PyPI release of HSTaXe (v.1.0.1):
 
 Installing the latest released version of `hstaxe` with `pip` involves
-the following steps (`conda` is used to install some dependencies):
+the following steps (`conda` is used to install some non-Python
+dependencies):
 
     conda create --name hstaxe_test python=3
     conda activate hstaxe_test
-    conda install numpy astropy gsl cfitsio wcstools stwcs stsci.imagestats jupyter make automake autoconf libtool pkg-config
-    pip install drizzle drizzlepac gwcs photutils tweakwcs spherical-geometry hstaxe
+    conda install gsl cfitsio make automake autoconf libtool pkg-config -y
+    conda install wcstools -c https://ssb.stsci.edu/astroconda -y
+    pip install hstaxe
 
-NOTE: The last step installs the latest released version of HSTaXe along
-with some of its dependencies.
+Optionally install Jupyter:
+
+    pip install jupyter
 
 
 ### Option 2. Installing the Astroconda release of HSTaXe (v.1.0.0):
@@ -57,44 +60,32 @@ Install HSTaXe from Astroconda:
 
 ### Option 3. Installing the development version of HSTaXe from source distribution:
 
-These instructions describe the installation of the latest
-development version of the HSTaXe source code. This workflow
-involves the retrieval of the source code from this repository
-(https://github.com/spacetelescope/hstaxe), the creation of a new
-conda environment, and the installation of the HSTaXe software and its
-dependencies in that environment. Some of the dependencies need to
-be installed using `pip` due to bugs in importing these packages if
-installed using `conda`.
+These instructions describe the installation of the latest development
+version of the HSTaXe source code. This workflow involves the the
+creation of a new conda environment, retrieval of the source code
+from this repository (https://github.com/spacetelescope/hstaxe), and
+the installation of the HSTaXe software and its dependencies in that
+environment.
 
-Create a directory where `hstaxe` would be cloned. cd into that
-directory. We call this directory `test` in this example:
-
-    mkdir test
-    cd test
-
-Create a conda environment where `hstaxe` and all its dependencies will
-be installed in. We call it `hstaxe_test` in this example:
+Create and activate a conda environment where `hstaxe` and all its
+dependencies will be installed in. We call it `hstaxe_test` in this
+example:
 
     conda create --name hstaxe_test python=3
-
-Activate this environment:
 
     conda activate hstaxe_test
 
 Install supporting packages before installing `hstaxe`:
 
-    conda install numpy astropy gsl cfitsio wcstools stwcs stsci.imagestats jupyter make automake autoconf libtool pkg-config
+    conda install gsl cfitsio make automake autoconf libtool pkg-config -y
 
-Due to recent issues with Astroconda, several other dependencies need to
-be installed in our environment via `pip`:
-
-    pip install drizzle drizzlepac gwcs photutils tweakwcs spherical-geometry
+    conda install wcstools -c https://ssb.stsci.edu/astroconda -y
 
 Clone the `hstaxe` software from this repository:
 
     git clone https://github.com/spacetelescope/hstaxe.git
 
-Install `hstaxe`:
+Install `hstaxe` (and its dependencies):
 
     cd hstaxe
     pip install .
