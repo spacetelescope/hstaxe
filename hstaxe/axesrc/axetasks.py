@@ -183,17 +183,17 @@ def axeprep(inlist='',
     # go over all the input
     for row in axe_inputs:
         # make a prepare-object; run the prepare
+        prep_kwargs = {'backgr': backgr, 'backped': backped, 'mfwhm': mfwhm,
+                       'norm': norm, 'gcorr': gcorr}
+        if backgr:
+            prep_kwargs['master_bck'] = row['fringe']
+
         aXePrep = axepreptor.aXePrepArator(row['grisim'],
                                            row['objcat'],
                                            row['dirim'],
                                            row['config'],
                                            row['dmag'],
-                                           backgr=backgr,
-                                           master_bck=row['fringe'],
-                                           backped=backped,
-                                           mfwhm=mfwhm,
-                                           norm=norm,
-                                           gcorr=gcorr)
+                                           **prep_kwargs)
 
         aXePrep.run()
         del aXePrep
