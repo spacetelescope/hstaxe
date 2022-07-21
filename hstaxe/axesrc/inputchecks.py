@@ -159,7 +159,7 @@ class InputChecker:
 
         # check for background subtraction
         if backgr:
-            if not backims:
+            if backims is None or backims == "":
                 err_msg = ("{0:s}: A background image must be given for the "
                            "background subtraction!".format(self.taskname))
                 raise aXeError(err_msg)
