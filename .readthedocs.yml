@@ -9,6 +9,7 @@ build:
     - libgsl-dev
     - wcstools
     - libcfitsio-dev
+    - wcslib-dev
   tools:
     python: "3.10"
 
