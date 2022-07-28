@@ -7,6 +7,8 @@ build:
     - autoconf
     - libtool
     - libgsl-dev
+    - wcstools
+    - cfitsio
   tools:
     python: "3.10"
 
