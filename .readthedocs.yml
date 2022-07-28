@@ -5,6 +5,7 @@ build:
   apt_packages:
     - graphviz
     - autoconf
+    - libtool
   tools:
     python: "3.10"
 
