@@ -12,4 +12,3 @@ dependencies:
   - cfitsio
   - automake
   - wcstools
-prefix: /Users/rosteen/opt/anaconda3/envs/hstaxe
