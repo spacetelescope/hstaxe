@@ -4,12 +4,6 @@ build:
   os: ubuntu-20.04
   apt_packages:
     - graphviz
-    - autoconf
-    - libtool
-    - libgsl-dev
-    - wcstools
-    - libcfitsio-dev
-    - wcslib-dev
   tools:
     python: "3.10"
 
@@ -17,6 +11,9 @@ sphinx:
   builder: html
   configuration: docs/conf.py
   fail_on_warning: true
+
+conda:
+  environment: conda_environment.yml
 
 python:
   system_packages: false
