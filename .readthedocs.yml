@@ -6,6 +6,7 @@ build:
     - graphviz
     - autoconf
     - libtool
+    - libgsl-dev
   tools:
     python: "3.10"
 
