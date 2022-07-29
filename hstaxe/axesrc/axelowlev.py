@@ -629,7 +629,7 @@ class aXe_GOL2AF(TaskWrapper):
     def __init__(self, grism, config,
                  slitless_geom=True,
                  orient=True,
-                 back=False, **params):
+                 **params):
         """Generates an aperture file from a grism object list.
 
         Parameters
@@ -816,7 +816,7 @@ class aXe_GOL2AF(TaskWrapper):
             self.command_list.append('-exclude_faint')
 
         #  append the flag 'bck'
-        if (('back' in params) and (params['back'])):
+        if params.get('back', False):
             # put the bck-flag to the list
             self.command_list.append('-bck')
         _log.info("Command list: {}".format(self.command_list))

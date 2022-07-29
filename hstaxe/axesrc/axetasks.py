@@ -682,7 +682,6 @@ def gol2af(grism='',
 
     # run GOL2AF
     gol2af = axelowlev.aXe_GOL2AF(grism, config,
-                                  back=back,
                                   mfwhm=mfwhm,
                                   orient=orient,
                                   slitless_geom=slitless_geom,
@@ -690,7 +689,8 @@ def gol2af(grism='',
                                   lambda_mark=lambda_mark,
                                   dmag=dmag,
                                   in_gol=in_gol,
-                                  out_af=out_af)
+                                  out_af=out_af,
+                                  back=back)
     gol2af.run()
 
 
