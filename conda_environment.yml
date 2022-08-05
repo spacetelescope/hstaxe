@@ -4,7 +4,9 @@ channels:
   - defaults
 dependencies:
   - python=3
-  - pip=21
+  - pip=21.2.4
+  - setuptools=61.2.0
+  - wheel=0.37.1
   - make
   - autoconf
   - gsl
