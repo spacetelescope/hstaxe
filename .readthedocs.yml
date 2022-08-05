@@ -16,7 +16,6 @@ conda:
   environment: conda_environment.yml
 
 python:
-  system_packages: false
   install:
     - method: pip
       path: .

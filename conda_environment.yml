@@ -12,3 +12,4 @@ dependencies:
   - cfitsio
   - automake
   - wcstools
+  - wcslib-dev
