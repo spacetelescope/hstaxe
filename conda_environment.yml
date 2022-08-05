@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - python=3
+  - pip
   - make
   - autoconf
   - gsl
@@ -12,4 +13,3 @@ dependencies:
   - cfitsio
   - automake
   - wcstools
-  - wcslib-dev
