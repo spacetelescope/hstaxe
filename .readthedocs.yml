@@ -4,6 +4,8 @@ build:
   os: ubuntu-20.04
   apt_packages:
     - graphviz
+  tools:
+    python: "miniconda3-4.7"
 
 sphinx:
   builder: html
