@@ -159,7 +159,7 @@ a WFC data set.
 Input Object List
 -----------------
 
-:ref:`sex` This file is a simple ASCII file containing tabulated information
+``sex``: This file is a simple ASCII file containing tabulated information
 about objects to be extracted. It has the same format as a SExtractor
 2.x output object catalog. The first few lines contain the name and
 description of each of the columns in the tabulated portion of this
@@ -240,7 +240,7 @@ sex2gol. It has exactly the same format as the Input Object List.
 Aperture File
 -------------
 
-:ref:`aper` This Aperture File is an ASCII file describing the APERTUREs in
+``aper``: This Aperture File is an ASCII file describing the APERTUREs in
 the spectroscopic image. An APERTURE consists of all BEAMS of an object.
 A BEAM is defined as the group of pixels in the image which will be
 extracted and combined to produce a final 1-D spectrum. APERTUREs are

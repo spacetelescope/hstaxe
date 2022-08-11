@@ -34,18 +34,15 @@ def setup(app):
 
 conf = ConfigParser()
 
-sys.path.insert(0, os.path.abspath('../'))
 sys.path.insert(0, os.path.abspath('hstaxe/'))
 sys.path.insert(0, os.path.abspath('exts/'))
 
 # -- General configuration ---------------------------------------------------
-conf.read([os.path.join(os.path.dirname(__file__), '..', 'setup.cfg')])
-setup_cfg = dict(conf.items('metadata'))
 
 # General information about the project
-package = importlib.import_module(setup_cfg['name'])
-project = setup_cfg['name']
-author = setup_cfg['author']
+package = 'hstaxe'
+project = 'hstaxe'
+author = 'STScI'
 copyright = '{0}, {1}'.format(datetime.datetime.now().year, author)
 
 # The version info for the project you're documenting, acts as replacement for
@@ -53,13 +50,7 @@ copyright = '{0}, {1}'.format(datetime.datetime.now().year, author)
 # built documents.
 #
 # The short X.Y version.
-try:
-    version = package.__version__.split('-', 1)[0]
-    # The full version, including alpha/beta/rc tags.
-    release = package.__version__
-except AttributeError:
-    version = 'dev'
-    release = 'dev'
+version = release = '1.0.1'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.3'
@@ -89,15 +80,8 @@ intersphinx_mapping = {
 # ones.
 extensions = [
     'numfig',
-    'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.inheritance_diagram',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.imgmath',
     'sphinx.ext.mathjax',
     ]
 
@@ -135,23 +119,9 @@ exclude_patterns = ['_build']
 suppress_warnings = ['app.add_directive', ]
 
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-#
-# The short X.Y version.
-package = importlib.import_module(setup_cfg['name'])
-try:
-    version = package.__version__.split('-', 1)[0]
-    # The full version, including alpha/beta/rc tags.
-    release = package.__version__
-except AttributeError:
-    version = 'dev'
-    release = 'dev'
-
 # This is added to the end of RST files - a good place to put substitutions to
 # be used globally.
-rst_epilog = """.. _hstaxe: high-level_API.html"""
+#rst_epilog = """.. _hstaxe: high-level_API.html"""
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -160,13 +130,13 @@ default_role = 'obj'
 
 # Don't show summaries of the members in each class along with the
 # class' docstring
-numpydoc_show_class_members = False
+#numpydoc_show_class_members = False
 
-autosummary_generate = True
+#autosummary_generate = True
 
 # Class documentation should contain *both* the class docstring and
 # the __init__ docstring
-autoclass_content = "both"
+#autoclass_content = "both"
 
 # Render inheritance diagrams in SVG
 graphviz_output_format = "svg"

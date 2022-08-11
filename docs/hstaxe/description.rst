@@ -290,7 +290,7 @@ out on both the science and the master sky image.
 
 When reducing a dataset consisting of many individual exposures, it may
 be desirable to check the sky subtraction by co-adding all the sky-subtracted
-grism images (e.g. with the Astrodrizzle task). The co-added image also provides
+grism images (e.g., with the Astrodrizzle task). The co-added image also provides
 a way to quickly assess the quality of the background subtraction. Any deviations
 from zero in the mean background level of the combined image will also affect the
 spectra derived withthe aXe reduction.
@@ -473,7 +473,7 @@ with every grism image. A fluxcube file is a multi-dimensional fits
 image with one or several flux images taken at different wavelengths as
 extensions. The basis of the flux images are normal 2D images in
 :math:`[counts/sec]`, which must be transformed to flux in
-:math:`[erg/cm^2/s/Ã…Â]` using the appropriate zeropoints. All
+:math:`[erg/cm^2/s/\AA]` using the appropriate zeropoints. All
 extensions of the fluxcube image must cover the same area as the
 corresponding grism image.
 
