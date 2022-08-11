@@ -1,4 +1,4 @@
-.. _configuration_files:
+.. _configuration_files_main_section:
 
 Configuration of aXe tasks
 ==========================

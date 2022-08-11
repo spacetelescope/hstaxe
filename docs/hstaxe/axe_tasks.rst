@@ -271,7 +271,9 @@ drzfwhm in the task axecore must correspond to the values to be used for
 parameters infwhm and outfwhm in the task axedrizzle, respectively. The
 extraction width used after drizzling, which is specified via drzfwhm
 and outfwhm, must be larger than the extraction width for the PETs in
-axecore, which is set by extrfwhm (see :ref:`axedrizzle_task`).
+axecore, which is set by extrfwhm.
+
+.. (see :ref:`axedrizzle_task`)
 
 Usage
 ~~~~~

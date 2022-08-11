@@ -23,12 +23,3 @@ Welcome to the hstaxe package documentation!
     File Formats <hstaxe/file_formats.rst>
     Appendix <hstaxe/appendix.rst>
     Bibliography <hstaxe/bibliography.rst>
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-

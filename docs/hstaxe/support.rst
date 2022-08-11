@@ -5,7 +5,7 @@ Support
 ===========================
 
 History
----------------
+-------
 The Space Telescope - European Coordinating Facility (STECF)
 was responsible for supporting the slitless spectroscopic modes
 of the Hubble instruments ACS and WFC3 until 2011

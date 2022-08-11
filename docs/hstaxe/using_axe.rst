@@ -39,7 +39,9 @@ The dispersed images observed with the G800L grism are:
 The data set presented here is in the HST archive. It has been taken as
 part of the ACS/HRC Parallels program to the ACS Ultra Deep Field.
 Moreover these images are also part of the test data for grism
-observations (see :ref:`validating_the_axe_install`).
+observations.
+
+.. (see :ref:`validating_the_axe_install`)
 
 
 .. warning:: Spectral extraction from MultiDrizzled grism/prism images:
@@ -130,8 +132,8 @@ hand increase the computation time and simulate contributions to the
 contamination of real objects.
 
 The master catalogue must contain all columns which are necessary for
-the spectral extraction with aXe (see the format description in
-�). The first few lines of the master catalogue
+the spectral extraction with aXe (see the format description).
+The first few lines of the master catalogue
 **f555w\_drz.cat** extracted from the direct image in
 :num:`figure #drizz-images` are:
 
@@ -499,8 +501,6 @@ it might be convenient to modify some keywords (see
 Chapt. [time\ :sub:`r`\ equirements]). The location of the configuration
 and calibration files is the directory indicated by the environment
 variable AXE\_CONFIG\_PATH (see Chapt. [Env Var]).
-
-[] |image|
 
 The ACS Wide Field Camera and the WFC3 UVIS Camera contain two CCD
 chips, and the data is stored in two independent extensions of the fits
