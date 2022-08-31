@@ -1,6 +1,10 @@
 version 1.x.x (unreleased)
 --------------------------
-- no changes yet
+
+Bug Fixes
+^^^^^^^^^
+
+- Input checks now properly allow interp 0. [#39]
 
 version 1.0.1 (2021-01-10)
 --------------------------
