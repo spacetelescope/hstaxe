@@ -286,7 +286,7 @@ class InputChecker:
 
         # for background extraction the interpolation
         # type must be set
-        if back and not interp:
+        if back and interp is None:
             err_msg = ("{0:s}: The parameter 'interp' must be set for the "
                        "background PETs!".format(self.taskname))
             raise aXeError(err_msg)
