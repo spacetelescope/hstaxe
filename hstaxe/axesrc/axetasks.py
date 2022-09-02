@@ -883,8 +883,8 @@ def pet2spc(grism='',
 
     if "UVIS" in config:
         adj_sens = False
-        print("\nWarning: extended source sensitivity adjustment is not available "
-              "for UVIS, setting adj_sens to False.")
+        _log.warn("\nWarning: extended source sensitivity adjustment is not available "
+                  "for UVIS, setting adj_sens to False.")
 
     pet2spc = axelowlev.aXe_PET2SPC(grism, config,
                                     use_bpet=use_bpet,
