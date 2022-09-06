@@ -1094,7 +1094,7 @@ and Background Pixel Extraction Tables were created with the same
 Aperture File. Additionally, absolute flux calibration can be performed
 if the proper information is included in the Main Configuration File.
 
-Note that the adj_sens parameter defaults to True for ACS and IR grims,
+Note that the adj_sens parameter defaults to True for ACS and IR grisms,
 but will be set to False for UVIS as this functionality is currently
 unavailable for UVIS.
 
