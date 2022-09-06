@@ -312,7 +312,8 @@ def axecore(inlist='',
       compute and apply optimal weights
 
     adj_sens: bool
-       adjust the sensitivity function for extended sources
+       Adjust the sensitivity function for extended sources. 
+       Currently unavailable for UVIS.
 
     sampling: str
       the sampling mode for the stamp images
@@ -879,6 +880,11 @@ def pet2spc(grism='',
     """Function for the aXe task PET2SPC"""
     # check for required environment variables
     axe_setup()
+
+    if "UVIS" in config:
+        adj_sens = False
+        _log.warn("\nWarning: extended source sensitivity adjustment is not available "
+                  "for UVIS, setting adj_sens to False.")
 
     pet2spc = axelowlev.aXe_PET2SPC(grism, config,
                                     use_bpet=use_bpet,

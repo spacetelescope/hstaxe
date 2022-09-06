@@ -354,7 +354,8 @@ Parameters
 
     weights:  compute and apply optimal weights
 
-    adj_sens: adjust the sensitivity function for extended sources
+    adj_sens: adjust the sensitivity function for extended sources. Note that
+              this option is not available for UVIS.
 
     sampling: the sampling mode for the stamp images
 
@@ -1092,6 +1093,10 @@ background subtraction is performed. Care must be taken that both Object
 and Background Pixel Extraction Tables were created with the same
 Aperture File. Additionally, absolute flux calibration can be performed
 if the proper information is included in the Main Configuration File.
+
+Note that the adj_sens parameter defaults to True for ACS and IR grisms,
+but will be set to False for UVIS as this functionality is currently
+unavailable for UVIS.
 
 Usage
 ~~~~~
