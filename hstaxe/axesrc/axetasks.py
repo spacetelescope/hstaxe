@@ -214,8 +214,8 @@ def axecore(inlist='',
             model_scale=None,
             inter_type='linear',
             lambda_psf=None,
-            np=None,
-            interp=None,
+            np=10,  # Default value retrieved from hstaxe manual: https://hstaxe.readthedocs.io/en/latest/hstaxe/axe_tasks.html?highlight=interp#backest # noqa
+            interp=0,  # Default value retrieved from hstaxe manual: https://hstaxe.readthedocs.io/en/latest/hstaxe/axe_tasks.html?highlight=interp#backest # noqa
             niter_med=None,
             niter_fit=None,
             kappa=None,
