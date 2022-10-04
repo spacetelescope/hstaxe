@@ -88,7 +88,7 @@ Clone the `hstaxe` software from this repository:
 Install `hstaxe` (and its dependencies):
 
     cd hstaxe
-    pip install .
+    pip install -e .
 
 
 ## Notebooks and Examples
