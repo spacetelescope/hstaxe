@@ -27,10 +27,10 @@ Installing the latest released version of `hstaxe` with `pip` involves
 the following steps (`conda` is used to install some non-Python
 dependencies):
 
-    conda create --name hstaxe_test python=3
+    conda create --name hstaxe_test python=3 -y
     conda activate hstaxe_test
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
-    conda install wcstools -c https://ssb.stsci.edu/astroconda -y
+    conda install wcstools -c conda-forge -y
     pip install hstaxe
 
 Optionally install Jupyter:
@@ -71,7 +71,7 @@ Create and activate a conda environment where `hstaxe` and all its
 dependencies will be installed in. We call it `hstaxe_test` in this
 example:
 
-    conda create --name hstaxe_test python=3
+    conda create --name hstaxe_test python=3 -y
 
     conda activate hstaxe_test
 
@@ -79,7 +79,7 @@ Install supporting packages before installing `hstaxe`:
 
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
 
-    conda install wcstools -c https://ssb.stsci.edu/astroconda -y
+    conda install wcstools -c conda-forge -y
 
 Clone the `hstaxe` software from this repository:
 
