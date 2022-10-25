@@ -25,9 +25,10 @@ pathways were tested on macOS Catalina.
 
 Installing the latest released version of `hstaxe` with `pip` involves
 the following steps (`conda` is used to install some non-Python
-dependencies):
+dependencies). Note that this installation method currently
+incompatible with python versions greater than 3.9:
 
-    conda create --name hstaxe_test python=3 -y
+    conda create --name hstaxe_test python=3.9 -y
     conda activate hstaxe_test
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
     conda install wcstools -c conda-forge -y
@@ -65,7 +66,7 @@ version of the HSTaXe source code. This workflow involves the the
 creation of a new conda environment, retrieval of the source code
 from this repository (https://github.com/spacetelescope/hstaxe), and
 the installation of the HSTaXe software and its dependencies in that
-environment.
+environment. This method has been confirmed to work with python 3.8 - 3.10.
 
 Create and activate a conda environment where `hstaxe` and all its
 dependencies will be installed in. We call it `hstaxe_test` in this
@@ -88,7 +89,7 @@ Clone the `hstaxe` software from this repository:
 Install `hstaxe` (and its dependencies):
 
     cd hstaxe
-    pip install -e .
+    pip install .
 
 
 ## Notebooks and Examples
