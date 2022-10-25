@@ -25,7 +25,7 @@ pathways were tested on macOS Catalina.
 
 Installing the latest released version of `hstaxe` with `pip` involves
 the following steps (`conda` is used to install some non-Python
-dependencies). Note that this installation method currently
+dependencies). Note that this installation method is currently
 incompatible with python versions greater than 3.9:
 
     conda create --name hstaxe_test python=3.9 -y
