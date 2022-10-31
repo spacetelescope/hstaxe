@@ -1,5 +1,73 @@
 [build-system]
-requires = ["setuptools>=42", "setuptools_scm[toml]>=3.4", "wheel", "numpy"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hstaxe"
+dynamic = ["version"]
+description = "Spectral extraction tools for Hubble Space Telescope Grisms"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+authors = [
+    { name = "hstaxe and aXe developers", email = "help@stsci.edu" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: C",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "astropy",
+    "drizzle",
+    "drizzlepac",
+    "numpy",
+    "stsci.imagestats",
+    "stwcs",
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx-automodapi",
+    "sphinx-rtd-theme",
+    "stsci-rtd-theme",
+]
+test = [
+    "backports.tempfile",
+    "pytest",
+    "pytest-catchlog",
+    "requests_mock",
+]
+
+[project.urls]
+Homepage = "https://github.com/spacetelescope/hstaxe"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "hstaxe/_version.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/hstaxe",
+    "cextern/src/*.h",
+    "cextern/src/Makefile.am",
+    "cextern/Makefile.am",
+    "cextern/autogen.sh",
+    "cextern/config.h.in",
+    "cextern/configure.ac"
+]
+artifacts = [
+    "cextern/src/*.c"
+]
+
+[tool.hatch.build.hooks.custom]
 
 [tool.setuptools_scm]
