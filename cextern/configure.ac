@@ -17,12 +17,11 @@ AM_INIT_AUTOMAKE(foreign)
 
 # Checks for programs.
 AC_PROG_CC
-LT_INIT
 AC_CANONICAL_HOST
 
 # libtools init and update
-LT_PREREQ([2.4.6])
-LT_INIT()
+LT_PREREQ([2.4.2])
+LT_INIT
 AC_SUBST([LIBTOOL_DEPS])
 
 # RPATH is the path used to look for shared library files.
