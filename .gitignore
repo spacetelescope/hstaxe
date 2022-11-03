@@ -4,6 +4,7 @@ cextern/Makefile.in
 cextern/aclocal.m4
 cextern/autom4te.cache/
 cextern/config.h
+cextern/config.h.in
 cextern/config.log
 cextern/config.status
 cextern/config/
