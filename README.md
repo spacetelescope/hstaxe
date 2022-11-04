@@ -31,7 +31,7 @@ incompatible with python versions greater than 3.9:
     conda create --name hstaxe_test python=3.9 -y
     conda activate hstaxe_test
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
-    conda install wcstools -c conda-forge -y
+    conda install wcstools -c https://ssb.stsci.edu/astroconda -y
     pip install hstaxe
 
 Optionally install Jupyter:
