@@ -165,12 +165,13 @@ def BuildExtWithConfigure():
             # otherwise this must be a vanilla wcstools from upstream
             # with "libwcs", and no .pc file
             CONFIGURE_ARGS += ["--with-wcstools-libname=wcs"]
-
-    if WCSTOOLS_SEARCH_PATH:
+    else:
         # pkg-config is installed
-        # prepend the search path
-        PKG_CONFIG_PATH.insert(0, WCSTOOLS_SEARCH_PATH)
+        if WCSTOOLS_SEARCH_PATH:
+            # prepend the search path
+            PKG_CONFIG_PATH.insert(0, WCSTOOLS_SEARCH_PATH)
 
+    # apply the search path to the environment
     os.environ["PKG_CONFIG_PATH"] = ":".join(PKG_CONFIG_PATH)
     try:
         check_call(["sh", "autogen.sh"],
