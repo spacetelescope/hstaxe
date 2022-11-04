@@ -66,7 +66,8 @@ def BuildExtWithConfigure():
                     "--with-wcstools="+CURRENT_ENV,
                     "--with-gsl="+CURRENT_ENV,
                     "--libdir="+CURRENT_ENV,
-                    "--prefix="+CURRENT_ENV],
+                    "--prefix="+CURRENT_ENV,
+                    "--with-wcstools-libname=wcstools"],
                    cwd=AXELIB_DIR)
         check_call(["make", "clean"], cwd=AXELIB_DIR)
         check_call(["make", "install"], cwd=AXELIB_DIR)
