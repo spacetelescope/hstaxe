@@ -17,15 +17,11 @@ AM_INIT_AUTOMAKE(foreign)
 
 # Checks for programs.
 AC_PROG_CC
-AC_PROG_CC_C99
-AC_PROG_LIBTOOL
 AC_CANONICAL_HOST
 
-AM_PROG_LIBTOOL
-
 # libtools init and update
-LT_PREREQ([2.4.6])
-LT_INIT()
+LT_PREREQ([2.4.2])
+LT_INIT
 AC_SUBST([LIBTOOL_DEPS])
 
 # RPATH is the path used to look for shared library files.
@@ -33,7 +29,7 @@ AC_MSG_CHECKING(RPATH)
 if test -z "$RPATH"
 then
 	case $host_os in
-		*linux*) RPATH='-Xlinker -rpath,\$$ORIGIN/../lib';;
+		*linux*) RPATH='-Wl,-rpath,\$$ORIGIN/../lib';;
 		*darwin*) RPATH='-Wl,-rpath,${prefix}/lib';;
 		*) RPATH='';;
 	esac
@@ -42,7 +38,7 @@ AC_SUBST([RPATH])
 AC_MSG_RESULT($RPATH)
 AC_MSG_RESULT($host_os)
 
-LDFLAGS="$LDFLAGS $RPATH"
+LDFLAGS="$LDFLAGS -lm $RPATH"
 
 
 # Checks for shared libraries.
@@ -73,11 +69,12 @@ AS_IF([test "x$with_cfitsio" != "xno"], [
 
 AC_ARG_WITH(wcstools, [AS_HELP_STRING([--with-wcstools], [path to wcstools])])
 AS_IF([test "x$with_wcstools" != "xno"], [
-       if test ! -d "$withval"; then
-           AC_MSG_ERROR([--with-wcstools requires a directory prefix])
-       fi
-
        WCSTOOLS="$withval"
+       ])
+
+AC_ARG_WITH(wcstools-libname, [AS_HELP_STRING([--with-wcstools-libname], [path to wcstools])])
+AS_IF([test "x$with_wcstools_libname" != "xno"], [
+       WCSTOOLS_LIBNAME="$withval"
        ])
 
 if test "x$GSL" != "x"; then
@@ -94,18 +91,23 @@ else
     PKG_CHECK_MODULES([CFITSIO], [cfitsio >= 3])
 fi
 
+if test "x$WCSTOOLS_LIBNAME" == "x"; then
+    WCSTOOLS_LIBNAME="wcs"
+fi
+
 if test "x$WCSTOOLS" != "x"; then
-    WCSTOOLS_LIBS="-L$WCSTOOLS/lib -lwcs"
-    WCSTOOLS_CFLAGS="-I$WCSTOOLS/include"
+    incdir="$WCSTOOLS/include"
+    WCSTOOLS_LIBS="-L$WCSTOOLS/lib -l${WCSTOOLS_LIBNAME} -lm"
+    WCSTOOLS_CFLAGS="-I$incdir -I$incdir/${WCSTOOLS_LIBNAME}"
     LDFLAGS="$LDFLAGS $WCSTOOLS_LIBS"
     CFLAGS="$CFLAGS $WCSTOOLS_CFLAGS"
 else
-    AC_MSG_ERROR([wcstools does not support pkg-config; use --with-wcstools=/path/to/wcstools])
+    PKG_CHECK_MODULES([WCSTOOLS], [wcstools >= 3.9])
 fi
 
 
 # Checks for header files.
-AC_CHECK_HEADERS([limits.h stddef.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([limits.h math.h stddef.h stdlib.h string.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
@@ -117,5 +119,5 @@ AC_FUNC_STRTOD
 AC_CHECK_FUNCS([floor pow rint sqrt strchr strdup strstr strtol])
 
 AC_CONFIG_FILES([Makefile src/Makefile])
-AC_OUTPUT()
+AC_OUTPUT
 
