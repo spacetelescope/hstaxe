@@ -18,6 +18,7 @@ AM_INIT_AUTOMAKE(foreign)
 # Checks for programs.
 AC_PROG_CC
 AC_CANONICAL_HOST
+PKG_PROG_PKG_CONFIG
 
 # libtools init and update
 LT_PREREQ([2.4.2])
@@ -67,10 +68,19 @@ AS_IF([test "x$with_cfitsio" != "xno"], [
        CFITSIO="$withval"
        ])
 
-AC_ARG_WITH(wcstools, [AS_HELP_STRING([--with-wcstools], [path to wcstools])])
-AS_IF([test "x$with_wcstools" != "xno"], [
-       WCSTOOLS="$withval"
-       ])
+AC_ARG_WITH(wcstools,
+    [AS_HELP_STRING([--with-wcstools],
+                    [path to wcstools])],
+    [use_wcstools=$withval],
+    [use_wcstools=no])
+
+
+AC_ARG_WITH([wcstools-libname],
+    [AS_HELP_STRING([--with-wcstools-libname],
+                    [set wcstools library name])],
+    [WCSTOOLS_LIBNAME=$withval],
+    [WCSTOOLS_LIBNAME=wcs])
+
 
 AC_ARG_WITH(wcstools-libname, [AS_HELP_STRING([--with-wcstools-libname], [path to wcstools])])
 AS_IF([test "x$with_wcstools_libname" != "xno"], [
@@ -91,20 +101,23 @@ else
     PKG_CHECK_MODULES([CFITSIO], [cfitsio >= 3])
 fi
 
-if test "x$WCSTOOLS_LIBNAME" == "x"; then
-    WCSTOOLS_LIBNAME="wcs"
-fi
-
-if test "x$WCSTOOLS" != "x"; then
+if test "x$use_wcstools" == "xno"; then
+    AC_MSG_NOTICE([using wcstools from... pkg-config])
+    PKG_CHECK_MODULES([WCSTOOLS], [wcstools >= 3.9],
+        [
+            if $PKG_CONFIG --libs wcstools | grep 'lwcstools' >/dev/null; then
+                WCSTOOLS_LIBNAME=wcstools
+            fi
+        ])
+else
+    AC_MSG_NOTICE([using wcstools from... user-defined])
     incdir="$WCSTOOLS/include"
     WCSTOOLS_LIBS="-L$WCSTOOLS/lib -l${WCSTOOLS_LIBNAME} -lm"
     WCSTOOLS_CFLAGS="-I$incdir -I$incdir/${WCSTOOLS_LIBNAME}"
-    LDFLAGS="$LDFLAGS $WCSTOOLS_LIBS"
-    CFLAGS="$CFLAGS $WCSTOOLS_CFLAGS"
-else
-    PKG_CHECK_MODULES([WCSTOOLS], [wcstools >= 3.9])
 fi
 
+LDFLAGS="$LDFLAGS $WCSTOOLS_LIBS"
+CFLAGS="$CFLAGS $WCSTOOLS_CFLAGS"
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h math.h stddef.h stdlib.h string.h unistd.h])
@@ -117,6 +130,27 @@ AC_CHECK_HEADER_STDBOOL
 AC_FUNC_MALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([floor pow rint sqrt strchr strdup strstr strtol])
+
+cat << EOF
+
+hstaxe has been configured with the following
+
+Host:                ${host}
+Compiler:            ${CC}
+Preprocessor flags:  ${CPPFLAGS}
+Compiler flags:      ${CFLAGS}
+Preprocessor flags:  ${CPPFLAGS}
+Linker flags:        ${LDFLAGS}
+
+CFITSIO_CFLAGS:   $CFITSIO_CFLAGS
+CFITSIO_LIBS:     $CFITSIO_LIBS
+GSL_CFLAGS:       $GSL_CFLAGS
+GSL_LIBS:         $GSL_LIBS
+WCSTOOLS_CFLAGS:  $WCSTOOLS_CFLAGS
+WCSTOOLS_LIBNAME: $WCSTOOLS_LIBNAME
+WCSTOOLS_LIBS:    $WCSTOOLS_LIBS
+
+EOF
 
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
