@@ -68,7 +68,7 @@ def check_pkgconfig(name):
     # Consume user defined pkg-config search path
     pkg_configs_user = os.environ.get("PKG_CONFIG_PATH", "")
     if pkg_configs_user:
-        pkg_configs = [*pkg_configs_user.split(":"), pkg_configs]
+        pkg_configs = [*pkg_configs_user.split(":"), *pkg_configs]
 
     # Is the target file present in any of the search paths?
     for path in pkg_configs:
@@ -146,7 +146,7 @@ def BuildExtWithConfigure():
 
     PKG_CONFIG_PATH = []
     if os.environ.get("PKG_CONFIG_PATH", ""):
-        PKG_CONFIG_PATH = PKG_CONFIG_PATH.split(":")
+        PKG_CONFIG_PATH = os.environ["PKG_CONFIG_PATH"].split(":")
 
     WCSTOOLS = check_pkgconfig("wcstools")
     WCSTOOLS_USABLE = WCSTOOLS["usable"]
