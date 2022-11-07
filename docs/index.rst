@@ -9,6 +9,18 @@
 Welcome to the hstaxe package documentation!
 ============================================
 
+`hstaxe` is a Python package to extract spectra from all
+slitless spectroscopy modes provided by the 
+`Hubble Space Telescope <https://www.stsci.edu/hst>`_ 
+`Wide Field Camera 3 (WFC3) <https://www.stsci.edu/hst/instrumentation/wfc3>`_
+and the `Advanced Camera for Surveys (ACS) <https://www.stsci.edu/hst/instrumentation/acs>`_.
+It supports the features provided by the previous IRAF-based aXe package.
+
+.. note::
+   This documentation mostly overlaps with, but is not identical to, the original
+   aXe manual. The last version of the aXe manual can be downloaded from
+   `the hstaxe repository <https://github.com/spacetelescope/hstaxe/tree/main/docs/aXe_manual/axe-user-manual-v-2-3.pdf>`_.
+
 .. toctree::
    :maxdepth: 3
    :numbered: 3
