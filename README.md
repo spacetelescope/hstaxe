@@ -1,3 +1,8 @@
+.. image:: docs/hstaxe/images/ACS_aXe02.png
+    :width: 400
+    :alt: Jdaviz logo
+    :align: center
+
 # HSTaXe
 
 `hstaxe` is a Python package to provide a uniform process to perform spectral
