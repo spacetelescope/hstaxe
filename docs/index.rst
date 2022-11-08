@@ -57,9 +57,9 @@ Using HSTaXe
    :maxdepth: 3
    :numbered: 3
 
-    Description <hstaxe/description.rst>
     Installation <hstaxe/installing.rst>
     Example Notebooks <hstaxe/examples.rst>
+    Description <hstaxe/description.rst>
     Calibration Files <hstaxe/calibration_files.rst>
     Using Axe <hstaxe/using_axe.rst>
     aXe Tasks <hstaxe/axe_tasks.rst>
