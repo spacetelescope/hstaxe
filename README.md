@@ -20,8 +20,8 @@ employed under Linux, Solaris, and MacOS X.
 ## Quickstart
 To install the latest release of `hstaxe`:
 
-    conda create --name hstaxe_test -y
-    conda activate hstaxe_test
+    conda create --name hstaxe-env -y
+    conda activate hstaxe-env
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
     conda config --add channels conda-forge
     conda install wcstools -c conda-forge -y
