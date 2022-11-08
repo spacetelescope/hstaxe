@@ -4,17 +4,11 @@ Description
 ===========
 
 
-What is aXe?
-------------
+aXe Hierarchy
+-------------
 
 
-The aXe software was designed to extract spectra in a consistent manner
-from all the slitless spectroscopy modes provided by the **W**\ ide
-**F**\ ield **C**\ amera 3 (WFC3) and the **A**\ dvanced **C**\ amera for
-**S**\ urveys (ACS), which were installed on the Hubble Space Telescope in
-May 2009 and February 2002, respectively. What we refer to as aXe is in
-fact a PyRAF/IRAF package with several tasks that can be used to produce
-extracted spectra. There exist two classes of aXe tasks, see :num:`figure #comm-over`).
+There exist two classes of aXe tasks, see :num:`figure #comm-over`).
 
 .. _comm-over:
 
@@ -39,20 +33,6 @@ The High-Level Tasks were designed to cover all steps of the aXe
 reduction without any restriction in functionality. All tasks are
 controlled through a set of configuration files , which can be edited by
 the user and optimized for a given data set.
-
-The core of the software package is written using ANSI C and and is
-highly portable from one platform to another. aXe uses the third-party
-libraries CFITSIO, GSL, and WCSLIB, which have been successfully
-employed under Linux, Solaris, and MacOS X.
-
-aXe is distributed as part of the STSDAS software package. Within
-STSDAS, aXe is located under the subpackages analysis.slitless.axe
-
-aXe has been used successfully in several large science programs, such
-as GRAPES (ACS/WFC, [PIRZKAL1]_ ) and PEARS (ACS/WFC, [PIRZKAL2]_ ). The aXe software was
-central in extracting ACS/G800L and, using a customized version of aXe,
-NICMOS/G141 data within the corresponding Hubble Legacy Archive (HLA)
-projects (see [FREUDLING]_ and [KUMMEL4]_).
 
 
 Slitless Spectroscopy
