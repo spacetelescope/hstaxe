@@ -41,14 +41,14 @@ been provided by STScI. Please send questions to: http://hsthelp.stsci.edu
 The developers have included, roughly in order of who has worked on the
 software:
 
-* Norbert Pirzkal, ST-ECF/STScI
-* Markus Demleitner, ST-ECF
-* Martin Kuemmel, ST-ECF
-* Richard Hook, ST-ECF/STScI
-* Howard Bushouse, STScI
-* Megan Sosey, STScI
-* Richard O'Steen, STScI
-* Duy Nguyen, STScI
+- Norbert Pirzkal, ST-ECF/STScI
+- Markus Demleitner, ST-ECF
+- Martin Kuemmel, ST-ECF
+- Richard Hook, ST-ECF/STScI
+- Howard Bushouse, STScI
+- Megan Sosey, STScI
+- Ricky O'Steen, STScI
+- Duy Nguyen, STScI
 
 
 Using HSTaXe
