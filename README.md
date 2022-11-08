@@ -1,6 +1,6 @@
 .. image:: docs/hstaxe/images/ACS_aXe02.png
     :width: 400
-    :alt: Jdaviz logo
+    :alt: HSTaXe logo
     :align: center
 
 # HSTaXe
