@@ -5,9 +5,9 @@ Installing hstaxe
 
 Preparing Your Local Environment
 --------------------------------
-We recommend using Anaconda to manage your `hstaxe` environment.
+We recommend using Anaconda to manage your ``hstaxe`` environment.
 
-You may want to consider installing `hstaxe` in a new virtual or conda
+You may want to consider installing ``hstaxe`` in a new virtual or conda
 environment to avoid version conflicts with other packages you may have
 installed. We provide a premade conda environment yaml, or you may build the
 environment manually.
@@ -31,8 +31,8 @@ Start by creating an empty conda environment:
 
 Build Prerequisites
 """""""""""""""""""
-Because the core modules of `hstaxe` are written in C, we require some
-additional prerequisites to be installed before attempting to install `hstaxe`:
+Because the core modules of ``hstaxe`` are written in C, we require some
+additional prerequisites to be installed before attempting to install ``hstaxe``:
 
 .. code-block:: bash
     
@@ -43,7 +43,7 @@ additional prerequisites to be installed before attempting to install `hstaxe`:
 
 Installing HSTaXe
 -----------------
-`hstaxe` is distributed through PyPI. To install the latest release of `hstaxe`:
+``hstaxe`` is distributed through PyPI. To install the latest release of ``hstaxe``:
 
 .. code-block:: bash
 
@@ -72,7 +72,7 @@ requirements, which are usually included by default, may be useful to check:
 
 C Compiler
 ^^^^^^^^^^
-A C compiler suite (e.g., ``gcc`` or ``clang``) is required to build `hstaxe`.
+A C compiler suite (e.g., ``gcc`` or ``clang``) is required to build ``hstaxe``.
 These are usually included by default on most macOS and Linux distributions.
 
 C compliers are not included by default in Windows. Microsoft provides these
@@ -84,13 +84,13 @@ Note that you may also need to install the
 [c-blosc](https://github.com/Blosc/c-blosc) package as a dependency
 of the [tables](https://pypi.org/project/tables/) package on certain
 platforms (e.g., this is currently needed for macOS and Windows with
-Python 3.9 due to missing `tables` wheels on PyPI).
+Python 3.9 due to missing ``tables`` wheels on PyPI).
 
 
 Legacy Astroconda Installation
 ------------------------------
 For historical preservation, we provide the original installation instructions
-for installing `hstaxe` via Astroconda:
+for installing ``hstaxe`` via Astroconda:
 
 .. code-block:: bash
 
@@ -102,7 +102,7 @@ for installing `hstaxe` via Astroconda:
 Package Structure
 -----------------
 
-The hstaxe software is composed of a combination of routines written in
+The ``hstaxe`` software is composed of a combination of routines written in
 ANSI-C and python. Many of the python modules use the C executables to
 do their work, while some perform all operations within the python
 module itself. The C executables reside in the cextern directory, 
