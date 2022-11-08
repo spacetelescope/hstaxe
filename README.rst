@@ -3,7 +3,8 @@
     :alt: HSTaXe logo
     :align: center
 
-# HSTaXe
+HSTaXe
+======
 
 `hstaxe` is a Python package to provide a uniform process to perform spectral
 extraction for the Hubble Space Telescope. `hstaxe` supports all slitless
@@ -17,7 +18,8 @@ employed under Linux, Solaris, and MacOS X.
 `hstaxe` is the successor to aXe, a similar package written on PyRAF/IRAF.
 
 
-## Quickstart
+Quickstart
+----------
 To install the latest release of `hstaxe`:
 
     conda create --name hstaxe-env -y
