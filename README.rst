@@ -20,7 +20,7 @@ employed under Linux, Solaris, and MacOS X.
 
 Quickstart
 ----------
-To install the latest release of `hstaxe`:
+To install the latest release of `hstaxe`::
 
     conda create --name hstaxe-env -y
     conda activate hstaxe-env
