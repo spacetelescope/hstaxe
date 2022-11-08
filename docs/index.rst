@@ -9,16 +9,16 @@
 Welcome to the hstaxe package documentation!
 ============================================
 
-`hstaxe` is a Python package to provide a uniform process to perform spectral
-extraction for the Hubble Space Telescope. `hstaxe` supports all slitless
+``hstaxe`` is a Python package to provide a uniform process to perform spectral
+extraction for the Hubble Space Telescope. ``hstaxe`` supports all slitless
 spectroscopy modes provided by the Wide Field Camera 3 (WFC3) and Advanced
 Camera for Surveys (ACS).
 
-The core `hstaxe` is written in ANSI C and is highly cross-platform by
-leveraging `CFITSIO`, `GSL`, and `WCSLIB`, which have been successfully
+The core ``hstaxe`` is written in ANSI C and is highly cross-platform by
+leveraging ``CFITSIO``, ``GSL``, and ``WCSLIB``, which have been successfully
 employed under Linux, Solaris, and MacOS X.
 
-`hstaxe` is the successor to aXe, a similar package written on PyRAF/IRAF.
+``hstaxe`` is the successor to aXe, a similar package written on PyRAF/IRAF.
 
 .. note::
    This documentation mostly overlaps with, but is not identical to, the original
