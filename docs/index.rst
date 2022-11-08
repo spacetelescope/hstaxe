@@ -47,7 +47,7 @@ been provided by STScI. Please send questions to: http://hsthelp.stsci.edu
    Howard Bushouse (STScI),
    Megan Sosey (STScI),
    Ricky O'Steen (STScI),
-   Duy Nguyen (STScI),
+   Duy Nguyen (STScI)
 
 
 Using HSTaXe

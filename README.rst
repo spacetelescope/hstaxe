@@ -32,4 +32,4 @@ For additional installation instructions, visit our full documentation:
 https://hstaxe.readthedocs.io/en/latest/hstaxe/installing.html
 
 Example notebooks can also be found on our full documentation:
-https://hstaxe.readthedocs.io/en/latest/hstaxe/notebooks.html
+https://hstaxe.readthedocs.io/en/latest/hstaxe/examples.html
