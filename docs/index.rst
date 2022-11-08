@@ -39,16 +39,16 @@ modes of ACS and WFC3 until late 2010. Since the beginning of 2011 support has
 been provided by STScI. Please send questions to: http://hsthelp.stsci.edu
 
 The developers have included, roughly in order of who has worked on the
-software::
+software:
 
-    Norbert Pirzkal, ST-ECF/STScI
-    Markus Demleitner, ST-ECF
-    Martin Kuemmel, ST-ECF
-    Richard Hook, ST-ECF/STScI
-    Howard Bushouse, STScI
-    Megan Sosey, STScI
-    Richard O'Steen, STScI
-    Duy Nguyen, STScI
+* Norbert Pirzkal, ST-ECF/STScI
+* Markus Demleitner, ST-ECF
+* Martin Kuemmel, ST-ECF
+* Richard Hook, ST-ECF/STScI
+* Howard Bushouse, STScI
+* Megan Sosey, STScI
+* Richard O'Steen, STScI
+* Duy Nguyen, STScI
 
 
 Using HSTaXe
