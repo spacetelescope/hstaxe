@@ -36,7 +36,7 @@ research opportunities provided by the earth-orbiting Hubble Space Telescope.
 
 STECF supported the use of the aXe software and the slitless spectroscopic
 modes of ACS and WFC3 until late 2010. Since the beginning of 2011 support has
-been provided by STScI.
+been provided by STScI. Please send questions to: http://hsthelp.stsci.edu
 
 The developers have included, roughly in order of who has worked on the
 software:
@@ -57,7 +57,6 @@ Using HSTaXe
    :maxdepth: 3
    :numbered: 3
 
-    Support <hstaxe/support.rst>
     Description <hstaxe/description.rst>
     Installation <hstaxe/installing.rst>
     Example Notebooks <hstaxe/examples.rst>
