@@ -9,19 +9,8 @@ We recommend using Anaconda to manage your ``hstaxe`` environment.
 
 You may want to consider installing ``hstaxe`` in a new virtual or conda
 environment to avoid version conflicts with other packages you may have
-installed. We provide a premade conda environment yaml, or you may build the
-environment manually.
+installed.
 
-Using the Provided HSTaXe Environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. code-block:: bash
-
-    conda create --name hstaxe-env --file conda_environment.yml
-    conda activate hstaxe-env
-
-
-Manually Creating Your Environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Start by creating an empty conda environment:
 
 .. code-block:: bash
@@ -30,7 +19,7 @@ Start by creating an empty conda environment:
     conda activate hstaxe-env
 
 Build Prerequisites
-"""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^
 Because the core modules of ``hstaxe`` are written in C, we require some
 additional prerequisites to be installed before attempting to install ``hstaxe``:
 
@@ -89,10 +78,13 @@ Python 3.9 due to missing ``tables`` wheels on PyPI).
 Legacy Astroconda Installation
 ------------------------------
 For historical preservation, we provide the original installation instructions
-for installing ``hstaxe`` via Astroconda:
+for installing ``hstaxe`` via Astroconda. We preserved a premade conda
+environment yaml in the repository for reproducability:
 
 .. code-block:: bash
 
+    conda create --name hstaxe-env --file legacy_astroconda_environment.yml
+    conda activate hstaxe-env
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
     conda install wcstools -c https://ssb.stsci.edu/astroconda -y
     conda install hstaxe -c https://ssb.stsci.edu/astroconda
