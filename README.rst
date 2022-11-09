@@ -28,7 +28,8 @@ To install the latest release of ``hstaxe``::
     conda install wcstools -c https://conda.anaconda.org/conda-forge/ --override-channels -y
     pip install hstaxe
 
-For additional installation instructions, visit our full documentation:
+For additional installation instructions, including instructions on installing older
+or development versions of hstaxe, visit our full documentation:
 https://hstaxe.readthedocs.io/en/latest/hstaxe/installing.html
 
 Example notebooks can also be found on our full documentation:
