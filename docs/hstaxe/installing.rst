@@ -86,8 +86,8 @@ environment yaml in the repository for reproducability:
     conda create --name hstaxe-env --file legacy_astroconda_environment.yml
     conda activate hstaxe-env
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
-    conda install wcstools -c https://ssb.stsci.edu/astroconda -y
-    conda install hstaxe -c https://ssb.stsci.edu/astroconda
+    conda install wcstools -c https://ssb.stsci.edu/astroconda --override-channels -y
+    conda install hstaxe -c https://ssb.stsci.edu/astroconda --override-channels
 
 
 Package Structure
