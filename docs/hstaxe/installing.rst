@@ -36,7 +36,6 @@ additional prerequisites to be installed before attempting to install ``hstaxe``
 
 .. code-block:: bash
     
-    # Install hstaxe build prerequisites
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
     conda install wcstools -c https://conda.anaconda.org/conda-forge/ --override-channels -y
 
@@ -81,8 +80,8 @@ tools as part of their
 which can be found under "Tools for Visual Studio" towards the bottom of the page.
 
 Note that you may also need to install the
-[c-blosc](https://github.com/Blosc/c-blosc) package as a dependency
-of the [tables](https://pypi.org/project/tables/) package on certain
+`c-blosc <https://github.com/Blosc/c-blosc>`_ package as a dependency
+of the `tables <https://pypi.org/project/tables/>` package on certain
 platforms (e.g., this is currently needed for macOS and Windows with
 Python 3.9 due to missing ``tables`` wheels on PyPI).
 
