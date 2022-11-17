@@ -3,6 +3,9 @@
 Installing hstaxe
 =================
 
+.. note::
+   As of current testing, HSTaXe does not support Windows or Apple M1 systems
+
 Preparing Your Local Environment
 --------------------------------
 We recommend using Anaconda to manage your ``hstaxe`` environment.
