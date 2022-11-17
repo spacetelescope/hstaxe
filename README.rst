@@ -22,7 +22,7 @@ Quickstart
 ----------
 To install the latest release of ``hstaxe``::
 
-    conda create --name hstaxe-env -y
+    conda create --name hstaxe-env "python>=3.8, <3.11"
     conda activate hstaxe-env
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
     conda install wcstools -c https://conda.anaconda.org/conda-forge/ --override-channels -y
