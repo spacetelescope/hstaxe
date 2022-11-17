@@ -4,7 +4,8 @@ Installing hstaxe
 =================
 
 .. note::
-   As of current testing, HSTaXe does not support Windows or Apple M1 systems
+   As of current testing, HSTaXe does not support Windows. Please use our
+   legacy instructions for attempting to use HSTaXe on Windows
 
 Preparing Your Local Environment
 --------------------------------
