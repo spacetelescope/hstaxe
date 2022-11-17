@@ -52,28 +52,6 @@ or alternatively, clone the repository locally and install the clone:
     cd hstaxe
     pip install .
 
-    
-Additional Requirements
------------------------
-In the event the above installation instructions do not succeed, the following
-requirements, which are usually included by default, may be useful to check:
-
-C Compiler
-^^^^^^^^^^
-A C compiler suite (e.g., ``gcc`` or ``clang``) is required to build ``hstaxe``.
-These are usually included by default on most macOS and Linux distributions.
-
-C compliers are not included by default in Windows. Microsoft provides these
-tools as part of their
-`Build Tools for Visual Studio <https://visualstudio.microsoft.com/downloads>`_, 
-which can be found under "Tools for Visual Studio" towards the bottom of the page.
-
-Note that you may also need to install the
-`c-blosc <https://github.com/Blosc/c-blosc>`_ package as a dependency
-of the `tables <https://pypi.org/project/tables/>` package on certain
-platforms (e.g., this is currently needed for macOS and Windows with
-Python 3.9 due to missing ``tables`` wheels on PyPI).
-
 
 Legacy Astroconda Installation
 ------------------------------
