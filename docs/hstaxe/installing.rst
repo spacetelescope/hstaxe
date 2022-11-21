@@ -32,7 +32,16 @@ additional prerequisites to be installed before attempting to install ``hstaxe``
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
     conda install wcstools -c https://conda.anaconda.org/conda-forge/ --override-channels -y
 
+Some architectures (for example systems with Apple M1 processors) may not have a
+wheel available for ``tables``. This can manifest as a failure to install ``tables``
+during the next ``hstaxe`` installation step and can be solved by running the
+following (which allows ``tables`` to build from source) before repeating the
+failed install step:
 
+.. code-block:: bash
+
+    conda install hdf5 -c conda-forge
+    
 Installing HSTaXe
 -----------------
 ``hstaxe`` is distributed through PyPI. To install the latest release of ``hstaxe``:
