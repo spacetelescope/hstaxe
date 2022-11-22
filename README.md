@@ -1,7 +1,4 @@
-.. image:: docs/hstaxe/images/ACS_aXe02.png
-    :width: 400
-    :alt: HSTaXe logo
-    :align: center
+![aXe logo](docs/hstaxe/images/ACS_aXe02.png)
 
 HSTaXe
 ======
