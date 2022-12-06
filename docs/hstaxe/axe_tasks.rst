@@ -333,8 +333,7 @@ Parameters
     np:       number of points for background estimation
 
     interp:   interpolation type for background determination
-              (-1: GLOBAL median; 0: local median; 1: linear fit;
-              2: quadratic fit)
+              (-1: median; 0: average; 1: linear fit; 2: quadratic fit)
 
     niter_med: number of kappa-sigma iterations around the median
 
@@ -806,6 +805,8 @@ If  back='NO':
 If  back='YES':
 
 -  $AXE\_OUTPUT\_PATH/[slitless filename]\_[ext number].BAF
+
+.. _backest_task:
 
 BACKEST
 -------
