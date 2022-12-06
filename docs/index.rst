@@ -20,9 +20,16 @@ employed under Linux, Solaris, and MacOS X.
 
 HSTaXe is the successor to aXe, a similar package written on PyRAF/IRAF.
 
-.. note::
+.. warning::
    This documentation mostly overlaps with, but is not identical to, the original
-   aXe manual. The last version of the aXe manual can be downloaded from
+   aXe manual. This means that many of the descriptions and code snippets provided
+   refer to the old command line/IRAF-based version of aXe rather than the current
+   python-based ``hstaxe``. The installation and example notebooks sections, as well
+   as some content related to background subtraction, has been more recently updated
+   to be up-to-date for ``hstaxe``. The rest of the older content is nonetheless
+   useful for understanding what is going on "under the hood".
+
+   The last version of the aXe manual can be downloaded from
    `the hstaxe repository <https://github.com/spacetelescope/hstaxe/tree/main/docs/aXe_manual/axe-user-manual-v-2-3.pdf>`_.
 
 Attribution
