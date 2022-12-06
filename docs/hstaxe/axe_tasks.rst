@@ -165,7 +165,7 @@ is mandatory if axedrizzle is to be used later on.
 
 axeprep provides three different processing steps:
 
--  background subtraction:
+*  global background subtraction:
    Provided that an Input Object List is given for the grism image,
    axeprep uses the tasks sex2gol, gol2af and backest to mark the beam
    areas on the grism image as well as on the master background image.
@@ -175,10 +175,12 @@ axeprep provides three different processing steps:
    image. The master background, scaled to the level of the grism image,
    is finally subtracted from the grism image.
 
--  exposure time normalization The input file is normalized by the
+*  exposure time normalization:
+   The input file is normalized by the
    exposure time to transform the images into counts per second.
 
--  gain correction The input file is multiplied by the gain conversion
+*  gain correction:
+   The input file is multiplied by the gain conversion
    factor (electrons/ADU) to transform the images from units of detector
    counts to electrons. For HST data, this is usually only necessary for
    NICMOS images, because ACS and WFC3 images will normally already be
@@ -249,7 +251,7 @@ AXECORE
 [AXECORE] This aXe task combines the Low Level Tasks sex2gol, gol2af,
 af2pet, petff, petcont, pet2spc and stamps and offers the possibility to
 make a complete aXe reduction based on the individual images in one
-task. This also includes the reduction with background PETs (set
+task. This also includes local background subtraction (set
 back=YES). The parameter list comprises all parameters for the
 individual tasks, and as a consequence is rather long. For most of the
 parameters the default value is appropriate, so the actual number of
@@ -281,6 +283,8 @@ Usage
 ::
 
     axecore inlist configs extrfwhm drzfwhm back backfwhm orient slitless_geom exclude ...
+
+.. _axecore_parameters:
 
 Parameters
 ~~~~~~~~~~
