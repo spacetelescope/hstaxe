@@ -258,7 +258,7 @@ The strategy of estimating a local sky background can also be applied
 after a global sky background subtraction for very difficult cases or
 instruments (e.g. NICMOS G141 data, see [FREUDLING]_ ). In either case (with
 or without previous global sky background subtraction), the local background
-subtraction is used by setting ``back=False`` and specifying a value for
+subtraction is used by setting ``back=True`` and specifying a value for
 ``backfwhm``, ``np``, and ``interp`` in the ``axetasks.axecore`` step, for
 example::
 
