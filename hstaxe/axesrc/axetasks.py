@@ -285,7 +285,7 @@ def axecore(inlist='',
 
     interp: int
       interpolation type for background determination
-      (-1: GLOBAL median; 0: local median; 1: linear fit;
+      (-1: median; 0: average; 1: linear fit;
       2: quadratic fit)
 
     niter_med: int

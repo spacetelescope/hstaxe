@@ -232,17 +232,51 @@ master-sky frame from each input spectrum image at the beginning of
 the reduction process. This removes the background signature from the
 images, so that the remaining signal can be assumed to originate from
 the sources only and is extracted without further background correction
-in the aXe reduction.
+in the aXe reduction. To enable global background subtraction in ``hstaxe``,
+set the ``backgr`` argument in the ``axeprep`` step to ``True``, for example::
+
+    axetasks.axeprep(inlist="aXe.lis",
+                     configs="G141.F140W.V4.31.conf",
+                     backgr=True,
+                     norm=False,
+                     mfwhm=3.0)
 
 The second strategy is to make a local estimate of the sky background
 for each BEAM by interpolating between the adjacent pixels on either
 side of the BEAM. In this case, an individual sky estimate is made for
-every BEAM in each science image.
+every BEAM in each science image. Counter-intuitively, if you wish to
+do local subtraction without doing a global subtraction first, you must
+set ``backgr`` to ``False`` in the ``axeprep`` step::
+
+    axetasks.axeprep(inlist="aXe.lis",
+                     configs="G141.F140W.V4.31.conf",
+                     backgr=False,
+                     norm=False,
+                     mfwhm=3.0)
 
 The strategy of estimating a local sky background can also be applied
 after a global sky background subtraction for very difficult cases or
-instruments (e.g. NICMOS G141 data, see [FREUDLING]_ ).
+instruments (e.g. NICMOS G141 data, see [FREUDLING]_ ). In either case (with
+or without previous global sky background subtraction), the local background
+subtraction is used by setting ``back=True`` and specifying a value for
+``backfwhm``, ``np``, and ``interp`` in the ``axetasks.axecore`` step, for
+example::
 
+    axetasks.axecore('aXe.lis',
+                     "G141.F140W.V4.31.conf",
+                     np=5,
+                     interp=0,
+                     back=True,
+                     backfwhm=4.0,
+                     [additional keyword arguments])
+
+For additional information about these parameters, see :ref:`axecore_parameters`
+and :ref:`backest_task`. More information about local and global background
+subtraction is also given below.
+
+In addition to global and local background subtraction, you can choose to
+not perform any sky background subtraction at all by setting ``backgr=False``
+in the ``axeprep`` step and ``back=False`` in the ``axecore`` step.
 
 .. _global_background_subtraction:
 
@@ -280,7 +314,6 @@ spectra derived withthe aXe reduction.
 
 Local Background Subtraction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 The second option for handling the sky background is to make a local
 estimate of the background for each object. In this case, aXe creates an
