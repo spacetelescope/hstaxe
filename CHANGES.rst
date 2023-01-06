@@ -1,3 +1,11 @@
+version 1.0.3 (2023-01-06)
+--------------------------
+
+Bug fixes
+^^^^^^^^^
+
+- Hotfix to avoid incompatibility with numpy 1.24.
+
 version 1.0.2 (2023-01-06)
 --------------------------
 
