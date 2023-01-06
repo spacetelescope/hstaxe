@@ -1,10 +1,19 @@
-version 1.x.x (unreleased)
+version 1.0.2 (2023-01-06)
 --------------------------
 
 Bug Fixes
 ^^^^^^^^^
 
+- ``axeprep`` no longer looks for fringe column if ``backgr`` is False. [#31]
+- Added missing flag to allow local background subtraction. [#35]
 - Input checks now properly allow interp 0. [#39]
+
+Other Changes
+^^^^^^^^^^^^^
+
+- Disabled sensitivity adjustment for UVIS rather than failing silently. [#40]
+- Updated package installation to work with more recent python versions.
+- Updated installation instructions and documentation.
 
 version 1.0.1 (2022-01-10)
 --------------------------
