@@ -6,10 +6,10 @@ tutorial Jupyter Notebook `wfc3-basic-uvis-fullframe-hstaxe-cookbook.ipynb`, an
 a `.HTML` copy of the notebook. In the `.HTML` version of the notebook each cell
 has been run and the corresponding output is shown.
 
-**In order to run this Jupyter Notebook, you must create a virtual
-environment using the `cookbook_env.yml` file provided in the root HSTaXe
-repository.** Once you have the `.yml` file in your current working directory you
-can build the environment using the command below:
+**In order to run this Jupyter Notebook, you must create a virtual environment
+using the `cookbook_env.yml` file provided in the WFC3 cookbook folder.** Once
+the `.yml` file is in the current working directory, the environment can be
+built using the command below:
 
 `conda env create -f cookbook_env.yml`
 
