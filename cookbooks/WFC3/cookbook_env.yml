@@ -1,0 +1,22 @@
+name: hstaxe_cookbook_acs_wfc3
+channels:
+- defaults
+dependencies:
+- autoconf 
+- automake
+- cfitsio
+- conda-forge::wcstools
+- gsl
+- hstcal>=2.7.2
+- libtool
+- make
+- pip
+- pkg-config
+- python>=3.8,<3.11
+- pip:
+    - crds
+    - ginga
+    - jupyter
+    - acstools
+    - git+https://github.com/spacetelescope/wfc3tools.git
+    - git+https://github.com/spacetelescope/hstaxe.git
