@@ -259,6 +259,12 @@ parameters that will normally need to be edited by the user is quite
 modest. In the listing below, the axecore parameters are organised
 according to the low-level aXe tasks they affect.
 
+.. warning::
+
+  Local background subtraction is currently unavailable for ACS (see 
+  `this issue <https://github.com/spacetelescope/hstaxe/issues/64>`_
+  for details). Please use master background subtraction for ACS.
+
 The Input Image List used in the task axeprep as inlist can be reused
 again in axecore, perhaps extended with individual dmag-values for the
 grism images.
