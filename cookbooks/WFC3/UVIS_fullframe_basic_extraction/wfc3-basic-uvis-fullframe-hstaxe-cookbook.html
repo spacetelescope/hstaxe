@@ -14652,9 +14652,9 @@ The original source for this notebook is the &quot;cookbook&quot; folder on the 
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="1.-Introduction-">1. Introduction <a id="intro" /><a class="anchor-link" href="#1.-Introduction-">&#182;</a></h2><p><a href="https://hstaxe.readthedocs.io/en/latest/index.html">HSTaXe</a> is a Python package that provides spectral extraction processes for HST data. <strong>Please be aware that running this notebook requires creating a conda environment from the provided <code>.yml</code> file in this notebook's <a href="https://github.com/spacetelescope/hstaxe/tree/main/cookbooks">github repository</a>.</strong> For more details about creating the necessary environment see the notebook's README file.</p>
-<p>Below, we show the workflow for a basic specral extraction using WFC3/UVIS full frame G280 grism data. <strong>The example data we use in this notebook are available <a href="https://stsci.app.box.com/folder/193832071717">here</a>.</strong> If you would like to use this notebook with the example data, please dowload all required data in the <code>example_data</code> subdirectory from the link above, and store it within the same parent directory as this notebook. Once you have the example data directory, this notebook is intended to run continuously without needing to edit any of the cells.</p>
-<p>In addition to the grism and direct image data, <strong>this notebook also requires configuration files for HSTaXe, which can be downloaded <a href="https://stsci.app.box.com/folder/191816748622">here</a>.</strong> Please download the folder titled <code>WFC3_UVIS_conf</code>. This configuration directory should be stored in the  same parent directory as this notebook, and later we will be copy them to the <code>CONF</code> subdirectory created by HSTaXe.</p>
-<p><strong>If you plan to use your own data with this notebook, please be aware you will be required to create an input source catalog with SExtractor.</strong> Information regarding SExtractor including installation instructions are available <a href="https://sextractor.readthedocs.io/en/latest/Installing.html">here</a>. In addition to installing SExtractor, you must run the software with aXe specific configuration files. <strong>These aXe-SExtractor configuration files can be downloaded <a href="https://stsci.app.box.com/folder/193841141416?s=3npry36gu7ocfnuxgzwr5syj4i8r7hy8">here</a>.</strong> Once SExtractor is installed, create a <code>sextractor</code> directory in the same parent directory as this notebook, and place configuration files inside.</p>
+<p>Below, we show the workflow for a basic specral extraction using WFC3/UVIS full frame G280 grism data. <strong>The example data we use in this notebook are available <a href="https://stsci.box.com/s/x0ndoduqkqd1ys1u9fgsz32urizsjdks">here</a>.</strong> If you would like to use this notebook with the example data, please dowload all required data in the <code>example_data</code> subdirectory from the link above, and store it within the same parent directory as this notebook. Once you have the example data directory, this notebook is intended to run continuously without needing to edit any of the cells.</p>
+<p>In addition to the grism and direct image data, <strong>this notebook also requires configuration files for HSTaXe, which can be downloaded <a href="https://stsci.box.com/s/ojbj3v4twkpkqt6tj9hwg1xkzbhrugm4">here</a>.</strong> Please download the folder titled <code>WFC3_UVIS_conf</code>. This configuration directory should be stored in the  same parent directory as this notebook, and later we will be copy them to the <code>CONF</code> subdirectory created by HSTaXe.</p>
+<p><strong>If you plan to use your own data with this notebook, please be aware you will be required to create an input source catalog with SExtractor.</strong> Information regarding SExtractor including installation instructions are available <a href="https://sextractor.readthedocs.io/en/latest/Installing.html">here</a>. In addition to installing SExtractor, you must run the software with aXe specific configuration files. <strong>These aXe-SExtractor configuration files can be downloaded <a href="https://stsci.box.com/s/3npry36gu7ocfnuxgzwr5syj4i8r7hy8">here</a>.</strong> Once SExtractor is installed, create a <code>sextractor</code> directory in the same parent directory as this notebook, and place configuration files inside.</p>
 
 </div>
 </div>
@@ -15164,9 +15164,9 @@ ibr502icq_flc.fits
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Setting up logfile :  astrodrizzle.log
 AstroDrizzle log file: astrodrizzle.log
-AstroDrizzle Version 3.5.1 started at: 09:58:03.945 (29/03/2023)
+AstroDrizzle Version 3.5.1 started at: 12:46:25.214 (31/03/2023)
 
-==== Processing Step  Initialization  started at  09:58:03.948 (29/03/2023)
+==== Processing Step  Initialization  started at  12:46:25.216 (31/03/2023)
 
 Reading in MDRIZTAB parameters for 3 files
 - MDRIZTAB: AstroDrizzle parameters read from row 5.
@@ -15187,14 +15187,14 @@ NAXIS : 4125  4386
 *  Cores available:         6
 *
 ********************************************************************************
-==== Processing Step Initialization finished at 09:58:05.667 (29/03/2023)
-==== Processing Step  Static Mask  started at  09:58:05.668 (29/03/2023)
+==== Processing Step Initialization finished at 12:46:27.464 (31/03/2023)
+==== Processing Step  Static Mask  started at  12:46:27.466 (31/03/2023)
 
-==== Processing Step Static Mask finished at 09:58:06.765 (29/03/2023)
-==== Processing Step  Subtract Sky  started at  09:58:06.766 (29/03/2023)
+==== Processing Step Static Mask finished at 12:46:28.628 (31/03/2023)
+==== Processing Step  Subtract Sky  started at  12:46:28.629 (31/03/2023)
 
-==== Processing Step Subtract Sky finished at 09:58:06.854 (29/03/2023)
-==== Processing Step  Separate Drizzle  started at  09:58:06.85 (29/03/2023)
+==== Processing Step Subtract Sky finished at 12:46:28.717 (31/03/2023)
+==== Processing Step  Separate Drizzle  started at  12:46:28.718 (31/03/2023)
 
 WCS Keywords
 
@@ -15219,28 +15219,9 @@ NAXIS : 4125  4386
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
 <pre>WARNING: VerifyWarning: Card is too long, comment will be truncated. [astropy.io.fits.card]
 WARNING: VerifyWarning: Card is too long, comment will be truncated. [astropy.io.fits.card]
-WARNING: FITSFixedWarning: &#39;datfix&#39; made the change &#39;Set MJD-OBS to 56073.000000 from DATE-OBS&#39;. [astropy.wcs.wcs]
 WARNING: VerifyWarning: Card is too long, comment will be truncated. [astropy.io.fits.card]
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Writing out image to disk: ibr502i9q_single_sci.fits
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>WARNING: FITSFixedWarning: &#39;datfix&#39; made the change &#39;Set MJD-OBS to 56073.000000 from DATE-OBS&#39;. [astropy.wcs.wcs]
+WARNING: FITSFixedWarning: &#39;datfix&#39; made the change &#39;Set MJD-OBS to 56073.000000 from DATE-OBS&#39;. [astropy.wcs.wcs]
+WARNING: FITSFixedWarning: &#39;datfix&#39; made the change &#39;Set MJD-OBS to 56073.000000 from DATE-OBS&#39;. [astropy.wcs.wcs]
 WARNING: FITSFixedWarning: &#39;datfix&#39; made the change &#39;Set MJD-OBS to 56073.000000 from DATE-OBS&#39;. [astropy.wcs.wcs]
 </pre>
 </div>
@@ -15251,20 +15232,21 @@ WARNING: FITSFixedWarning: &#39;datfix&#39; made the change &#39;Set MJD-OBS to 
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Writing out image to disk: ibr502ibq_single_sci.fits
-Writing out image to disk: ibr502icq_single_sci.fits
-Writing out image to disk: ibr502i9q_single_wht.fits
-Writing out image to disk: ibr502icq_single_wht.fits
+<pre>Writing out image to disk: ibr502icq_single_sci.fits
+Writing out image to disk: ibr502i9q_single_sci.fits
+Writing out image to disk: ibr502ibq_single_sci.fits
 Writing out image to disk: ibr502ibq_single_wht.fits
-==== Processing Step Separate Drizzle finished at 09:58:09.032 (29/03/2023)
-==== Processing Step  Create Median  started at  09:58:09.0 (29/03/2023)
+Writing out image to disk: ibr502icq_single_wht.fits
+Writing out image to disk: ibr502i9q_single_wht.fits
+==== Processing Step Separate Drizzle finished at 12:46:31.193 (31/03/2023)
+==== Processing Step  Create Median  started at  12:46:31.195 (31/03/2023)
 
 reference sky value for image &#39;ibr502i9q_flc.fits&#39; is 0.0
 reference sky value for image &#39;ibr502ibq_flc.fits&#39; is 0.0
 reference sky value for image &#39;ibr502icq_flc.fits&#39; is 0.0
 Saving output median image to: &#39;grism_med.fits&#39;
-==== Processing Step Create Median finished at 09:58:14.704 (29/03/2023)
-==== Processing Step  Blot  started at  09:58:14.705 (29/03/2023)
+==== Processing Step Create Median finished at 12:46:37.078 (31/03/2023)
+==== Processing Step  Blot  started at  12:46:37.079 (31/03/2023)
 
     Blot: creating blotted image:  ibr502i9q_flc.fits[sci,1]
 Using default C-based coordinate transformation...
@@ -15290,17 +15272,17 @@ Writing out image to disk: ibr502icq_sci1_blt.fits
 Using default C-based coordinate transformation...
 -Generating simple FITS output: ibr502icq_sci2_blt.fits
 Writing out image to disk: ibr502icq_sci2_blt.fits
-==== Processing Step Blot finished at 09:58:20.271 (29/03/2023)
-==== Processing Step  Driz_CR  started at  09:58:20.272 (29/03/2023)
+==== Processing Step Blot finished at 12:46:42.776 (31/03/2023)
+==== Processing Step  Driz_CR  started at  12:46:42.777 (31/03/2023)
 
-Creating output: ibr502ibq_sci1_crmask.fits
 Creating output: ibr502i9q_sci1_crmask.fits
+Creating output: ibr502ibq_sci1_crmask.fits
 Creating output: ibr502icq_sci1_crmask.fits
-Creating output: ibr502i9q_sci2_crmask.fits
 Creating output: ibr502ibq_sci2_crmask.fits
+Creating output: ibr502i9q_sci2_crmask.fits
 Creating output: ibr502icq_sci2_crmask.fits
-==== Processing Step Driz_CR finished at 09:58:22.396 (29/03/2023)
-==== Processing Step  Final Drizzle  started at  09:58:22.403 (29/03/2023)
+==== Processing Step Driz_CR finished at 12:46:45.113 (31/03/2023)
+==== Processing Step  Final Drizzle  started at  12:46:45.121 (31/03/2023)
 
 WCS Keywords
 
@@ -15332,9 +15314,9 @@ Writing out to disk: grism_drc.fits
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>==== Processing Step Final Drizzle finished at 09:58:33.247 (29/03/2023)
+<pre>==== Processing Step Final Drizzle finished at 12:46:56.49 (31/03/2023)
 
-AstroDrizzle Version 3.5.1 is finished processing at 09:58:33.248 (29/03/2023).
+AstroDrizzle Version 3.5.1 is finished processing at 12:46:56.492 (31/03/2023).
 
 
 
@@ -15342,16 +15324,16 @@ AstroDrizzle Version 3.5.1 is finished processing at 09:58:33.248 (29/03/2023).
                    Step          Elapsed time
    --------------------          --------------------
 
-         Initialization          1.7191 sec.
-            Static Mask          1.0963 sec.
-           Subtract Sky          0.0888 sec.
-       Separate Drizzle          2.1765 sec.
-          Create Median          5.6699 sec.
-                   Blot          5.5656 sec.
-                Driz_CR          2.1240 sec.
-          Final Drizzle          10.8440 sec.
+         Initialization          2.2484 sec.
+            Static Mask          1.1625 sec.
+           Subtract Sky          0.0882 sec.
+       Separate Drizzle          2.4744 sec.
+          Create Median          5.8830 sec.
+                   Blot          5.6972 sec.
+                Driz_CR          2.3360 sec.
+          Final Drizzle          11.3695 sec.
    ====================          ====================
-                  Total          29.2844 sec.
+                  Total          31.2592 sec.
 
 Trailer file written to:  astrodrizzle.log
 </pre>
@@ -15455,9 +15437,9 @@ Trailer file written to:  astrodrizzle.log
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>Setting up logfile :  astrodrizzle.log
 AstroDrizzle log file: astrodrizzle.log
-AstroDrizzle Version 3.5.1 started at: 09:58:33.447 (29/03/2023)
+AstroDrizzle Version 3.5.1 started at: 12:46:56.711 (31/03/2023)
 
-==== Processing Step  Initialization  started at  09:58:33.44 (29/03/2023)
+==== Processing Step  Initialization  started at  12:46:56.713 (31/03/2023)
 
 Creating OUTPUT WCS from ../grism_ims/grism_drc.fits[1]
 WCS Keywords
@@ -15477,13 +15459,13 @@ ORIENTAT : 18.5816628435462
 *  Cores available:         1
 *
 ********************************************************************************
-==== Processing Step Initialization finished at 09:58:33.718 (29/03/2023)
-==== Processing Step  Static Mask  started at  09:58:33.719 (29/03/2023)
+==== Processing Step Initialization finished at 12:46:56.981 (31/03/2023)
+==== Processing Step  Static Mask  started at  12:46:56.982 (31/03/2023)
 
-==== Processing Step Static Mask finished at 09:58:34.166 (29/03/2023)
-==== Processing Step  Subtract Sky  started at  09:58:34.166 (29/03/2023)
+==== Processing Step Static Mask finished at 12:46:57.454 (31/03/2023)
+==== Processing Step  Subtract Sky  started at  12:46:57.45 (31/03/2023)
 
-***** skymatch started on 2023-03-29 09:58:34.231159
+***** skymatch started on 2023-03-31 12:46:57.528475
       Version 1.0.9
 
 &#39;skymatch&#39; task will apply computed sky differences to input image file(s).
@@ -15503,18 +15485,18 @@ NOTE: Computed sky values WILL NOT be subtracted from image data (&#39;subtracts
        EXT: &#39;SCI&#39;,2;	MASK: ibr502i6q_skymatch_mask_sci2.fits[0]
 
 skymatch: Need at least 2 images for sky matching. Aborting...
-==== Processing Step Subtract Sky finished at 09:58:34.239 (29/03/2023)
-==== Processing Step  Separate Drizzle  started at  09:58:34.240 (29/03/2023)
+==== Processing Step Subtract Sky finished at 12:46:57.537 (31/03/2023)
+==== Processing Step  Separate Drizzle  started at  12:46:57.538 (31/03/2023)
 
-==== Processing Step Separate Drizzle finished at 09:58:34.242 (29/03/2023)
-==== Processing Step  Create Median  started at  09:58:34.242 (29/03/2023)
+==== Processing Step Separate Drizzle finished at 12:46:57.540 (31/03/2023)
+==== Processing Step  Create Median  started at  12:46:57.541 (31/03/2023)
 
-==== Processing Step  Blot  started at  09:58:34.243 (29/03/2023)
+==== Processing Step  Blot  started at  12:46:57.543 (31/03/2023)
 
-==== Processing Step Blot finished at 09:58:34.244 (29/03/2023)
-==== Processing Step  Driz_CR  started at  09:58:34.245 (29/03/2023)
+==== Processing Step Blot finished at 12:46:57.543 (31/03/2023)
+==== Processing Step  Driz_CR  started at  12:46:57.544 (31/03/2023)
 
-==== Processing Step  Final Drizzle  started at  09:58:34.246 (29/03/2023)
+==== Processing Step  Final Drizzle  started at  12:46:57.545 (31/03/2023)
 
 WCS Keywords
 
@@ -15527,9 +15509,9 @@ Plate Scale : 0.03962000086903362
 ORIENTAT : 18.5816628435462
 -Generating multi-extension output file:  direct_drc.fits
 Writing out to disk: direct_drc.fits
-==== Processing Step Final Drizzle finished at 09:58:38.40 (29/03/2023)
+==== Processing Step Final Drizzle finished at 12:47:01.981 (31/03/2023)
 
-AstroDrizzle Version 3.5.1 is finished processing at 09:58:38.406 (29/03/2023).
+AstroDrizzle Version 3.5.1 is finished processing at 12:47:01.982 (31/03/2023).
 
 
 
@@ -15537,16 +15519,16 @@ AstroDrizzle Version 3.5.1 is finished processing at 09:58:38.406 (29/03/2023).
                    Step          Elapsed time
    --------------------          --------------------
 
-         Initialization          0.2690 sec.
-            Static Mask          0.4469 sec.
-           Subtract Sky          0.0727 sec.
-       Separate Drizzle          0.0017 sec.
+         Initialization          0.2679 sec.
+            Static Mask          0.4720 sec.
+           Subtract Sky          0.0818 sec.
+       Separate Drizzle          0.0022 sec.
           Create Median          0.0000 sec.
-                   Blot          0.0013 sec.
+                   Blot          0.0009 sec.
                 Driz_CR          0.0000 sec.
-          Final Drizzle          4.1590 sec.
+          Final Drizzle          4.4354 sec.
    ====================          ====================
-                  Total          4.9505 sec.
+                  Total          5.2603 sec.
 
 Trailer file written to:  astrodrizzle.log
 </pre>
@@ -15613,7 +15595,7 @@ Trailer file written to:  astrodrizzle.log
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>&lt;matplotlib.colorbar.Colorbar at 0x7f9a3c4a99c0&gt;</pre>
+<pre>&lt;matplotlib.colorbar.Colorbar at 0x7f8fb027bd60&gt;</pre>
 </div>
 
 </div>
@@ -15760,7 +15742,7 @@ class="
 
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
 <div><i>Table length=3</i>
-<table id="table140300411820672" class="table-striped table-bordered table-condensed">
+<table id="table140255417319632" class="table-striped table-bordered table-condensed">
 <thead><tr><th>X_IMAGE</th><th>Y_IMAGE</th><th>NUMBER</th><th>X_WORLD</th><th>Y_WORLD</th><th>A_IMAGE</th><th>B_IMAGE</th><th>THETA_IMAGE</th><th>A_WORLD</th><th>B_WORLD</th><th>THETA_WORLD</th><th>FLUX_RADIUS</th><th>MAG_ISO</th><th>MAGERR_ISO</th></tr></thead>
 <thead><tr><th>pix</th><th>pix</th><th></th><th>deg</th><th>deg</th><th>pix</th><th>pix</th><th>deg</th><th>deg</th><th>deg</th><th>deg</th><th>pix</th><th>mag</th><th>mag</th></tr></thead>
 <thead><tr><th>float64</th><th>float64</th><th>int64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th></tr></thead>
@@ -15921,7 +15903,7 @@ class="
 
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html">
 <div><i>Table length=3</i>
-<table id="table140300411815248" class="table-striped table-bordered table-condensed">
+<table id="table140255417325776" class="table-striped table-bordered table-condensed">
 <thead><tr><th>NUMBER</th><th>X_IMAGE</th><th>Y_IMAGE</th><th>A_IMAGE</th><th>B_IMAGE</th><th>THETA_IMAGE</th><th>FLUX_RADIUS</th><th>MAG_F4971</th></tr></thead>
 <thead><tr><th></th><th>pix</th><th>pix</th><th>pix</th><th>pix</th><th>deg</th><th>pix</th><th>mag</th></tr></thead>
 <thead><tr><th>int64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th><th>float64</th></tr></thead>
@@ -15944,7 +15926,8 @@ class="
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h2 id="4.-Running-HSTaXe">4. Running HSTaXe<a id="aXe" /><a class="anchor-link" href="#4.-Running-HSTaXe">&#182;</a></h2><p>With the catalog generated and edited, we can now move on to working with HSTaXe. We'll set up a few additional directories and environment variables that point to them, while clearing out any previous data or outputs in these directories. We'll also copy our data into the fresh <code>DATA</code> directory.</p>
+<h2 id="4.-Running-HSTaXe">4. Running HSTaXe<a id="aXe" /><a class="anchor-link" href="#4.-Running-HSTaXe">&#182;</a></h2><p>Below, we show an example of using HSTaXe to complete a basic extraction. If you are interested in seeing an example of a more advanced extraction method that utilizes a fluxcube, please see the WFC3/IR cookbook <a href="https://github.com/spacetelescope/hstaxe/tree/main/cookbooks/WFC3">here</a>.<br></p>
+<p>With the catalog generated and edited, we can now move on to working with HSTaXe. We'll set up a few additional directories and environment variables that point to them, while clearing out any previous data or outputs in these directories. We'll also copy our data into the fresh <code>DATA</code> directory.</p>
 
 </div>
 </div>
@@ -16470,18 +16453,18 @@ Warning: extended source sensitivity adjustment is not available for UVIS, setti
 
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>-rw-r--r--  1 bkuhn  STSCI\science  190080 Mar 29 09:58 OUTPUT/ibr502i9q_flc_5.SPC.fits
--rw-r--r--  1 bkuhn  STSCI\science  190080 Mar 29 09:58 OUTPUT/ibr502ibq_flc_5.SPC.fits
--rw-r--r--  1 bkuhn  STSCI\science  190080 Mar 29 09:58 OUTPUT/ibr502icq_flc_5.SPC.fits
--rw-r--r--  1 bkuhn  STSCI\science  360000 Mar 29 09:58 OUTPUT/ibr502i9q_flc_2.SPC.fits
--rw-r--r--  1 bkuhn  STSCI\science  360000 Mar 29 09:58 OUTPUT/ibr502ibq_flc_2.SPC.fits
--rw-r--r--  1 bkuhn  STSCI\science  360000 Mar 29 09:58 OUTPUT/ibr502icq_flc_2.SPC.fits
--rw-r--r--  1 bkuhn  STSCI\science  319680 Mar 29 09:58 OUTPUT/ibr502i9q_flc_5.STP.fits
--rw-r--r--  1 bkuhn  STSCI\science  319680 Mar 29 09:58 OUTPUT/ibr502ibq_flc_5.STP.fits
--rw-r--r--  1 bkuhn  STSCI\science  319680 Mar 29 09:58 OUTPUT/ibr502icq_flc_5.STP.fits
--rw-r--r--  1 bkuhn  STSCI\science  357120 Mar 29 09:58 OUTPUT/ibr502i9q_flc_2.STP.fits
--rw-r--r--  1 bkuhn  STSCI\science  357120 Mar 29 09:58 OUTPUT/ibr502ibq_flc_2.STP.fits
--rw-r--r--  1 bkuhn  STSCI\science  357120 Mar 29 09:58 OUTPUT/ibr502icq_flc_2.STP.fits
+<pre>-rw-r--r--  1 bkuhn  STSCI\science  190080 Mar 31 12:47 OUTPUT/ibr502i9q_flc_5.SPC.fits
+-rw-r--r--  1 bkuhn  STSCI\science  190080 Mar 31 12:47 OUTPUT/ibr502ibq_flc_5.SPC.fits
+-rw-r--r--  1 bkuhn  STSCI\science  190080 Mar 31 12:47 OUTPUT/ibr502icq_flc_5.SPC.fits
+-rw-r--r--  1 bkuhn  STSCI\science  360000 Mar 31 12:47 OUTPUT/ibr502i9q_flc_2.SPC.fits
+-rw-r--r--  1 bkuhn  STSCI\science  360000 Mar 31 12:47 OUTPUT/ibr502ibq_flc_2.SPC.fits
+-rw-r--r--  1 bkuhn  STSCI\science  360000 Mar 31 12:47 OUTPUT/ibr502icq_flc_2.SPC.fits
+-rw-r--r--  1 bkuhn  STSCI\science  319680 Mar 31 12:47 OUTPUT/ibr502i9q_flc_5.STP.fits
+-rw-r--r--  1 bkuhn  STSCI\science  319680 Mar 31 12:47 OUTPUT/ibr502ibq_flc_5.STP.fits
+-rw-r--r--  1 bkuhn  STSCI\science  319680 Mar 31 12:47 OUTPUT/ibr502icq_flc_5.STP.fits
+-rw-r--r--  1 bkuhn  STSCI\science  357120 Mar 31 12:47 OUTPUT/ibr502i9q_flc_2.STP.fits
+-rw-r--r--  1 bkuhn  STSCI\science  357120 Mar 31 12:47 OUTPUT/ibr502ibq_flc_2.STP.fits
+-rw-r--r--  1 bkuhn  STSCI\science  357120 Mar 31 12:47 OUTPUT/ibr502icq_flc_2.STP.fits
 </pre>
 </div>
 </div>
@@ -16688,7 +16671,7 @@ class="
 <li>Debopam Som for support in testing the HSTaXe workflow</li>
 </ul>
 <p><strong>Released:</strong> February 13, 2023 <br>
-<strong>Last Updated:</strong> March 29, 2023</p>
+<strong>Last Updated:</strong> March 31, 2023</p>
 <h2 id="7.-Citations-">7. Citations <a id="cite" /><a class="anchor-link" href="#7.-Citations-">&#182;</a></h2><p>If you use <code>astropy</code>, <code>drizzlepac</code>, <code>matplotlib</code> or <code>numpy</code> for published research, please cite the
 authors. Follow this link for more information about citing the libraries:</p>
 <ul>
