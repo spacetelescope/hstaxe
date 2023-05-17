@@ -2,10 +2,12 @@
 See LICENSE.txt
 """
 import logging
+import os
 
 from astropy.io import fits
 
 from hstaxe import axeerror
+from hstaxe.config import get_random_filename
 
 from . import configfile
 

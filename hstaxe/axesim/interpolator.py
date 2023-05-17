@@ -7,7 +7,7 @@ import logging
 
 from astropy.io import fits
 from .. import axe_asciidata
-from ..axeerror import aXeError
+from ..axeerror import aXeError, aXeSIMError
 
 from hstaxe.utils import set_logging
 
