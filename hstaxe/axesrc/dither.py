@@ -385,9 +385,9 @@ class Deriv:
         # subtract shifted image from imput image
         tmpArray = array - tmpArray
         # take the absolute value of tmpArray
-        tmpArray = numpy.fabs(tmpArray)
+        tmpArray = np.fabs(tmpArray)
         # save maximum value of outArray or tmpArray and save in outArray
-        outArray = numpy.maximum(tmpArray, outArray)
+        outArray = np.maximum(tmpArray, outArray)
         # zero out tmpArray before reuse
         tmpArray = tmpArray * 0.
 
@@ -399,8 +399,8 @@ class Deriv:
         """
 
         # Create 2 empty arrays in memory of the same dimensions as 'array'
-        tmpArray = numpy.zeros(array.shape, dtype=numpy.float64)
-        outArray = numpy.zeros(array.shape, dtype=numpy.float64)
+        tmpArray = np.zeros(array.shape, dtype=np.float64)
+        outArray = np.zeros(array.shape, dtype=np.float64)
 
         # Get the length of an array side
         (naxis1, naxis2) = array.shape
@@ -444,7 +444,7 @@ class Deriv:
         del tmpArray
 
         # return the result
-        return outArray.astype(numpy.float32)
+        return outArray.astype(np.float32)
 
     def run(self, in_name, out_name):
         """Code stolen from Multidrizzle.deriv()"""
@@ -505,17 +505,17 @@ class CRIdent:
         """
 
         # create an empty file
-        __crMask = numpy.zeros(in_img.shape, dtype=numpy.uint8)
+        __crMask = np.zeros(in_img.shape, dtype=np.uint8)
 
         # Part 1 of computation:
         # flag the central pixels
         # Create a temp array mask
-        __t1 = numpy.absolute(in_img - blot_img)
-        __ta = numpy.sqrt(numpy.absolute(blot_img * exptime
+        __t1 = np.absolute(in_img - blot_img)
+        __ta = np.sqrt(np.absolute(blot_img * exptime
                                          + sky_val * exptime) +
                           self.rdnoise*self.rdnoise)
         __t2 = self.driz_cr_scale[0] * blotder_img + self.driz_cr_snr[0] * __ta / exptime
-        __tmp1 = numpy.logical_not(numpy.greater(__t1, __t2))
+        __tmp1 = np.logical_not(np.greater(__t1, __t2))
 
         # mop up
         del __ta
@@ -523,9 +523,9 @@ class CRIdent:
         del __t2
 
         # Create a convolution kernel that is 3 x 3 of 1's
-        __kernel = numpy.ones((3, 3), dtype=numpy.uint8)
+        __kernel = np.ones((3, 3), dtype=np.uint8)
         # Create an output tmp file the same size as the input temp mask array
-        __tmp2 = numpy.zeros(__tmp1.shape, dtype=numpy.int16)
+        __tmp2 = np.zeros(__tmp1.shape, dtype=np.int16)
         # Convolve the mask with the kernel
         convolve.convolve2d(__tmp1,
                             __kernel,
@@ -539,14 +539,14 @@ class CRIdent:
         # Part 2 of computation
         # flag the neighboring pixels
         # Create the CR Mask
-        __xt1 = numpy.absolute(in_img - blot_img)
-        __xta = numpy.sqrt(numpy.absolute(blot_img * exptime +
+        __xt1 = np.absolute(in_img - blot_img)
+        __xta = np.sqrt(np.absolute(blot_img * exptime +
                                           sky_val * exptime) +
                            self.rdnoise*self.rdnoise)
         __xt2 = self.driz_cr_scale[1] * blotder_img + self.driz_cr_snr[1] * __xta / exptime
 
         # It is necessary to use a bitwise 'and' to create the mask with numarray objects.
-        __crMask = numpy.logical_not(numpy.greater(__xt1, __xt2) & numpy.less(__tmp2,9) )
+        __crMask = np.logical_not(np.greater(__xt1, __xt2) & np.less(__tmp2,9) )
 
         del __xta
         del __xt1
@@ -566,18 +566,18 @@ class CRIdent:
         # recast __crMask to int for manipulations below;
         # will recast to Bool at end
         __crMask_orig_bool = __crMask.copy()
-        __crMask = __crMask_orig_bool.astype(numpy.int8)
+        __crMask = __crMask_orig_bool.astype(np.int8)
 
         # make radial convolution kernel and convolve it with original __crMask
         # kernel for radial masking of CR pixel
-        cr_grow_kernel = numpy.ones((self.driz_cr_grow, self.driz_cr_grow))
+        cr_grow_kernel = np.ones((self.driz_cr_grow, self.driz_cr_grow))
         cr_grow_kernel_conv = __crMask.copy()   # for output of convolution
         convolve.convolve2d(__crMask,
                             cr_grow_kernel,
                             output=cr_grow_kernel_conv)
 
         # make tail convolution kernel and convolve it with original __crMask
-        cr_ctegrow_kernel = numpy.zeros((2*self.driz_cr_ctegrow+1,
+        cr_ctegrow_kernel = np.zeros((2*self.driz_cr_ctegrow+1,
                                          2*self.driz_cr_ctegrow+1))  # kernel for tail masking of CR pixel
         cr_ctegrow_kernel_conv = __crMask.copy()  # for output convolution
 
@@ -595,11 +595,11 @@ class CRIdent:
         convolve.convolve2d(__crMask, cr_ctegrow_kernel, output = cr_ctegrow_kernel_conv)
 
         # select high pixels from both convolution outputs; then 'and' them to create new __crMask
-        where_cr_grow_kernel_conv = numpy.where(cr_grow_kernel_conv < self.driz_cr_grow*self.driz_cr_grow,0,1 )        # radial
-        where_cr_ctegrow_kernel_conv = numpy.where(cr_ctegrow_kernel_conv < self.driz_cr_ctegrow, 0, 1 )     # length
-        __crMask = numpy.logical_and(where_cr_ctegrow_kernel_conv, where_cr_grow_kernel_conv) # combine masks
+        where_cr_grow_kernel_conv = np.where(cr_grow_kernel_conv < self.driz_cr_grow*self.driz_cr_grow,0,1 )        # radial
+        where_cr_ctegrow_kernel_conv = np.where(cr_ctegrow_kernel_conv < self.driz_cr_ctegrow, 0, 1 )     # length
+        __crMask = np.logical_and(where_cr_ctegrow_kernel_conv, where_cr_grow_kernel_conv) # combine masks
 
-        __crMask = __crMask.astype(numpy.uint8)  # cast back to Bool
+        __crMask = __crMask.astype(np.uint8)  # cast back to Bool
 
         del __crMask_orig_bool
         del cr_grow_kernel
@@ -618,8 +618,8 @@ class CRIdent:
         """
 
         # migrate the data over
-        _cr_file = numpy.zeros(in_imag.shape,numpy.uint8)
-        _cr_file = numpy.where(crmask,1,0).astype(numpy.uint8)
+        _cr_file = np.zeros(in_imag.shape,np.uint8)
+        _cr_file = np.where(crmask,1,0).astype(np.uint8)
 
         # rmove file if it exists
         if os.path.isfile(crName):
