@@ -1347,7 +1347,7 @@ class aXe_PETFF(TaskWrapper):
         # check for the 'FFNAME' name
         if ffname:
             # put the name to the list
-            self.command_list.append('-FFNAME={0:s}'.format(params['ffname']))
+            self.command_list.append(f'-FFNAME={ffname}')
 
         # append the flag 'bck'
         if back:
