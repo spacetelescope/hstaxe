@@ -1522,10 +1522,10 @@ class aXe_STAMPS(TaskWrapper):
                                      .format(params['out_stp']))
 
         # append the flag 'drz'
-        if (params['sampling'] is 'drizzle'):
+        if (params['sampling'] == 'drizzle'):
             # put the flagg to the list
             self.command_list.append('-drzstamp')
-        elif (params['sampling'] is 'rectified'):
+        elif (params['sampling'] == 'rectified'):
             # put the flagg to the list
             self.command_list.append('-rectified')
 

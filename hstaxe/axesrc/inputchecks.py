@@ -197,7 +197,7 @@ class InputChecker:
         self._check_IOL()
 
         # check the fluxcubes, if necessary
-        if cont_model.lower() is 'fluxcube':
+        if cont_model.lower() == 'fluxcube':
             self._check_fluxcubes()
 
         # check whether it is prism data
@@ -211,13 +211,13 @@ class InputChecker:
             self._force_dirim()
 
             # the fluxcube contamination does not work for prism data
-            if cont_model.lower() is "fluxcube":
+            if cont_model.lower() == "fluxcube":
                 err_msg = ("{0:s}: Fluxcube contamination is not possible for "
                            "prism data!".format(self.taskname))
                 raise aXeError(err_msg)
 
             # drizzled stamp images are not supported for prism data
-            if sampling.lower() is "drizzle":
+            if sampling.lower() == "drizzle":
                 err_msg = ("{0:s}: Drizzle sampling for the stamp images is "
                            "not possible for prism data!".format(self.taskname))
                 raise aXeError(err_msg)
@@ -293,7 +293,7 @@ class InputChecker:
 
         # check for proper contamination
         # to allow optimal extraction
-        if ((cont_model is "geometric") and (weights)):
+        if ((cont_model == "geometric") and (weights)):
             err_msg = ("{0:s}: Optimal weigthing needs quantitative "
                        "contamination! Please change to either the 'gauss'"
                        " or 'fluxcube' contamination model or drop optimal "
