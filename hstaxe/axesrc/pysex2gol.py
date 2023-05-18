@@ -102,13 +102,13 @@ class Sex2GolPy:
 
         # compose the feedback
         big_str = "{0:s}  Setup:\n".format(prefix)
-        big_str += "{0:s}  Input g/prism image:      {0:s} \n".format(prefix, self.grisim)
-        big_str += "{0:s}  Configuration file name:  {0:s} \n".format(prefix, self.config)
-        big_str += "{0:s}  Direct image:             {0:s} \n".format(prefix, self.dirname)
-        big_str += "{0:s}  G/Prism extension:        {0:s} \n".format(prefix, self.grism_extinfo['axe_ext'])
-        big_str += "{0:s}  Direct image extension:   {0:s} \n".format(prefix, self.dirname_extinfo['axe_ext'])
-        big_str += "{0:s}  Input catalog name:       {0:s} \n".format(prefix, self.in_sex)
-        big_str += "{0:s}  Output catalog name:      {0:s}   ".format(prefix, self.out_sex)
+        big_str += "{0:s}  Input g/prism image:      {1:s} \n".format(prefix, self.grisim)
+        big_str += "{0:s}  Configuration file name:  {1:s} \n".format(prefix, self.config)
+        big_str += "{0:s}  Direct image:             {1:s} \n".format(prefix, self.dirname)
+        big_str += "{0:s}  G/Prism extension:        {1:s} \n".format(prefix, self.grism_extinfo['axe_ext'])
+        big_str += "{0:s}  Direct image extension:   {1:s} \n".format(prefix, self.dirname_extinfo['axe_ext'])
+        big_str += "{0:s}  Input catalog name:       {1:s} \n".format(prefix, self.in_sex)
+        big_str += "{0:s}  Output catalog name:      {1:s}   ".format(prefix, self.out_sex)
 
         # return the string
         return big_str

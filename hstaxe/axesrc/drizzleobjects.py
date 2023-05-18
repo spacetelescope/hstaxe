@@ -982,7 +982,7 @@ class DrizzleObject:
             for index in range(num_driz):
 
                 # form the keyword
-                img_kword = "IMG{0:04d".format(index + 1)
+                img_kword = "IMG{0:04d}".format(index + 1)
 
                 # check whether the image name is reported and
                 # whether there is data on the rejection
@@ -1431,7 +1431,7 @@ class DrizzleObjectContrib:
 
             # name of the drizzle coefficients file
             ext_names['CFF'] = os.path.join(drztmp_dir,
-                                            '{0:s}_flt_coeffs{0:s}.dat'
+                                            '{0:s}_flt_coeffs{1:s}.dat'
                                             .format(file_root, objID))
 
         # return the dictionary
