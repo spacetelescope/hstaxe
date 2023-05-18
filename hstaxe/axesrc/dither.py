@@ -629,14 +629,14 @@ class CRIdent:
         fitsobj = fits.HDUList()
 
         if (header is not None):
-            del(header['NAXIS1'])
-            del(header['NAXIS2'])
+            del header['NAXIS1']
+            del header['NAXIS2']
             if 'XTENSION' in header:
-                del(header['XTENSION'])
+                del header['XTENSION']
             if 'EXTNAME' in header:
-                del(header['EXTNAME'])
+                del header['EXTNAME']
             if 'EXTVER' in header:
-                del(header['EXTVER'])
+                del header['EXTVER']
             if 'NEXTEND' in header:
                 header['NEXTEND'] = 0
 
