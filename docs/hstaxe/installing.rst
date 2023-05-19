@@ -48,7 +48,10 @@ Installing HSTaXe
 
 .. code-block:: bash
 
-    pip install hstaxe
+    pip install hstaxe --no-cache-dir
+
+The ``--no-cache-dir`` flag is optional, but it ensures that you are getting the most
+up-to-date versions of dependencies, rather than using anything cached on your local system.
 
 To instead install the latest development version, you can either install from our
 GitHub repository directly:
@@ -65,6 +68,11 @@ or alternatively, clone the repository locally and install the clone:
     cd hstaxe
     pip install .
 
+If you want to run the example notebooks, you will also need to install Jupyter:
+
+.. code-block:: bash
+
+    pip install jupyter
 
 Legacy Astroconda Installation
 ------------------------------
