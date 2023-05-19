@@ -2,15 +2,18 @@
 See LICENSE.txt
 """
 import logging
+import os
 
 from astropy.io import fits
 
 from hstaxe import axeerror
+from hstaxe.config import get_random_filename
 
 from . import configfile
 
 # make sure there is a logger
 _log = logging.getLogger(__name__)
+
 
 class DummyImages:
     """
@@ -48,7 +51,7 @@ class DummyImages:
 
         # check whether a grism image
         # shall be created
-        if image_data['grism'] != None and griname != None:
+        if image_data['grism'] is not None and griname is not None:
             self.griname  = griname
             self.gridata  = image_data['grism']
             self.WCSimage = griname
@@ -106,7 +109,7 @@ class DummyImages:
         if self.conf['CAMERA'] == 'HRC':
             # in case that several orders exist OR
             # the XOFFSET value is larger than -100, its HRG/G800L
-            if self.conf['B'] != None or float(self.conf['A']['XOFF_'].split()[0]) > -100.0:
+            if self.conf['B'] is not None or float(self.conf['A']['XOFF_'].split()[0]) > -100.0:
                 image_data = WCSdata.get_HRC_G800L_WCS()
             else:
                 image_data = WCSdata.get_HRC_PR200L_WCS()
@@ -217,7 +220,7 @@ class DummyImages:
         hdr = mex_hdu[0].header
         hdr['EXPTIME'] = (1.0, 'dummy exposure time')
 
-        if drzmeta != None:
+        if drzmeta is not None:
             # update the header
             for item in drzmeta:
                 hdr[item[0]] = (item[1], item[2])

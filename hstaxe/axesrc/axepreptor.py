@@ -52,7 +52,7 @@ class aXePrepArator:
         the grism image, axeprep uses the tasks sex2gol, gol2af and backest
         to mark the beam areas on the grism image as well as on the master
         background image. The median pixel values are derived for the unmarked
-        pixels on both the grism image and on the master background image. 
+        pixels on both the grism image and on the master background image.
         The master background, scaled to the level of the grism image, is
         finally subtracted from the grism image.
 
@@ -180,13 +180,13 @@ class aXePrepArator:
         with fits.open(self.grisim, mode='update') as grism_file:
             if 'AXEPRBCK' in grism_file[ext_info['fits_ext']].header:
                 # warn that this is the second time
-                _log.info("WARNING: Image %25s seems to be already background "
-                      "subtracted!".format(self.grisim))
+                _log.info(f"WARNING: Image {self.grisim} seems to be already "
+                          "background subtracted!")
 
             # Compute the ratio of the grism SCI image to the background image
             sci_data = grism_file['SCI', ext_info['ext_version']].data
             sci_header = grism_file['SCI', ext_info['ext_version']].header
-            npix = int(sci_header["NAXIS1"]) * int(sci_header["NAXIS2"]) 
+            npix = int(sci_header["NAXIS1"]) * int(sci_header["NAXIS2"])
 
             bck_data = fits.getdata(self.master_bck)
             ratio_data = sci_data / bck_data
@@ -223,7 +223,7 @@ class aXePrepArator:
             # Reload a clean version of background
             bck_data = fits.getdata(self.master_bck)
 
-            grism_file['SCI', ext_info['ext_version']].data -= bck_data * stats.midpt 
+            grism_file['SCI', ext_info['ext_version']].data -= bck_data * stats.midpt
             grism_header = grism_file['SCI', ext_info['ext_version']].header
 
             # write some header iformation
@@ -396,7 +396,7 @@ class aXePrepArator:
 
         if goodreturn:
             pstring = (f"AXEPREP: Image {self.grisim}[SCI,{str(ext_info['ext_version'])}] sky-subtracted.")
-                       
+
             _log.info(pstring)
 
     def _check_low_skyfrac(self, frac):
@@ -404,7 +404,7 @@ class aXePrepArator:
 
         msg = (f"\nAXEPREP Image {self.grisim}: Only {frac*100.0} percent of the pixels "
                "were used in the background scaling!")
-                                                             
+
         raise aXeError(msg)
 
     def _check_second_normalization(self):

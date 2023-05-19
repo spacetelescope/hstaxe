@@ -318,7 +318,7 @@ class ConfigList:
                 kvalue = self.gkeys[index].keyvalue
 
                 # if the keyvalue is NOT None but the file does not exist
-                if ((kvalue.upper() is not 'NONE') and
+                if ((kvalue.upper() != 'NONE') and
                     (not os.path.isfile(config_util.getCONF(kvalue)))):
                     # report an error
                     err_msg = ("The file: {0:s} does not exist!"
@@ -955,7 +955,7 @@ class ConfigBeam:
                 # check whether the current keyword is right
                 # and whether the keyvalue is not 'None'
                 if ((bkey.keyword is full_keyword) and
-                     (bkey.keyvalue.upper() is not 'NONE')):
+                     (bkey.keyvalue.upper() != 'NONE')):
                     # check for the file
                     if not os.path.isfile(config_util.getCONF(bkey.keyvalue)):
                         # report an error
@@ -1382,7 +1382,7 @@ class ConfHeader(DefConfHeader):
                         # check whether the first character
                         # is a comment, which qualifies
                         # the line as part of the header
-                        if ((len(str_line) > 0) and (str_line[0] is '#')):
+                        if ((len(str_line) > 0) and (str_line[0] == '#')):
                             # append the line to the header data
                             self.header.append(line.strip()+'\n')
                         else:

@@ -2,10 +2,14 @@
 See LICENSE.txt
 """
 import os
+
 import numpy as np
+from astropy.table import Table
 from astropy.io import fits
+
 from hstaxe import config as config_utils
 from hstaxe.axeerror import aXeError
+
 from . import configfile
 
 

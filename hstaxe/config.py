@@ -169,9 +169,9 @@ def getOUTSIM(name=None):
     # the pathname to the output file
     # in AXE_OUTSIM_PATH
     if name is None:
-        return AXE_OUTSIM_PATH
+        return __user_paths['AXE_OUTSIM_PATH']
     else:
-        return os.path.join(AXE_OUTSIM_PATH, name)
+        return os.path.join(__user_paths['AXE_OUTSIM_PATH'], name)
 
 
 def getSIMDATA(name=None):
@@ -179,9 +179,9 @@ def getSIMDATA(name=None):
     # the pathname to the input file
     # in AXE_SIMDATA_PATH
     if name is None:
-        return AXE_SIMDATA_PATH
+        return __user_paths['AXE_SIMDATA_PATH']
     else:
-        return os.path.join(AXE_SIMDATA_PATH, name)
+        return os.path.join(__user_paths['AXE_SIMDATA_PATH'], name)
 
 
 def getDRIZZLE(name=None):

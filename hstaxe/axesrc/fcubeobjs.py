@@ -225,7 +225,7 @@ class FluxCube:
                                       extname=str(self.fcube_info["ext_nam"]),
                                       extver=int(self.fcube_info["ext_nam"]))
 
-        elif (ftype is 'simple'):
+        elif (ftype == 'simple'):
             blot_wcs = HSTWCS(image_to_blot)  # assume simple
             image_data = fits.getdata(image_to_blot)
 
@@ -314,22 +314,22 @@ class FluxCube:
         # the science information.
         ftype = fileutil.isFits(self.grism_image_name)[1]
 
-        if (ftype is 'mef'):
+        if (ftype == 'mef'):
             grism_wcs = HSTWCS(self.grism_image_name,
                                ext=(str(self.fcube_info["ext_nam"]),
                                     self.fcube_info["ext_ver"]))
-        elif (ftype is 'simple'):
+        elif (ftype == 'simple'):
             grism_wcs = HSTWCS(self.grism_image_name)
         else:
             return IOError("File type of fits image is not "
                            "supported {0:s}".format(image_to_blot))
 
         ftype = fileutil.isFits(image_to_blot)[1]
-        if (ftype is 'mef'):
+        if (ftype == 'mef'):
             image_data = fits.getdata(image_to_blot,
                                       ext=(str(self.fcube_info["ext_nam"]),
                                            self.fcube_info["ext_ver"]))
-        elif (ftype is 'simple'):
+        elif (ftype == 'simple'):
             image_data = fits.getdata(image_to_blot)
         else:
             return IOError("Input image is not a supported FITS "

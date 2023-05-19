@@ -1,9 +1,10 @@
 """
 See LICENSE.txt
 """
-import sys
-import shutil
+import os
 import logging
+import shutil
+import sys
 
 from astropy.io import fits
 

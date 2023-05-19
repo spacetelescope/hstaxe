@@ -54,8 +54,8 @@ class aXeInput:
                 ('fits' in self._inimlist[name][0])):
             self._inimlist.rename_column(name, 'grisim')
         else:
-            err_msg = (f"Column 1 should be the names of the grism"
-                       " fits files: {self._inimlist}")
+            err_msg = ("Column 1 should be the names of the grism"
+                       f" fits files: {self._inimlist}")
             raise aXeError(err_msg)
 
         # check whether second column has type string
