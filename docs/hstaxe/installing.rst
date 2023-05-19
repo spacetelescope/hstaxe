@@ -48,7 +48,7 @@ Installing HSTaXe
 
 .. code-block:: bash
 
-    pip install hstaxe
+    pip install hstaxe --no-cache-dir
 
 To instead install the latest development version, you can either install from our
 GitHub repository directly:

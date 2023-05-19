@@ -17,13 +17,13 @@ HSTaXe is the successor to aXe, a similar package written on PyRAF/IRAF.
 
 Quickstart
 ----------
-To install the latest release of ``hstaxe``::
+To install the latest release of ``hstaxe``, we recommend the following steps::
 
     conda create --name hstaxe-env "python>=3.8, <3.11"
     conda activate hstaxe-env
     conda install gsl cfitsio make automake autoconf libtool pkg-config -y
     conda install wcstools -c https://conda.anaconda.org/conda-forge/ --override-channels -y
-    pip install hstaxe
+    pip install hstaxe --no-cache-dir
 
 For additional installation instructions, including instructions on installing older
 or development versions of hstaxe, visit our full documentation:
