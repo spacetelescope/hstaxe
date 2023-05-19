@@ -31,3 +31,7 @@ https://hstaxe.readthedocs.io/en/latest/hstaxe/installing.html
 
 Example notebooks can also be found on our full documentation:
 https://hstaxe.readthedocs.io/en/latest/hstaxe/examples.html
+
+To run the notebooks, you will need to install jupyter::
+
+    pip install jupyter
