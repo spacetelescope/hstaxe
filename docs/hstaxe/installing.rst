@@ -41,6 +41,14 @@ failed install step:
 .. code-block:: bash
 
     conda install hdf5 -c conda-forge
+
+Some users have also reported needing to install ``openblas`` in order to get a successful
+install working. If you have followed the rest of the ``hstaxe`` installation instructions
+and are still having problems, it may be worth adding the following command at this step:
+
+.. code-block:: bash
+
+    conda install openblas -c conda-forge
     
 Installing HSTaXe
 -----------------
