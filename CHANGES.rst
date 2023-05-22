@@ -1,5 +1,7 @@
-version 1.x.x (unreleased)
+version 1.0.4 (2023-05-22)
 --------------------------
+
+- Assorted code fixes to fix warnings. [#82]
 
 version 1.0.3 (2023-01-06)
 --------------------------
