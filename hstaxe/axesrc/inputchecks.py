@@ -72,7 +72,7 @@ class InputChecker:
         for one_input in self.axe_inputs:
 
             # check whether there is a direct image
-            if one_input['DIRIM'] is None:
+            if one_input['dirim'] is None:
                 # error and out
                 err_msg = ("{0:s}: The grism image: {1:s} does NOT have an "
                            "associated direct image!"
