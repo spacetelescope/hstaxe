@@ -50,7 +50,7 @@ class aXeInput:
 
         columns.reverse()
         name = columns.pop()
-        if ((np.issubsctype(self._inimlist[name], np.str)) and
+        if ((np.issubsctype(self._inimlist[name], str)) and
                 ('fits' in self._inimlist[name][0])):
             self._inimlist.rename_column(name, 'grisim')
         else:
@@ -60,7 +60,7 @@ class aXeInput:
 
         # check whether second column has type string
         name = columns.pop()
-        if np.issubsctype(self._inimlist[name], np.str):
+        if np.issubsctype(self._inimlist[name], str):
             self._inimlist.rename_column(name, 'objcat')
         else:
             err_msg = ("Column 2 should be the names of the object catalogs"
@@ -80,10 +80,10 @@ class aXeInput:
             name = columns.pop()
 
             # assume if it's a number it's DMAG
-            if np.issubsctype(self._inimlist[name], np.float):
+            if np.issubsctype(self._inimlist[name], float):
                 self._inimlist.rename_column(name, 'dmag')
             # assume if it's a string its the direct image
-            elif np.issubsctype(self._inimlist.columns[0], np.str):
+            elif np.issubsctype(self._inimlist.columns[0], str):
                 if '.fits' in self._inimlist.columns[0][0]:
                     self._inimlist.rename_column(name, 'dirim')
             else:
