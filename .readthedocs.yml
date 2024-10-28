@@ -1,7 +1,7 @@
 version: 2
 
 build:
-  os: ubuntu-20.04
+  os: ubuntu-22.04
   apt_packages:
     - graphviz
   tools:
@@ -13,6 +13,5 @@ sphinx:
   fail_on_warning: false
 
 python:
-  system_packages: false
   install:
     - requirements: docs/requirements.txt
