@@ -14,7 +14,7 @@ import numpy as np
 import pytest
 
 from astropy.table import Table
-from numpy.testing.utils import assert_allclose
+from numpy.testing import assert_allclose
 
 from hstaxe import axetasks
 

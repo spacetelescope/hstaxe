@@ -18,5 +18,6 @@ dependencies:
     - ginga<4.1
     - jupyter
     - acstools
+    - numpy<2.0
     - git+https://github.com/spacetelescope/wfc3tools.git
     - git+https://github.com/spacetelescope/hstaxe.git
