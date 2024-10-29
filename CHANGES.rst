@@ -1,3 +1,15 @@
+version 1.0.6 (2024-10-29)
+--------------------------
+
+- Bumped numpy max pin to <2.0 to fix install issue and addressed some
+  related deprecations. [#98]
+
+version 1.0.5 (2023-07-11)
+--------------------------
+
+- Fixed a capitalization issue that would cause ACS prism processing to
+  fail with a KeyError. [#84]
+
 version 1.0.4 (2023-05-22)
 --------------------------
 
