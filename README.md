@@ -1,5 +1,16 @@
 ![aXe logo](docs/hstaxe/images/ACS_aXe02.png)
 
+HSTaXe Support News
+===================
+
+We will end maintenance of HSTaXe on 3/15/2026. We currently do not accept new feature requests
+or application upgrades, and are only supporting major bug fixes until 3/15/2026. After that
+date the software will remain available in perpetuity, but we will no longer provide user support,
+bug fixes, feature requests or system upgrades. Please migrate to using Slitlessutils (see
+https://github.com/spacetelescope/slitlessutils and https://slitlessutils.readthedocs.io/en/latest/)
+for your work, and please give us feedback on the new tool and how we can best support your
+transition to using Slitlessutils.
+
 HSTaXe
 ======
 
