@@ -21,6 +21,15 @@ employed under Linux, Solaris, and MacOS X.
 HSTaXe is the successor to aXe, a similar package written on PyRAF/IRAF.
 
 .. warning::
+   We will end maintenance of HSTaXe on 3/15/2026. We currently do not accept new feature requests
+   or application upgrades, and are only supporting major bug fixes until 3/15/2026. After that
+   date the software will remain available in perpetuity, but we will no longer provide user support,
+   bug fixes, feature requests or system upgrades. Please migrate to using Slitlessutils (see
+   https://github.com/spacetelescope/slitlessutils and https://slitlessutils.readthedocs.io/en/latest/)
+   for your work, and please give us feedback on the new tool and how we can best support your
+   transition to using Slitlessutils.
+
+.. warning::
    This documentation mostly overlaps with, but is not identical to, the original
    aXe manual. This means that many of the descriptions and code snippets provided
    refer to the old command line/IRAF-based version of aXe rather than the current
