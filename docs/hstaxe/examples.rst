@@ -8,19 +8,19 @@ They are divided by their corresponding instrument.
 Wide Field Camera 3 (WFC3)
 --------------------------
 
--The HSTaXe WFC3 cookbooks are hosted in the cookbook folder on the main HSTaXe repository:
+- The HSTaXe WFC3 cookbooks are hosted in the cookbook folder on the main HSTaXe repository:
 	https://github.com/spacetelescope/hstaxe/tree/main/cookbooks/WFC3 
 
--To run the cookbooks, you must create a virtual environment using the `cookbook_env.yml` file provided in the cookbook folder: 
+- To run the cookbooks, you must create a virtual environment using the `cookbook_env.yml` file provided in the cookbook folder: 
 	https://github.com/spacetelescope/hstaxe/blob/main/cookbooks/cookbook_env.yml
 
--Once the `.yml` file is in the current working directory, the (conda) environment can be built using the command below:
+- Once the `.yml` file is in the current working directory, the (conda) environment can be built using the command below:
 	`conda env create -f cookbook_env.yml`
 
--The data associated with a given WFC3 cookbook can be downloaded from Box:
+- The data associated with a given WFC3 cookbook can be downloaded from Box:
 	https://stsci.box.com/s/qtrq6frlstvb5553opbyphu4r1rnih73
 
--Once the environment is created and activated, and the data are downloaded from Box, each cookbook should run from start to finish without any user input, serving as a means of validating the installation of HSTaXe. More information about the cookbooks can be found in our WFC3 Instrument Science Report (ISR) 2023-07 "HSTaXe - ACS & WFC3 Cookbook Tutorials" https://ui.adsabs.harvard.edu/abs/2023wfc..rept....7K/abstract
+- Once the environment is created and activated, and the data are downloaded from Box, each cookbook should run from start to finish without any user input, serving as a means of validating the installation of HSTaXe. More information about the cookbooks can be found in our WFC3 Instrument Science Report (ISR) 2023-07 "HSTaXe - ACS & WFC3 Cookbook Tutorials" https://ui.adsabs.harvard.edu/abs/2023wfc..rept....7K/abstract
 
 Advanced Camera for Surveys
 ---------------------------
