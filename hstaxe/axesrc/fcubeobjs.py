@@ -722,8 +722,8 @@ class FluxImage:
 
         if (ftype == 'mef'):
             scihdr = file_a['SCI'].header
-            scihdr.strip()
-            newhdr = fits.Header(prihdr + scihdr)
+#             scihdr.strip()
+            newhdr = fits.Header(prihdr + scihdr.copy(strip=True))
             data = file_a['SCI'].data
         else:
             newhdr = fits.Header(prihdr)
